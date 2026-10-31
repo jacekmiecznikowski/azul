@@ -92,15 +92,16 @@ describe('plansze, boty i historia partii', () => {
   })
   it('zapisuje w historii źródło, tafle, kwaterę i zmianę wyniku', () => {
     const game = newGame({ opponents: 1, seed: 44 })
+    const starter = game.currentPlayer
     const move = legalMoves(game).find(m => m.kind === 'take')!
     const next = applyMove(game, move)
     const event = next.history.find(e => e.kind === 'take')!
     expect(event).toBeDefined()
-    expect(event.playerIndex).toBe(0)
+    expect(event.playerIndex).toBe(starter)
     expect(event.picked).toBeGreaterThan(0)
     expect(event.placed).toBeGreaterThanOrEqual(0)
     expect(event.source).toEqual(move.kind === 'take' ? move.source : undefined)
-    expect(event.points).toBe(next.players[0].score - game.players[0].score)
+    expect(event.points).toBe(next.players[starter].score - game.players[starter].score)
   })
   it('nie gubi historii podczas wielorundowej symulacji', () => {
     let state = newGame({ opponents: 2, seed: 95 })
@@ -119,7 +120,8 @@ describe('plansze, boty i historia partii', () => {
 describe('tor stłuczonego szkła', () => {
   it('odejmuje 18 natychmiast po wejściu na ostatnie pole i wraca na START', () => {
     const game = newGame({ opponents: 1, seed: 57 })
-    game.players[0].brokenSteps = 7
+    const starter = game.currentPlayer
+    game.players[starter].brokenSteps = 7
     game.center = ['rose']
     game.factories = game.factories.map(() => [])
     game.firstCenterTaken = false
@@ -128,9 +130,9 @@ describe('tor stłuczonego szkła', () => {
     const move = legalMoves(game).find(m => m.kind === 'take' && m.source.type === 'center')!
     expect(move).toBeDefined()
     const next = applyMove(game, move)
-    expect(next.players[0].brokenSteps).toBe(0)
-    expect(next.players[0].glassLost).toBeGreaterThanOrEqual(18)
-    expect(next.players[0].score).toBeLessThanOrEqual(-18)
+    expect(next.players[starter].brokenSteps).toBe(0)
+    expect(next.players[starter].glassLost).toBeGreaterThanOrEqual(18)
+    expect(next.players[starter].score).toBeLessThanOrEqual(-18)
     expect(next.history.some(e => e.kind === 'take' && e.firstPlayer)).toBe(true)
   })
 })
