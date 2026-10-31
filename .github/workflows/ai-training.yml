@@ -1,0 +1,57 @@
+name: Strategia AI — trening
+on:
+  workflow_dispatch:
+    inputs:
+      preset:
+        description: 'Poziom testów (quick / balanced / deep)'
+        type: choice
+        required: true
+        default: balanced
+        options: [quick, balanced, deep]
+      opponent:
+        description: 'Przeciwnicy używani podczas treningu'
+        type: choice
+        required: true
+        default: hard
+        options: [hard, expert, incumbent, mixed]
+      seed:
+        description: 'Nasiono losowe do powtarzalnych eksperymentów'
+        required: true
+        default: '20261101'
+        type: string
+      budget:
+        description: 'Budżet minut (0 = bez limitu, maks. 180 min job)'
+        required: true
+        default: '110'
+        type: string
+permissions:
+  contents: read
+jobs:
+  train:
+    name: Symulacje i raport strategii
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - name: Training with independent holdout validation
+        run: npm run train:ai -- --preset "$TRAIN_PRESET" --rival "$TRAIN_RIVAL" --seed "$TRAIN_SEED" --budget-minutes "$TRAIN_BUDGET"
+        env:
+          TRAIN_PRESET: ${{ inputs.preset }}
+          TRAIN_RIVAL: ${{ inputs.opponent }}
+          TRAIN_SEED: ${{ inputs.seed }}
+          TRAIN_BUDGET: ${{ inputs.budget }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sintra-strategy-${{ inputs.preset }}-${{ inputs.seed }}
+          path: |
+            reports/strategy-advanced.json
+            reports/strategy-advanced.md
+            reports/strategy-checkpoint.json
+            src/game/trained-weights.json
+          if-no-files-found: warn
+          retention-days: 30
