@@ -4,6 +4,17 @@ import { chooseLearnedMove, FEATURE_NAMES, moveFeatures, TRAINED_WEIGHTS } from 
 import report from '../game/trained-weights.json'
 import type { GameState, GlassColor, Move } from '../game/engine'
 
+const FEATURE_PL: Record<string,string> = {
+  pointsNow:'punkty za ukończone okno',placed:'liczba ułożonych tafli',
+  complete:'dokończenie kwatery',rightChain:'punkty za okna po prawej',
+  futureLeft:'przyszłe punkty za lewe okna',openUpper:'postęp budowy kwatery',
+  roundBonus:'premia aktualnej rundy',palaceSynergy:'punkty finałowe pałacu',
+  penaltyCost:'ryzyko kary za szkło',brokenCount:'liczba stłuczeń',
+  jokerUse:'zużycie jokera',walking:'odległość witrażysty',
+  skippedWork:'opuszczone niedokończone kwatery',marketAvailability:'dostępność koloru',
+  resetOpportunity:'korzyść z cofnięcia witrażysty',firstToken:'żeton pierwszego gracza',
+  leaveToCenter:'szkło pozostawione przeciwnikom',
+}
 const words: Record<GlassColor,string> = {
   rose:'czerwone', citrine:'żółte', cyan:'niebieskie', amber:'pomarańczowe', slate:'białe',
 }
@@ -47,7 +58,7 @@ export function StrategyLab({state,onClose}:{state:GameState;onClose:()=>void}){
           {test&&<small>Wyłączenie tego elementu zmieniło skuteczność o {delta>=0?'+':''}{num(delta)} p.p. na korzyść pełnego modelu ({test.full.games} partii na wariant). Próba jest ograniczona.</small>}
         </div>})}</div>
       <h3><ShieldCheck size={18}/> Podpowiedź na Twoją turę</h3>
-      <div className="strategy-hint">{recommended?<><b>{moveDescription(recommended)}</b><p>Podpowiedź oparta na wytrenowanej ocenie legalnych ruchów. Ruch nie jest wykonywany automatycznie.</p><small>Najsilniejsze składowe oceny: {important.map(x=>x.key).join(' · ')}</small></>:<span>Podpowiedź pojawi się w Twojej turze, kiedy będziesz mógł wykonać ruch.</span>}</div>
+      <div className="strategy-hint">{recommended?<><b>{moveDescription(recommended)}</b><p>Podpowiedź oparta na wytrenowanej ocenie legalnych ruchów. Ruch nie jest wykonywany automatycznie.</p><small>Najsilniejsze składowe oceny: {important.map(x=>FEATURE_PL[x.key] ?? x.key).join(' · ')}</small></>:<span>Podpowiedź pojawi się w Twojej turze, kiedy będziesz mógł wykonać ruch.</span>}</div>
       <footer>Poszukiwanie parametrów: {report.training.trainingGames} symulacji. Testy z oddzielnych losowań; model nie zna kolejności szkła w woreczku. Korelacja i wyniki ablacji nie dowodzą przyczynowości dla wszystkich rozgrywek.</footer>
     </section>
   </div>
