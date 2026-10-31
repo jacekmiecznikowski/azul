@@ -70,7 +70,8 @@ function paired({ games, seed, players, candidate, incumbent, rival = 'hard', ve
     const gameSeed = seed + k * 197
     const side = k % 2 ? 'B' : 'A'
     const seat = k % players
-    const agents = Array(players).fill(rival)
+    const actualRival = rival === 'mixed' ? ['hard','incumbent','expert'][k % 3] : rival
+    const agents = Array(players).fill(actualRival)
     agents[seat] = 'candidate'
     const c = simulate({ seed: gameSeed, side, players, agents, candidate, incumbent, verify })[seat]
     agents[seat] = 'incumbent'
