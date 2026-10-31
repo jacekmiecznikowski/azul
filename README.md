@@ -93,3 +93,12 @@ Wzory przechowujemy jako osiem sparowanych, dwustronnych pasków w `PATTERN_STRI
 Domyślny układ **Duże plansze** wyświetla pełne kwatery wszystkich graczy w dwóch rzędach po dwie plansze, przedzielonych paskiem warsztatów, wyników i toru stłuczeń. W odróżnieniu od wcześniejszego wymuszonego dopasowania nie zmniejsza szkiełek do mikroskopijnych rozmiarów. Przy typowej rozdzielczości laptopa trzeba **przewinąć środkowy obszar stołu**, aby zobaczyć drugi rząd; w prawym górnym rogu są skróty **Plansze AI** i **Moje witraże**. Wybranie tafli automatycznie przewija do własnych kwater.
 
 Przełącznik **Stół fizyczny** przywraca cztery plansze wokół warsztatów z obrotem górnej i bocznych, przeznaczony do oglądania całego stołu naraz. Oba układy wykorzystują te same komponenty i stan rozgrywki, bez restartu partii. Nie jest fizycznie możliwe zmieszczenie czterech pełnowymiarowych, obróconych plansz na ekranie 1440 × 900 bez znaczącego pomniejszenia albo przewijania.
+
+
+## Widok stołu: czytelne plansze (v7)
+
+W wersji testowej ekran gry znów przedstawia stół planszowy: Aurora naprzeciwko, Iris po prawej, Noctis po lewej, Ty na dole. Każdy gracz korzysta z tego samego ośmiokwaterowego komponentu i **identycznego rozmiaru planszy**; boczne witraże są obrócone, a nie pomniejszone. Tafle są kwadratowe, warsztaty zajmują mniej miejsca, a tor stłuczeń i dziennik pozostają dostępne.
+
+Usunięto układ 2×2 i zbędny przełącznik wielkości plansz. W niższych rozdzielczościach przewijana jest powierzchnia stołu, ponieważ zachowanie czytelnych szkieł jest ważniejsze niż sztuczne zmniejszanie wszystkiego.
+
+**Weryfikacja:** widok sprawdzony statycznie w Chromium na makiecie 1440×900 i 1920×1080; nie jest to jeszcze test całej aplikacji React. Przed scaleniem uruchom `npm run build`, `npm test` i sprawdź interakcje w przeglądarce.
