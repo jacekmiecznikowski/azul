@@ -63,3 +63,11 @@ Aby użyć nowych kwater, wybierz **Nowa gra** — wcześniejsze zapisane partie
 - **Historia**: komunikat „Twój ruch / gra bot” znajduje się na górze panelu historii; oddzielna dolna belka została usunięta.
 
 **Migracja zapisów:** rozpocznij **Nową grę**, aby zobaczyć losowy przydział kolorów i nowy sposób wyboru pól z jokerami. Wcześniejsze zapisy są nadal odczytywane, ale zachowują przydzielone wcześniej kolory i aktualny przebieg rozgrywki.
+
+## Zmiany v14 — czytelniejsze jokery i muzyka ambientowa
+
+- Pola **joker** mają teraz fioletowe szkło i wyraźnie odróżniają się od białych tafli, również w podglądzie drugiej strony kwatery.
+- Żeton pierwszego gracza ma ciemny, czytelny numer „1” na jasnym kaflu z kontrastową ramką.
+- W górnym pasku są **dwa niezależne przełączniki**: **Muzyka** (spokojna, autorska muzyka ambientowa generowana w przeglądarce) oraz **Dźwięk** (krótkie efekty akcji).
+- Muzyka jest domyślnie włączona, ale ze względu na zasady automatycznego odtwarzania przeglądarek zaczyna grać po pierwszym kliknięciu lub naciśnięciu klawisza. Każdy przełącznik pamięta ustawienie w `localStorage`.
+- Do muzyki nie są używane żadne zewnętrzne pliki, połączenie internetowe ani materiały chronione prawem autorskim.
