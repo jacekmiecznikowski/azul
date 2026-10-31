@@ -190,7 +190,7 @@ export default function App() {
   const [showRules, setShowRules] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const { enabled: soundEnabled, toggle: toggleSound, play } = useGameAudio()
-  const { enabled: musicEnabled, toggle: toggleMusic } = useAmbientMusic()
+  const { enabled: musicEnabled, toggle: toggleMusic, unavailable: musicUnavailable } = useAmbientMusic()
   const humanTurn = game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
   const moves = useMemo(() => legalMoves(game), [game])
   const sourceOptions = useMemo(() => availableSources(game), [game])
@@ -288,7 +288,7 @@ export default function App() {
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span><small>WITRAŻE SINTRY · EDYCJA CYFROWA</small></div>
       <div className="sg-header-round"><span>RUNDA</span><strong>{game.round} <small>/ 6</small></strong><div className="sg-round-colors">{game.roundColors.map((c, i) =>
         <i key={i} title={`Runda ${i + 1}: ${COLORS_PL[c]}`} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : i + 1 < game.round ? ' sg-color-past' : ''}`}/>)}</div></div>
-      <div className="sg-header-actions"><button type="button" className="sg-music-toggle" onClick={toggleMusic} aria-pressed={musicEnabled} title={musicEnabled ? "Wycisz muzykę ambientową" : "Włącz muzykę ambientową"} aria-label={musicEnabled ? "Wycisz muzykę" : "Włącz muzykę"}>{musicEnabled ? <Music2 size={16}/> : <VolumeX size={16}/>}<span>{musicEnabled ? "Muzyka" : "Muzyka wył."}</span></button><button type="button" onClick={toggleSound} title={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-label={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-pressed={soundEnabled} className="sg-audio-toggle">{soundEnabled ? <Volume2 size={16}/> : <VolumeX size={16}/>}<span>{soundEnabled ? 'Dźwięk' : 'Cisza'}</span></button><button onClick={() => setShowRules(true)}><BookOpen size={16}/> Zasady</button>
+      <div className="sg-header-actions"><button type="button" className="sg-music-toggle" onClick={toggleMusic} aria-pressed={musicEnabled && !musicUnavailable} title={musicUnavailable ? "Brak pliku public/background.mp3 — skopiuj plik do katalogu public i odśwież stronę" : musicEnabled ? "Wycisz muzykę w tle" : "Włącz muzykę w tle"} aria-label={musicUnavailable ? "Brak pliku muzyki" : musicEnabled ? "Wycisz muzykę" : "Włącz muzykę"}>{musicUnavailable || !musicEnabled ? <VolumeX size={16}/> : <Music2 size={16}/>}<span>{musicUnavailable ? "Brak MP3" : musicEnabled ? "Muzyka" : "Muzyka wył."}</span></button><button type="button" onClick={toggleSound} title={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-label={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-pressed={soundEnabled} className="sg-audio-toggle">{soundEnabled ? <Volume2 size={16}/> : <VolumeX size={16}/>}<span>{soundEnabled ? 'Dźwięk' : 'Cisza'}</span></button><button onClick={() => setShowRules(true)}><BookOpen size={16}/> Zasady</button>
         <button className="sg-new" onClick={() => setShowSetup(true)}><RotateCcw size={16}/> Nowa gra</button></div>
     </header>
     <main className="sg-stage" aria-label="Wspólny stół Sintra Glass">
