@@ -30,6 +30,14 @@ npm.cmd run dev
 Node.js 22.18.0 jest zgodny z Vite 8 i Vitest 5. Nie próbuj instalować npm 12 na tej wersji Node.
 
 
+## Układ stołu na ekranie (v3)
+
+- Na desktopach (od 1200 px szerokości i 700 px wysokości) stół z ośmioma kwaterami **każdego** gracza, warsztatami, żetonem pierwszego gracza oraz torem stłuczeń mieści się w oknie bez przewijania całej strony.
+- Przeciwnicy korzystają z tego samego renderer'a `WindowCard` co człowiek: pięć pól, widok rewersu, ukończone ramy i pozycja witrażysty są bezpośrednio widoczne na planszy.
+- Twoje kwatery są na dole stołu, przycisk **Cofnij witrażystę** znajduje się w nagłówku Twojej planszy. Warsztaty są na środku, a boty wokół stołu.
+- Wyniki oraz tor stłuczeń pozostają widoczne obok stołu; tylko historia ruchów przewija się wewnątrz panelu.
+- Na węższych ekranach aplikacja przechodzi w przewijalny układ, aby utrzymać czytelność i dostępność przycisków (nie ukrywa żadnej planszy).
+
 ## Co jest zaimplementowane
 
 - Gra 2–4-osobowa: 1 człowiek + od 1 do 3 botów.
