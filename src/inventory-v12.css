@@ -1,0 +1,43 @@
+/* V12 — glass-tower inventory within the existing market card. */
+.sg-center .sg-market { padding-bottom:76px; }
+.sg-center .sg-market-circle { width:min(calc(100cqi - 18px),calc(100cqb - 48px),460px); }
+.sg-inventory {
+  position:absolute;bottom:26px;left:8px;right:8px;z-index:5;
+  min-height:44px;display:flex;align-items:center;gap:5px;padding:4px 5px;
+  background:linear-gradient(100deg,rgba(13,42,53,.97),rgba(23,66,69,.96));
+  border:1px solid #57837f;border-radius:9px;box-shadow:0 5px 16px #00172091;
+}
+.sg-inventory-tower {display:flex;align-items:center;gap:3px;flex-shrink:0;}
+.sg-inventory-tower svg {height:36px;width:28px;filter:drop-shadow(0 2px 3px #0008);}
+.sg-inventory-tower span {font-size:9px;letter-spacing:.8px;color:#b3e3dd;font-weight:800;}
+.sg-inventory-stats {display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:stretch;flex:1;min-width:0;gap:3px;}
+.sg-inventory-stats>span {min-width:0;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-left:1px solid #5b8c864b;}
+.sg-inventory-stats small {font-size:clamp(8px, .76vw, 10px);color:#a9cac8;line-height:1.05;white-space:nowrap;}
+.sg-inventory-stats b {font-size:clamp(13px,1.15vw,17px);color:#eef1e2;line-height:1;}
+.sg-inventory-stats .sg-inventory-highlight b {color:#e8cb8c;}
+.sg-inventory-total {display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;padding-left:6px;border-left:1px solid #5b8c86a6;}
+.sg-inventory-total strong {font-size:16px;color:#b9f1dd;line-height:1.1;white-space:nowrap;}
+.sg-inventory-total strong small {font-size:10px;color:#9bacae;}
+.sg-inventory-total>span {font-size:8px;letter-spacing:.8px;color:#a6c3be;font-weight:800;}
+.sg-inventory-warning strong {color:#ffb6ac;}
+@media(max-width:1480px){
+  .sg-inventory {gap:3px;left:4px;right:4px;padding:3px;}
+  .sg-inventory-tower span {display:none;}
+  .sg-inventory-tower svg {width:22px;height:31px;}
+}
+@media(max-height:810px){
+  .sg-center .sg-market {padding-bottom:69px;}
+  .sg-inventory{min-height:37px;}
+  .sg-inventory-stats small{font-size:8px;}
+  .sg-inventory-stats b{font-size:12px;}
+}
+/* Players are assigned the four physical palace colors, rather than arbitrary avatar colors. */
+.sg-player-icon-0 {background:#b64d58;color:#fff;}
+.sg-player-icon-1 {background:#e2ba4d;color:#192c30;}
+.sg-player-icon-2 {background:#469ec3;color:#fff;}
+.sg-player-icon-3 {background:#dde5df;color:#17353c;}
+.sg-pawn-0 {background:#d66d76;}
+.sg-pawn-1 {background:#e5c16c;}
+.sg-pawn-2 {background:#6cc9ef;}
+.sg-pawn-3 {background:#e8f3ef;}
+.sg-glass-rose {--shine:#cf566e;}
