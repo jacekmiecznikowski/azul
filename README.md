@@ -30,13 +30,15 @@ npm.cmd run dev
 Node.js 22.18.0 jest zgodny z Vite 8 i Vitest 5. Nie próbuj instalować npm 12 na tej wersji Node.
 
 
-## Układ stołu na ekranie (v3)
+## Widok fizycznego stołu (v4)
 
-- Na desktopach (od 1200 px szerokości i 700 px wysokości) stół z ośmioma kwaterami **każdego** gracza, warsztatami, żetonem pierwszego gracza oraz torem stłuczeń mieści się w oknie bez przewijania całej strony.
-- Przeciwnicy korzystają z tego samego renderer'a `WindowCard` co człowiek: pięć pól, widok rewersu, ukończone ramy i pozycja witrażysty są bezpośrednio widoczne na planszy.
-- Twoje kwatery są na dole stołu, przycisk **Cofnij witrażystę** znajduje się w nagłówku Twojej planszy. Warsztaty są na środku, a boty wokół stołu.
-- Wyniki oraz tor stłuczeń pozostają widoczne obok stołu; tylko historia ruchów przewija się wewnątrz panelu.
-- Na węższych ekranach aplikacja przechodzi w przewijalny układ, aby utrzymać czytelność i dostępność przycisków (nie ukrywa żadnej planszy).
+- **Cztery plansze wokół warsztatów:** twoja na dole, bot naprzeciwko do góry nogami, a dwaj pozostali po bokach (obróceni o 90°). Tak samo, jak przy prawdziwym stole. Dla 2–3 graczy nieobecne miejsca są pomijane.
+- **Pełne kwatery:** wszystkie plansze korzystają z tego samego komponentu `WindowCard`; żadnych uproszczonych miniaturek. Kliknij ikonę powiększenia przy graczu, aby obejrzeć planszę z bliska.
+- **Kwadratowe tafle:** naprawiono problem z zawężaniem szkła przez procentową wysokość w automatycznej siatce CSS. Wielkość tafli zależy od rozmiaru pola, zachowuje proporcje 1:1.
+- **Mniejsze warsztaty** są w centrum stołu. Wyniki, stan tury, tor stłuczeń i przycisk historii znajdują się obok nich, bez zabierania miejsca czterem planszom.
+- Historia partii otwiera się w dużym oknie z filtrami, zamiast zajmować stale widoczną kolumnę; tor stłuczonego szkła pozostaje widoczny.
+- Na desktopie o wysokości co najmniej 710 px gra automatycznie dopasowuje się do okna. Na małych ekranach stół jest przewijany, aby nie upychać ośmiu kwater w kilka pikseli.
+- Przycisk **„Obróć plansze do mnie”** zmienia orientację planszy naprzeciwko i kierunek obrotu plansz bocznych.
 
 ## Co jest zaimplementowane
 
@@ -69,7 +71,7 @@ Pierwotna gra planszowa: **Azul: Stained Glass of Sintra / Witraże Sintry**, au
 
 ## Wersja rozszerzona — plansze, historia i AI
 
-- **Witraże wszystkich graczy:** zawsze widoczna galeria miniaturowych plansz wraz z witrażystą, taflami, poziomem AI i punktami. Kliknięcie powiększa wybrany witraż.
+- **Witraże wszystkich graczy:** pełne, rozmieszczone wokół stołu plansze wraz z witrażystą, taflami, poziomem AI i punktami. Kliknięcie powiększa wybrany witraż.
 - **Historia rozgrywki:** pełna oś czasu z filtrowaniem po rundzie i uczestniku; liczba pobranych, ułożonych i stłuczonych tafli, źródło, premia za kolor, punkty za okno, znacznik pierwszego gracza.
 - **Ściągawka rewersu:** pięć małych pól na szczycie każdej kwatery przedstawia wzór drugiej strony, a nie dodatkowe miejsca na tafle.
 - **Tor stłuczonego szkła:** stopnie `0, −1, −2, −4, −6, −8, −11, −14, −18`, osobne pionki dla uczestników, wyjaśnienie resetu znacznika i natychmiastowej kary `−18`.
