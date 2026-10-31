@@ -151,7 +151,7 @@ function SetupModal({ settings, onClose, onStart }: {
       {Array.from({length: local.opponents}, (_, i) => <div key={i} className="bot-setting-row">
         <label htmlFor={`bot-level-${i}`}><Bot size={16}/><span>{['Aurora','Iris','Noctis'][i]}</span></label>
         <select id={`bot-level-${i}`} value={local.difficulties[i] ?? 'normal'} onChange={(e) => setLocal(prev => ({...prev, difficulties: prev.difficulties.map((level, idx) => idx === i ? e.target.value as Difficulty : level)}))}>
-          <option value="easy">Łatwy · losowy</option><option value="normal">Normalny · zachłanny</option><option value="hard">Trudny · strategiczny</option><option value="expert">Ekspert · przewiduje przeciwników</option><option value="master">Mistrz · wytrenowany na symulacjach</option>
+          <option value="easy">Łatwy · losowy</option><option value="normal">Normalny · zachłanny</option><option value="hard">Trudny · strategiczny</option><option value="expert">Ekspert · przewiduje przeciwników</option><option value="master">Trenowany · eksperymentalna strategia</option>
         </select>
       </div>)}
       <label className="field-label" htmlFor="palace-side">Punktowanie finałowe</label>
