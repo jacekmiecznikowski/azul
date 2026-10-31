@@ -1,33 +1,18 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  ArrowRight, BookOpen, Bot, Check, Crown, Gem, History,
-  Info, Layers3, RotateCcw, Settings2, Trophy, RefreshCw,
-  X,
-} from 'lucide-react'
-import {
-  applyMove, availableSources, COLORS, legalMoves,
-  newGame, standings,
-} from './game/engine'
+import { useEffect, useMemo, useState } from 'react'
+import { ArrowRight, BookOpen, Bot, Check, Gem, History, Info, RotateCcw, Settings2, Trophy, X } from 'lucide-react'
+import { applyMove, availableSources, BROKEN_TRACK, COLORS, legalMoves, newGame, standings } from './game/engine'
 import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
-import { BrokenGlassTrack, GameTimeline, TableSeat } from './components/MatchPanels'
-import { Glass, WindowCard } from './components/WindowBoard'
+import { GameTimeline } from './components/MatchPanels'
+import { GameBoard, GlassPiece } from './components/GameBoard'
 import './match.css'
-import './tabletop.css'
-import './balanced-table.css'
-import './full-boards.css'
+import './redesign.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
-const COLORS_PL: Record<GlassColor, string> = {
-  rose: 'Róż', citrine: 'Złoto', cyan: 'Turkus', amber: 'Bursztyn', slate: 'Srebro',
-}
-const PLAYER_AVATARS = ['✧', '✦', '❖', '✳']
-interface Settings {
-  opponents: number
-  difficulties: Difficulty[]
-  palaceSide: PalaceSide
-}
-const DEFAULT_OPTIONS: Settings = { opponents: 2, difficulties: ['normal', 'normal', 'normal'], palaceSide: 'A' }
+const COLORS_PL: Record<GlassColor, string> = { rose: 'Róż', citrine: 'Złoto', cyan: 'Turkus', amber: 'Bursztyn', slate: 'Srebro' }
+const PLAYER_AVATARS = ['✦', '✧', '✳', '❖']
+interface Settings { opponents: number; difficulties: Difficulty[]; palaceSide: PalaceSide }
+const DEFAULT_OPTIONS: Settings = { opponents: 3, difficulties: ['normal', 'normal', 'normal'], palaceSide: 'A' }
 interface Selection { source: Source; color: GlassColor }
 function sourceEquals(a: Source, b: Source): boolean {
   return a.type === b.type && (a.type === 'center' || (b.type === 'factory' && a.index === b.index))
@@ -37,36 +22,81 @@ function restore(): GameState | null {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return null
     const game = JSON.parse(raw) as GameState
-    if (game.players?.length >= 2 && game.factories && game.roundColors?.length === 6 && game.round >= 1 && game.round <= 6) return { ...game, history: Array.isArray(game.history) ? game.history : [] }
-  } catch { /* Ignore expired/corrupt browser storage. */ }
+    if (game.players?.length >= 2 && game.factories && game.roundColors?.length === 6 && game.round >= 1 && game.round <= 6)
+      return { ...game, history: Array.isArray(game.history) ? game.history : [] }
+  } catch { /* Corrupt or old save: start a fresh game. */ }
   return null
 }
-function Factory({ tiles, index, selected, onPick, disabled, count }: {
-  tiles: GlassColor[]; index: number; selected: Selection | null; onPick: (source: Source, color: GlassColor) => void; disabled: boolean; count: number
+
+function Factory({ tiles, index, count, selected, disabled, onPick }: {
+  tiles: GlassColor[]; index: number; count: number; selected: Selection | null;
+  disabled: boolean; onPick: (source: Source, color: GlassColor) => void
 }) {
-  const angle = (-90 + 360 * index / count) * Math.PI / 180
-  const x = 50 + 38 * Math.cos(angle)
-  const y = 50 + 38 * Math.sin(angle)
-  const source: Source = { type: 'factory', index }
-  return <div className={`factory${tiles.length ? '' : ' factory-empty'}`} style={{ left: `${x}%`, top: `${y}%` }}>
-    <span className="factory-id">{String(index + 1).padStart(2, '0')}</span>
-    <div className="factory-tiles">
-      {tiles.length ? tiles.map((color, i) => <Glass key={`${index}-${i}`} color={color} small selected={!!selected && sourceEquals(selected.source, source) && selected.color === color} onClick={disabled ? undefined : () => onPick(source, color)} />) : <span className="factory-flower">✳</span>}
+  const a = (-90 + 360 * index / count) * Math.PI / 180
+  const x = 50 + 39 * Math.cos(a)
+  const y = 50 + 39 * Math.sin(a)
+  return <div className={`sg-factory${tiles.length ? '' : ' sg-factory-empty'}`} style={{ left: `${x}%`, top: `${y}%` }}>
+    <span className="sg-factory-num">{String(index + 1).padStart(2, '0')}</span>
+    <div className="sg-factory-grid">{tiles.length ? tiles.map((color, i) =>
+      <button type="button" key={`${i}-${color}`} disabled={disabled} onClick={() => onPick({ type: 'factory', index }, color)}
+        className={`sg-market-token sg-market-token-${color}${selected?.source.type === 'factory' && selected.source.index === index && selected.color === color ? ' sg-token-selected' : ''}`}
+        aria-label={`Warsztat ${index + 1}, ${COLORS_PL[color]}`} title={`Weź wszystkie ${COLORS_PL[color].toLowerCase()} tafle z warsztatu ${index + 1}`}>
+        <GlassPiece color={color}/></button>) : <span className="sg-factory-empty-mark">✥</span>}
     </div>
   </div>
 }
-function CenterPile({ tiles, selected, onPick, disabled, first }: {
-  tiles: GlassColor[]; selected: Selection | null; onPick: (source: Source, color: GlassColor) => void; disabled: boolean; first: boolean
+function Market({ game, selection, disabled, onPick }: {
+  game: GameState; selection: Selection | null; disabled: boolean;
+  onPick: (source: Source, color: GlassColor) => void
 }) {
-  const counts = COLORS.map((color) => ({ color, count: tiles.filter((x) => x === color).length })).filter((x) => x.count)
-  return <div className="center-pile">
-    <span className="center-eyebrow">ŚRODEK STOŁU</span>
-    {counts.length ? <div className="center-tiles">{counts.map(({ color, count }) =>
-      <button key={color} className={`center-choice${selected?.source.type === 'center' && selected.color === color ? ' center-choice-selected' : ''}`} onClick={() => onPick({ type: 'center' }, color)} disabled={disabled} title={`Weź ${count} × ${COLORS_PL[color]}`}>
-        <Glass color={color} small /><span>×{count}</span>
-      </button>)}</div> : <div className="center-empty">✦<span>Pusto</span></div>}
-    {!first && <span className="center-token">✦ +1 stłuczenia</span>}
-  </div>
+  const center = COLORS.map(color => ({ color, count: game.center.filter(x => x === color).length })).filter(item => item.count > 0)
+  return <section className="sg-market sg-center-card" aria-label="Warsztaty szkła">
+    <div className="sg-panel-title"><span>WARSZTATY SZKŁA</span><small>{game.factories.filter(f => f.length).length} aktywnych</small></div>
+    <div className="sg-market-circle">
+      <div className="sg-market-ring"/>
+      {game.factories.map((tiles, i) => <Factory key={i} tiles={tiles} index={i} count={game.factories.length} selected={selection} disabled={disabled} onPick={onPick}/>)}
+      <div className="sg-center-pile">
+        <span>ŚRODEK</span>
+        <div className="sg-center-tokens">{center.length ? center.map(({ color, count }) =>
+          <button type="button" disabled={disabled} key={color} title={`Zabierz ${count} × ${COLORS_PL[color]}`} onClick={() => onPick({ type: 'center' }, color)}
+            className={`sg-center-choice${selection?.source.type === 'center' && selection.color === color ? ' sg-token-selected' : ''}`}>
+            <GlassPiece color={color} small/><b>{count}</b>
+          </button>) : <span className="sg-center-quiet">✧</span>}</div>
+        {!game.firstCenterTaken && <small className="sg-center-penalty">+1 stłuczenie</small>}
+      </div>
+    </div>
+    <div className="sg-first-token"><span className="sg-first-mark">1</span>{game.firstCenterTaken ? `${game.players[game.nextStartingPlayer ?? game.startingPlayer].name} rozpocznie następną rundę` : 'Żeton pierwszego gracza'}</div>
+  </section>
+}
+
+function PenaltyTrack({ game }: { game: GameState }) {
+  return <section className="sg-track sg-center-card" aria-label="Tor stłuczonego szkła">
+    <div className="sg-panel-title"><span>STŁUCZONE SZKŁO</span><small>tor kar</small></div>
+    <div className="sg-track-cells">{BROKEN_TRACK.map((value, i) =>
+      <div key={i} className={`sg-track-step${i === 8 ? ' sg-track-last' : ''}`}>
+        <span>{i === 0 ? 'START' : `${i} szkieł`}</span>
+        <strong>{value === 0 ? '0' : `−${value}`}</strong>
+        <div className="sg-track-pawns">{game.players.map((p, j) => p.brokenSteps === i && <i key={p.id} className={`sg-pawn sg-pawn-${j}`} title={`${p.name}: ${i}/8`}/>)}</div>
+      </div>)}</div>
+    <div className="sg-track-legend">{game.players.map((p, i) => <span key={p.id}><i className={`sg-pawn sg-pawn-${i}`}/>{p.name} <b>{p.brokenSteps}/8</b></span>)}</div>
+  </section>
+}
+
+function TurnSummary({ game, onHistory, onRules }: { game: GameState; onHistory: () => void; onRules: () => void }) {
+  const current = game.players[game.currentPlayer]
+  return <section className="sg-turn sg-center-card" aria-label="Tura i wyniki">
+    <div className="sg-panel-title"><span>PRZY STOLE</span><span className="sg-live-dot"/></div>
+    <div className="sg-turn-player"><span className={`sg-player-icon sg-player-icon-${game.currentPlayer}`}>{PLAYER_AVATARS[game.currentPlayer]}</span>
+      <div><strong>{game.phase === 'finished' ? 'Koniec rozgrywki' : current.controller === 'human' ? 'Twój ruch' : `Gra ${current.name}`}</strong>
+      <small>{game.phase === 'finished' ? 'Zobacz końcowe wyniki' : current.controller === 'human' ? 'Wybierz tafle i kwaterę' : 'Przeciwnik rozważa ruch…'}</small></div>
+      {current.controller === 'ai' && game.phase === 'playing' && <span className="sg-thinking" aria-label="AI myśli"><i/><i/><i/></span>}
+    </div>
+    <div className="sg-score-heading"><Trophy size={14}/> WYNIKI</div>
+    <div className="sg-scores">{game.players.map((p, i) => <div key={p.id} className={`sg-score-line${game.currentPlayer === i && game.phase === 'playing' ? ' sg-score-current' : ''}`}>
+      <i className={`sg-pawn sg-pawn-${i}`}/><span>{p.name}</span><b>{p.score}</b></div>)}</div>
+    <div className="sg-turn-actions"><button type="button" onClick={onHistory}><History size={15}/> Historia <b>{game.history?.length ?? 0}</b></button>
+    <button type="button" onClick={onRules}><BookOpen size={15}/> Zasady</button></div>
+  </section>
 }
 function SetupModal({ settings, onClose, onStart }: {
   settings: Settings; onClose: () => void; onStart: (settings: Settings) => void
@@ -116,170 +146,102 @@ export default function App() {
   const [game, setGame] = useState<GameState>(() => restore() ?? newGame({ ...DEFAULT_OPTIONS, botDifficulties: DEFAULT_OPTIONS.difficulties }))
   const [settings, setSettings] = useState<Settings>(() => ({
     opponents: game.players.length - 1,
-    difficulties: game.players.slice(1).map((player) => player.difficulty ?? 'normal'),
+    difficulties: game.players.slice(1).map(p => p.difficulty ?? 'normal'),
     palaceSide: game.palaceSide,
   }))
   const [selection, setSelection] = useState<Selection | null>(null)
-  const [inspect, setInspect] = useState(0)
-  const [inspectedBoard, setInspectedBoard] = useState<number | null>(null)
   const [finishing, setFinishing] = useState<Move[] | null>(null)
   const [showSetup, setShowSetup] = useState(false)
   const [showRules, setShowRules] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
-  const [physicalOrientation, setPhysicalOrientation] = useState(true)
-  const [boardLayout, setBoardLayout] = useState<'large' | 'physical'>('large')
-  const tableRef = useRef<HTMLElement>(null)
   const humanTurn = game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
   const moves = useMemo(() => legalMoves(game), [game])
   const sourceOptions = useMemo(() => availableSources(game), [game])
-  const selectionMoves = useMemo(() => selection ? moves.filter((move) => move.kind === 'take' &&
-    sourceEquals(move.source, selection.source) && move.color === selection.color) : [], [moves, selection])
-  const targetIndices = new Set<number>(selectionMoves.flatMap((move) => move.kind === 'take' && move.windowIndex !== null ? [move.windowIndex] : []))
-  const best = standings(game)
+  const selectionMoves = useMemo(() => selection ? moves.filter(m => m.kind === 'take' &&
+    sourceEquals(m.source, selection.source) && m.color === selection.color) : [], [moves, selection])
+  const targets = new Set<number>(selectionMoves.flatMap(m => m.kind === 'take' && m.windowIndex !== null ? [m.windowIndex] : []))
+  const canReset = humanTurn && moves.some(m => m.kind === 'reset')
   const current = game.players[game.currentPlayer]
-  const canReset = humanTurn && moves.some((move) => move.kind === 'reset')
+  const best = standings(game)
 
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(game)) }, [game])
   useEffect(() => {
     if (game.phase !== 'playing' || game.players[game.currentPlayer].controller !== 'ai' || finishing) return
-    const timeout = window.setTimeout(() => {
-      const move = chooseAIMove(game, game.players[game.currentPlayer].difficulty ?? 'normal')
-      if (move) setGame((previous) => applyMove(previous, move))
-    }, 600)
-    return () => window.clearTimeout(timeout)
+    const difficulty = game.players[game.currentPlayer].difficulty ?? 'normal'
+    const base = difficulty === 'easy' ? 1100 : difficulty === 'normal' ? 1500 : 1900
+    const delay = base + Math.round(Math.random() * 450)
+    const timer = window.setTimeout(() => {
+      const move = chooseAIMove(game, difficulty)
+      if (move) setGame(prev => applyMove(prev, move))
+    }, delay)
+    return () => window.clearTimeout(timer)
   }, [game, finishing])
   useEffect(() => { if (!humanTurn) { setSelection(null); setFinishing(null) } }, [humanTurn])
 
-  function commitMove(move: Move) {
-    setGame((prev) => applyMove(prev, move))
+  function commit(move: Move) {
+    setGame(previous => applyMove(previous, move))
     setSelection(null)
     setFinishing(null)
-    setInspect(0)
-    setInspectedBoard(null)
   }
   function chooseSource(source: Source, color: GlassColor) {
-    if (!humanTurn || inspect !== 0 || finishing) return
-    const exists = sourceOptions.some((option) => option.color === color && sourceEquals(option.source, source))
-    if (!exists) return
-    if (selection?.color === color && sourceEquals(selection.source, source)) { setSelection(null); return }
-    const options = moves.filter((m) => m.kind === 'take' && sourceEquals(m.source, source) && m.color === color)
-    const discard = options.find((m) => m.kind === 'take' && m.windowIndex === null)
-    if (discard) { setSelection({ source, color }); return }
-    setSelection({ source, color })
-    if (boardLayout === 'large') requestAnimationFrame(() => {
-      const el = tableRef.current
-      if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
-    })
+    if (!humanTurn || finishing) return
+    if (!sourceOptions.some(option => option.color === color && sourceEquals(option.source, source))) return
+    setSelection(prev => prev && prev.color === color && sourceEquals(prev.source, source) ? null : { source, color })
   }
   function chooseTarget(index: number | null) {
-    const candidates = selectionMoves.filter((move) => move.kind === 'take' && move.windowIndex === index)
-    if (candidates.length === 0) return
+    const candidates = selectionMoves.filter(m => m.kind === 'take' && m.windowIndex === index)
+    if (!candidates.length) return
     if (candidates.length > 1 || (candidates[0].kind === 'take' && candidates[0].keepColor)) {
       setFinishing(candidates)
       return
     }
-    commitMove(candidates[0])
+    commit(candidates[0])
   }
   function startNew(options: Settings) {
     setSettings(options)
     setGame(newGame({ ...options, botDifficulties: options.difficulties }))
-    setSelection(null)
-    setFinishing(null)
-    setInspect(0)
-    setInspectedBoard(null)
-    setShowSetup(false)
+    setSelection(null); setFinishing(null); setShowSetup(false)
+  }
+  function seat(index: number, place: 'north' | 'west' | 'east' | 'south') {
+    const player = game.players[index]
+    if (!player) return null
+    return <div className={`sg-seat sg-seat-${place}`} key={player.id}>
+      <div className="sg-seat-rotation"><GameBoard player={player} index={index} isCurrent={game.currentPlayer === index && game.phase === 'playing'}
+        isHuman={index === 0} isHumanTurn={humanTurn} selected={!!selection}
+        targets={index === 0 ? targets : undefined} onTarget={index === 0 ? i => chooseTarget(i) : undefined}
+        canReset={canReset && !finishing} onReset={() => commit({ kind: 'reset' })}/></div>
+    </div>
   }
 
-  return <div className="app-shell tabletop-app">
-    <div className="ambient ambient-a"/><div className="ambient ambient-b"/>
-    <header className="site-header"><div className="tabletop-container nav-inner">
-      <a className="brand" href="#top" aria-label="Sintra Glass"><span className="brand-mark"><Gem size={23}/></span><span className="brand-name">SINTRA<span>GLASS</span></span><span className="brand-label">TABLETOP EDITION</span></a>
-      <div className="nav-right"><span className="online-indicator"><span/> TRYB OFFLINE</span><button className="nav-link" onClick={() => setShowRules(true)}><BookOpen size={17}/> Zasady</button><button className="btn btn-outline nav-new" onClick={() => setShowSetup(true)}><RotateCcw size={16}/> Nowa gra</button></div>
-    </div></header>
-    <main className="tabletop-container" id="top">
-      <div className="tabletop-topline" role="status" aria-label="Stan gry">
-        <div className="tabletop-title"><strong>SINTRA · WSPÓLNY STÓŁ</strong><span className="tabletop-title-hint">Witraże wszystkich graczy w czasie rzeczywistym</span></div>
-        <div className="tabletop-board-jump" aria-label="Szybka nawigacja po planszach">
-          {boardLayout === 'large' && <><button type="button" onClick={() => tableRef.current?.scrollTo({top:0,behavior:'smooth'})}>Plansze AI ↑</button><button type="button" onClick={() => {const el=tableRef.current;if(el)el.scrollTo({top:el.scrollHeight,behavior:'smooth'})}}>Moje witraże ↓</button></>}
-        </div>
-        <div className="tabletop-round-counter"><span>RUNDA</span><strong>{game.round}<small>/6</small></strong><div className="tabletop-round-pips">{game.roundColors.map((c,i) => <span key={i} className={`tile-${c}${i + 1 === game.round ? ' current' : ''}`} title={`Runda ${i + 1}: ${COLORS_PL[c]}`}/>)}</div></div>
-      </div>
-      <div className="tabletop-layout">
-        <section ref={tableRef} className={`tabletop-surface tabletop-players-${game.players.length}${boardLayout === 'large' ? ' large-board-layout' : ''}${physicalOrientation ? ' physical-orientation' : ' readable-orientation'}`} aria-label="Wspólny stół z planszami graczy i warsztatami">
-          <div className="tabletop-grid">
-            {game.players[3] && <div className="tabletop-seat-slot tabletop-seat-slot-west">
-              <TableSeat player={game.players[3]} index={3} location="west" isCurrent={game.currentPlayer === 3 && game.phase === 'playing'} onInspect={() => {setInspect(3);setInspectedBoard(3);setSelection(null)}} />
-            </div>}
-            {game.players[1] && <div className="tabletop-seat-slot tabletop-seat-slot-north">
-              <TableSeat player={game.players[1]} index={1} location="north" isCurrent={game.currentPlayer === 1 && game.phase === 'playing'} onInspect={() => {setInspect(1);setInspectedBoard(1);setSelection(null)}} />
-            </div>}
-            {game.players[2] && <div className="tabletop-seat-slot tabletop-seat-slot-east">
-              <TableSeat player={game.players[2]} index={2} location="east" isCurrent={game.currentPlayer === 2 && game.phase === 'playing'} onInspect={() => {setInspect(2);setInspectedBoard(2);setSelection(null)}} />
-            </div>}
-
-            <section className="tabletop-market" aria-label="Warsztaty, punktacja i historia">
-              <div className="tabletop-game-hud">
-                <div className="tabletop-hud-label">AKTUALNA TURA <span className="live-dot" /></div>
-                <div className="tabletop-hud-player">
-                  <span className={`player-avatar avatar-${game.currentPlayer}`}>{PLAYER_AVATARS[game.currentPlayer]}</span>
-                  <div><strong>{game.phase === 'finished' ? 'Koniec gry' : current.controller === 'human' ? 'Twój ruch' : `Gra ${current.name}`}</strong><small>{game.phase === 'finished' ? `Zwycięża ${best[0].name}!` : current.controller === 'human' ? 'Wybierz szkło i kwaterę' : 'Przeciwnik wybiera ruch…'}</small></div>
-                </div>
-                <div className="tabletop-hud-label tabletop-scores-label"><Trophy size={14}/> WYNIKI</div>
-                <div className="tabletop-hud-scores">{best.map((player, rank) => {
-                  const playerIndex = game.players.findIndex(p => p.id === player.id)
-                  return <div key={player.id} className={`tabletop-hud-score${playerIndex === game.currentPlayer ? ' is-current' : ''}`}>
-                    <i className={`track-legend-pawn avatar-${playerIndex}`} /><span>{rank + 1}. {player.name}</span><strong>{player.score} <small>pkt</small></strong>
-                  </div>
-                })}</div>
-                <button className="tabletop-hud-action" type="button" onClick={() => setShowHistory(true)}>
-                  <History size={16}/><span>Historia rozgrywki</span><b>{game.history?.length ?? 0}</b>
-                </button>
-                <div className="tabletop-layout-picker" role="group" aria-label="Układ plansz">
-                  <button type="button" className={boardLayout === 'large' ? 'is-selected' : ''} aria-pressed={boardLayout === 'large'} onClick={() => setBoardLayout('large')} title="Cztery pełne plansze i większe tafle">Duże plansze</button>
-                  <button type="button" className={boardLayout === 'physical' ? 'is-selected' : ''} aria-pressed={boardLayout === 'physical'} onClick={() => setBoardLayout('physical')} title="Obrócone plansze wokół warsztatów">Stół fizyczny</button>
-                </div>
-                {boardLayout === 'physical' && <button className="tabletop-hud-action tabletop-orient-action" type="button" aria-pressed={physicalOrientation} onClick={() => setPhysicalOrientation(v => !v)}>
-                  <RefreshCw size={15}/><span>{physicalOrientation ? 'Obróć plansze do siebie' : 'Odwróć plansze jak przy stole'}</span>
-                </button>}
-              </div>
-
-              <div className="tabletop-market-core">
-                <div className="tabletop-market-header"><h2>Warsztaty szkła</h2><span className="market-chip"><Layers3 size={13}/> {sourceOptions.length} wyborów</span></div>
-                <div className="market-playground">
-                  <div className="market-circles"><div className="market-inner-ring"/><div className="market-outer-ring"/></div>
-                  <CenterPile tiles={game.center} selected={selection} onPick={chooseSource} disabled={!humanTurn || inspect !== 0} first={game.firstCenterTaken}/>
-                  {game.factories.map((factory, index) => <Factory key={index} tiles={factory} index={index} count={game.factories.length} selected={selection} onPick={chooseSource} disabled={!humanTurn || inspect !== 0}/>)}
-                </div>
-                <div className="tabletop-first-player"><span className="first-player-tile" aria-hidden="true">1</span><span>{game.firstCenterTaken ? `${game.players[game.nextStartingPlayer ?? game.startingPlayer].name} rozpocznie następną rundę` : 'Żeton pierwszego gracza'}</span></div>
-              </div>
-
-              <div className="tabletop-track-area"><BrokenGlassTrack players={game.players}/></div>
-              <div className="tabletop-market-help" aria-live="polite"><Info size={15}/><span>{selection ? `Wybrano ${COLORS_PL[selection.color].toLowerCase()} — wskaż podświetloną kwaterę na swojej planszy.` : humanTurn ? 'Twój ruch — wybierz kolor z warsztatu lub ze środka.' : game.phase === 'finished' ? 'Partia zakończona.' : `Ruch: ${current.name} (AI)`}</span>{selection && <button className="clear-pick" onClick={() => setSelection(null)}>Anuluj <X size={13}/></button>}{selection && selectionMoves.some(move => move.kind === 'take' && move.windowIndex === null) && <button className="btn btn-warn tabletop-discard" onClick={() => chooseTarget(null)}>Stłucz tafle</button>}</div>
-            </section>
-
-            <div className="tabletop-seat-slot tabletop-seat-slot-south">
-              <TableSeat player={game.players[0]} index={0} location="south"
-                isCurrent={game.currentPlayer === 0 && game.phase === 'playing'}
-                isHuman isHumanTurn={humanTurn} activeSelection={selection !== null}
-                highlightedTargets={targetIndices} onTarget={chooseTarget}
-                canReset={canReset && !finishing}
-                onReset={() => commitMove({kind: 'reset'})}
-                onInspect={() => {setInspect(0);setInspectedBoard(0)}} />
-            </div>
+  return <div className="sg">
+    <header className="sg-header">
+      <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span><small>WITRAŻE SINTRY · EDYCJA CYFROWA</small></div>
+      <div className="sg-header-round"><span>RUNDA</span><strong>{game.round} <small>/ 6</small></strong><div className="sg-round-colors">{game.roundColors.map((c, i) =>
+        <i key={i} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : ''}`}/>)}</div></div>
+      <div className="sg-header-actions"><span className="sg-offline"><i/> OFFLINE</span><button onClick={() => setShowRules(true)}><BookOpen size={16}/> Zasady</button>
+        <button className="sg-new" onClick={() => setShowSetup(true)}><RotateCcw size={16}/> Nowa gra</button></div>
+    </header>
+    <main className="sg-stage" aria-label="Wspólny stół Sintra Glass">
+      <div className="sg-felt">
+        {seat(1, 'north')}
+        {seat(3, 'west')}
+        {seat(2, 'east')}
+        <div className="sg-center">
+          <TurnSummary game={game} onHistory={() => setShowHistory(true)} onRules={() => setShowRules(true)}/>
+          <Market game={game} selection={selection} disabled={!humanTurn || !!finishing} onPick={chooseSource}/>
+          <PenaltyTrack game={game}/>
+          <div className="sg-instruction" aria-live="polite"><Info size={15}/><span>{selection ? `Wybrano: ${COLORS_PL[selection.color]}. Kliknij podświetloną kwaterę na swojej planszy.` : game.phase === 'finished' ? `Zwycięża ${best[0].name}!` : humanTurn ? 'Twój ruch: wybierz tafle w warsztacie lub na środku.' : `${current.name} rozważa kolejny ruch…`}</span>
+            {selection && <><button onClick={() => setSelection(null)}>Anuluj</button>
+              {selectionMoves.some(m => m.kind === 'take' && m.windowIndex === null) && <button className="sg-discard" onClick={() => chooseTarget(null)}>Stłucz tafle</button>}</>}
           </div>
-        </section>
+        </div>
+        {seat(0, 'south')}
       </div>
     </main>
-    {showHistory && <div className="modal-backdrop tabletop-history-backdrop" onMouseDown={() => setShowHistory(false)}>
-      <div className="tabletop-history-dialog" role="dialog" aria-modal="true" aria-label="Dziennik rozgrywki" onMouseDown={e => e.stopPropagation()}>
-        <button className="close-btn" onClick={() => setShowHistory(false)} aria-label="Zamknij historię"><X size={19}/></button>
-        <GameTimeline state={game}/>
-      </div>
-    </div>}
-    {inspectedBoard !== null && <div className="modal-backdrop" onMouseDown={() => {setInspectedBoard(null);setInspect(0)}}><div className="modal tabletop-inspect-modal" role="dialog" aria-modal="true" aria-label={`Plansza gracza ${game.players[inspectedBoard].name}`} onMouseDown={e => e.stopPropagation()}><button className="close-btn" onClick={() => {setInspectedBoard(null);setInspect(0)}} aria-label="Zamknij podgląd"><X size={18}/></button><div className="tabletop-inspect-heading"><span className={`player-avatar avatar-${inspectedBoard}`}>{PLAYER_AVATARS[inspectedBoard]}</span><div><span className="overline">PEŁNOWYMIAROWA PLANSZA</span><h2>{game.players[inspectedBoard].name} <small>{game.players[inspectedBoard].score} pkt</small></h2></div></div><p>{inspectedBoard === 0 ? 'Twoje kwatery. Po wybraniu szkła na stole możesz również wskazać kwaterę tutaj.' : 'Pełny podgląd kwater i pozycji witrażysty przeciwnika.'}</p><div className="board-scroll"><div className="board-area"><div className="window-row">{game.players[inspectedBoard].strips.map((strip, index) => <WindowCard key={index} strip={strip} index={index} glazier={game.players[inspectedBoard].glazier} highlighted={inspectedBoard === 0 && targetIndices.has(index)} active={selection !== null} isHumanTurn={inspectedBoard === 0 && humanTurn} onClick={() => inspectedBoard === 0 && chooseTarget(index)}/>)}</div></div></div></div></div>}
-    {game.phase === 'finished' && <div className="result-float"><Crown size={18}/><span>Partia zakończona — wygrywa <strong>{best[0].name}</strong>!</span><button onClick={() => setShowSetup(true)}>Zagraj ponownie <ArrowRight size={15}/></button></div>}
+    {game.phase === 'finished' && <div className="sg-finish"><Trophy size={17}/> Zwycięża {best[0].name}! <button onClick={() => setShowSetup(true)}>Nowa partia <ArrowRight size={14}/></button></div>}
+    {showHistory && <div className="modal-backdrop" onMouseDown={() => setShowHistory(false)}><div className="sg-history-dialog" role="dialog" aria-modal="true" aria-label="Historia partii" onMouseDown={e => e.stopPropagation()}><button type="button" className="sg-dialog-close" onClick={() => setShowHistory(false)}><X size={20}/></button><GameTimeline state={game}/></div></div>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
-    {finishing && <div className="modal-backdrop" onMouseDown={() => setFinishing(null)}><div className="modal keep-modal" role="dialog" aria-modal="true" aria-label="Wybierz taflę do zachowania" onMouseDown={(e) => e.stopPropagation()}><button className="close-btn" onClick={() => setFinishing(null)} aria-label="Zamknij"><X size={18}/></button><div className="modal-icon"><Gem size={24}/></div><span className="overline">KWATERA UKOŃCZONA</span><h2>Wybierz taflę do okna</h2><p>Jedna tafla zostanie w pałacowym witrażu, pozostałe trafią do wieży.</p><div className="keep-options">{finishing.filter((move) => move.kind === 'take' && move.keepColor).map((move) => move.kind === 'take' && move.keepColor ? <button key={move.keepColor} onClick={() => commitMove(move)}><Glass color={move.keepColor}/><span>{COLORS_PL[move.keepColor]}</span></button> : null)}</div></div></div>}
+    {finishing && <div className="modal-backdrop" onMouseDown={() => setFinishing(null)}><div className="modal keep-modal" role="dialog" aria-modal="true" aria-label="Wybierz taflę do zachowania" onMouseDown={e => e.stopPropagation()}><button className="close-btn" onClick={() => setFinishing(null)} aria-label="Zamknij"><X size={18}/></button><div className="modal-icon"><Gem size={24}/></div><h2>Wybierz taflę do okna</h2><p>Jedna tafla zostanie w pałacowym witrażu.</p><div className="keep-options">{finishing.filter(m => m.kind === 'take' && m.keepColor).map(m => m.kind === 'take' && m.keepColor ? <button key={m.keepColor} onClick={() => commit(m)}><GlassPiece color={m.keepColor}/><span>{COLORS_PL[m.keepColor]}</span></button> : null)}</div></div></div>}
   </div>
 }
