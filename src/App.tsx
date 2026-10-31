@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, X, ListChecks } from 'lucide-react'
-import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, standings } from './game/engine'
-import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
+import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, patternFor, standings } from './game/engine'
+import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source, WindowStrip } from './game/engine'
 import { chooseAIMove } from './game/ai'
 import { LiveHistory } from './components/LiveHistory'
 import { FinalResults } from './components/FinalResults'
@@ -12,6 +12,7 @@ import './redesign.css'
 import './center-v9.css'
 import './center-v10.css'
 import './inventory-v12.css'
+import './ux-v13.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
@@ -107,9 +108,9 @@ function PenaltyTrack({ game }: { game: GameState }) {
       <div key={i} className={`sg-track-step${i === 8 ? ' sg-track-last' : ''}`}>
         <span>{i === 0 ? 'START' : i}</span>
         <strong>{value === 0 ? '0' : `−${value}`}</strong>
-        <div className="sg-track-pawns">{game.players.map((p, j) => p.brokenSteps === i && <i key={p.id} className={`sg-pawn sg-pawn-${j}`} title={`${p.name}: ${i}/8`}/>)}</div>
+        <div className="sg-track-pawns">{game.players.map((p, j) => p.brokenSteps === i && <i key={p.id} className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`} title={`${p.name}: ${i}/8`}/>)}</div>
       </div>)}</div>
-    <div className="sg-track-legend">{game.players.map((p, i) => <span key={p.id}><i className={`sg-pawn sg-pawn-${i}`}/>{p.name} <b>{p.brokenSteps}/8</b></span>)}</div>
+    <div className="sg-track-legend">{game.players.map((p, i) => <span key={p.id}><i className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`}/>{p.name} <b>{p.brokenSteps}/8</b></span>)}</div>
   </section>
 }
 
@@ -124,7 +125,7 @@ function TurnSummary({ game }: { game: GameState }) {
     </div>
 
     <div className="sg-scores">{game.players.map((p, i) => <div key={p.id} className={`sg-score-line${game.currentPlayer === i && game.phase === 'playing' ? ' sg-score-current' : ''}`}>
-      <i className={`sg-pawn sg-pawn-${i}`}/><span>{p.name}</span><b>{p.score}</b></div>)}</div>
+      <i className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`}/><span>{p.name}</span><b>{p.score}</b></div>)}</div>
 
   </section>
 }
@@ -181,6 +182,7 @@ export default function App() {
   }))
   const [selection, setSelection] = useState<Selection | null>(null)
   const [finishing, setFinishing] = useState<Move[] | null>(null)
+  const [placementOptions, setPlacementOptions] = useState<Move[] | null>(null)
   const [showSetup, setShowSetup] = useState(false)
   const [showRules, setShowRules] = useState(false)
   const [showResults, setShowResults] = useState(false)
@@ -194,6 +196,11 @@ export default function App() {
   const canReset = humanTurn && moves.some(m => m.kind === 'reset')
   const current = game.players[game.currentPlayer]
   const best = standings(game)
+  const status = selection
+    ? `Wybrano ${COLORS_PL[selection.color].toLowerCase()}. Wskaż podświetloną kwaterę.`
+    : game.phase === 'finished' ? `Koniec gry — wygrywa ${best[0].name}.`
+    : humanTurn ? 'Twój ruch: wybierz tafle z warsztatu lub środka stołu.'
+    : `${current.name} wybiera ruch…`
 
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(game)) }, [game])
   useEffect(() => { if (game.phase === 'finished') setShowResults(true) }, [game.phase])
@@ -212,7 +219,7 @@ export default function App() {
     }, delay)
     return () => window.clearTimeout(timer)
   }, [game, finishing, play])
-  useEffect(() => { if (!humanTurn) { setSelection(null); setFinishing(null) } }, [humanTurn])
+  useEffect(() => { if (!humanTurn) { setSelection(null); setFinishing(null); setPlacementOptions(null) } }, [humanTurn])
 
   function commit(move: Move) {
     const next = applyMove(game, move)
@@ -220,6 +227,7 @@ export default function App() {
     play(next.round !== game.round ? 'round' : next.players[game.currentPlayer].score > game.players[game.currentPlayer].score ? 'score' : 'place')
     setSelection(null)
     setFinishing(null)
+    setPlacementOptions(null)
   }
   function chooseSource(source: Source, color: GlassColor) {
     if (!humanTurn || finishing) return
@@ -227,20 +235,35 @@ export default function App() {
     play('pick')
     setSelection(prev => prev && prev.color === color && sourceEquals(prev.source, source) ? null : { source, color })
   }
+  function chooseFinalGlass(candidates: Move[]) {
+    // Keep-color choices are separate from placement choices. Choosing fields
+    // must never force which colored pane the player preserves afterwards.
+    if (candidates.length > 1 || (candidates[0]?.kind === 'take' && candidates[0].keepColor)) {
+      setFinishing(candidates)
+    } else if (candidates.length) commit(candidates[0])
+  }
   function chooseTarget(index: number | null) {
     const candidates = selectionMoves.filter(m => m.kind === 'take' && m.windowIndex === index)
     if (!candidates.length) return
-    if (candidates.length > 1 || (candidates[0].kind === 'take' && candidates[0].keepColor)) {
-      setFinishing(candidates)
-      return
+    const variants = [...new Set(candidates.map(m => m.kind === 'take' ? m.slots?.join(',') ?? '' : ''))]
+    if (variants.length > 1) {
+      setPlacementOptions(candidates)
+    } else {
+      chooseFinalGlass(candidates)
     }
-    commit(candidates[0])
+  }
+  function choosePlacement(selectedMove: Move) {
+    if (selectedMove.kind !== 'take') return
+    const options = (placementOptions ?? []).filter(m => m.kind === 'take' &&
+      m.slots?.join(',') === selectedMove.slots?.join(','))
+    setPlacementOptions(null)
+    chooseFinalGlass(options)
   }
   function startNew(options: Settings) {
     setSettings(options)
     setGame(newGame({ ...options, botDifficulties: options.difficulties }))
     play('round')
-    setSelection(null); setFinishing(null); setShowSetup(false); setShowResults(false)
+    setSelection(null); setFinishing(null); setPlacementOptions(null); setShowSetup(false); setShowResults(false)
   }
   function seat(index: number, place: 'north' | 'west' | 'east' | 'south') {
     const player = game.players[index]
@@ -259,7 +282,7 @@ export default function App() {
     <header className="sg-header">
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span><small>WITRAŻE SINTRY · EDYCJA CYFROWA</small></div>
       <div className="sg-header-round"><span>RUNDA</span><strong>{game.round} <small>/ 6</small></strong><div className="sg-round-colors">{game.roundColors.map((c, i) =>
-        <i key={i} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : ''}`}/>)}</div></div>
+        <i key={i} title={`Runda ${i + 1}: ${COLORS_PL[c]}`} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : i + 1 < game.round ? ' sg-color-past' : ''}`}/>)}</div></div>
       <div className="sg-header-actions"><button type="button" onClick={toggleSound} title={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-label={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-pressed={soundEnabled} className="sg-audio-toggle">{soundEnabled ? <Volume2 size={16}/> : <VolumeX size={16}/>}<span>{soundEnabled ? 'Dźwięk' : 'Cisza'}</span></button><button onClick={() => setShowRules(true)}><BookOpen size={16}/> Zasady</button>
         <button className="sg-new" onClick={() => setShowSetup(true)}><RotateCcw size={16}/> Nowa gra</button></div>
     </header>
@@ -271,19 +294,37 @@ export default function App() {
         <div className="sg-center">
           <div className="sg-side-left"><TurnSummary game={game}/><PenaltyTrack game={game}/></div>
           <Market game={game} selection={selection} disabled={!humanTurn || !!finishing} onPick={chooseSource}/>
-          <LiveHistory state={game}/>
-          <div className="sg-instruction" aria-live="polite"><Info size={15}/><span>{selection ? `Wybrano: ${COLORS_PL[selection.color]}. Kliknij podświetloną kwaterę na swojej planszy.` : game.phase === 'finished' ? `Zwycięża ${best[0].name}!` : humanTurn ? 'Twój ruch: wybierz tafle w warsztacie lub na środku.' : `${current.name} rozważa kolejny ruch…`}</span>
-            {selection && <><button onClick={() => setSelection(null)}>Anuluj</button>
-              {selectionMoves.some(m => m.kind === 'take' && m.windowIndex === null) && <button className="sg-discard" onClick={() => chooseTarget(null)}>Stłucz tafle</button>}</>}
-          </div>
+          <LiveHistory state={game} status={status} onCancel={selection ? () => setSelection(null) : undefined}
+            onDiscard={selection && selectionMoves.some(m => m.kind === 'take' && m.windowIndex === null) ? () => chooseTarget(null) : undefined}/>
+
         </div>
         {seat(0, 'south')}
       </div>
     </main>
-    {game.phase === 'finished' && <div className="sg-finish"><Trophy size={17}/> Koniec partii <button onClick={() => setShowResults(true)}><ListChecks size={14}/> Zobacz podliczenie</button><button onClick={() => setShowSetup(true)}>Nowa partia <ArrowRight size={14}/></button></div>}
+    {game.phase === 'finished' && !showResults && <div className="sg-finish"><Trophy size={17}/> Koniec partii <button onClick={() => setShowResults(true)}><ListChecks size={14}/> Zobacz podliczenie</button><button onClick={() => setShowSetup(true)}>Nowa partia <ArrowRight size={14}/></button></div>}
     {showResults && game.phase === 'finished' && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
+    {placementOptions && selection && <div className="modal-backdrop sg-placement-overlay" onMouseDown={() => setPlacementOptions(null)}>
+      <div className="modal sg-placement-dialog" role="dialog" aria-modal="true" aria-label="Wybierz pola kwatery" onMouseDown={e => e.stopPropagation()}>
+        <button className="close-btn" onClick={() => setPlacementOptions(null)} aria-label="Zamknij"><X size={18}/></button>
+        <h2>Wybierz pola na tafle</h2>
+        <p>Joker przyjmuje każdy kolor. Wybierz, czy zająć joker, czy zachować go na później.</p>
+        <div className="sg-placement-list">{[...new Map(placementOptions.filter((m): m is Extract<Move,{kind:'take'}> => m.kind === 'take')
+          .map(m => [m.slots?.join(',') ?? '', m] as const)).values()].map((m, i) => {
+            const strip = game.players[game.currentPlayer].strips[m.windowIndex!]
+            const pattern = patternFor(strip)
+            return <button type="button" key={m.slots?.join(',') ?? i} onClick={() => choosePlacement(m)}>
+              <span className="sg-placement-number">Wariant {i + 1}</span>
+              <span className="sg-placement-slots">{pattern.map((slot, j) => <span key={j} className={`sg-placement-slot${m.slots?.includes(j) ? ' sg-placement-active' : ''}`}>
+                <GlassPiece color={m.slots?.includes(j) ? m.color : strip.panes[j] ?? slot} placed={!!strip.panes[j] || !!m.slots?.includes(j)} small/>
+                <small>{slot === 'wild' ? '★' : String(j + 1)}</small>
+              </span>)}</span>
+              <small>{m.slots?.some(j => pattern[j] === 'wild') ? 'Z użyciem jokera' : 'Bez zajmowania jokera'}</small>
+            </button>
+          })}</div>
+      </div>
+    </div>}
     {finishing && <div className="modal-backdrop" onMouseDown={() => setFinishing(null)}><div className="modal keep-modal" role="dialog" aria-modal="true" aria-label="Wybierz taflę do zachowania" onMouseDown={e => e.stopPropagation()}><button className="close-btn" onClick={() => setFinishing(null)} aria-label="Zamknij"><X size={18}/></button><div className="modal-icon"><Gem size={24}/></div><h2>Wybierz taflę do okna</h2><p>Jedna tafla zostanie w pałacowym witrażu.</p><div className="keep-options">{finishing.filter(m => m.kind === 'take' && m.keepColor).map(m => m.kind === 'take' && m.keepColor ? <button key={m.keepColor} onClick={() => commit(m)}><GlassPiece color={m.keepColor}/><span>{COLORS_PL[m.keepColor]}</span></button> : null)}</div></div></div>}
   </div>
 }
