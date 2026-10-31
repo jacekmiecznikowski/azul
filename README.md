@@ -90,7 +90,7 @@ skopiuj nagranie do `public/background.mp3`; plik może być wersjonowany w GitH
 
 ## Laboratorium strategii (wytrenowany bot Mistrz)
 
-Ta aktualizacja dodaje nowy poziom AI **Mistrz** i przycisk **Strategia** w nagłówku.
+Ta aktualizacja dodaje nowy poziom AI **Trenowany** i przycisk **Strategia** w nagłówku.
 W każdej turze gracz może podejrzeć ruch proponowany przez model; nie wykonuje
 on ruchów za gracza. Panel zawiera osobne wyniki testów dwu- i czteroosobowych,
 porównanie z ręczną heurystyką wyjściową oraz eksperymenty ablacyjne.
