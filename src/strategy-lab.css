@@ -1,0 +1,26 @@
+.strategy-overlay{z-index:110;}
+.strategy-lab{width:min(92vw,790px);max-height:min(92dvh,940px);overflow:auto;scrollbar-color:#689d93 #15313b;padding:24px 26px 19px;text-align:left;}
+.strategy-heading{display:flex;align-items:center;gap:13px;color:#c3d7d1;margin:0 0 12px;}
+.strategy-heading>svg{color:#d4bd88;flex:none;}
+.strategy-heading span{font-size:10px;letter-spacing:1.8px;color:#9eb8b5;font-weight:900;}
+.strategy-heading h2{font-size:25px;margin:1px 0 0;font-family:Georgia,serif;color:#f4e3bb;}
+.strategy-intro{font-size:12px;line-height:1.65;color:#bbd0cb;margin:0 0 16px;max-width:720px;}
+.strategy-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;}
+.strategy-stats>div{display:flex;flex-direction:column;min-width:0;gap:7px;padding:14px 12px;background:#153a42;border:1px solid #638d8c80;border-radius:9px;}
+.strategy-stats small{font-size:9px;font-weight:900;color:#a8c6c0;letter-spacing:.5px;}
+.strategy-stats strong{font-size:27px;color:#f0d499;letter-spacing:-.7px;}
+.strategy-stats span{font-size:10px;color:#a6c3bc;}
+.strategy-lab h3{display:flex;align-items:center;gap:8px;margin:19px 0 10px;font-size:15px;color:#d8e8dd;}
+.strategy-lab h3 svg{color:#deb980;}
+.strategy-line{font-size:12px;line-height:1.5;color:#adc8c4;}
+.strategy-line strong{color:#f6dd9f;}
+.strategy-lessons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.strategy-lesson{padding:12px;background:#17333e;border:1px solid #496e745c;border-radius:9px;display:flex;flex-direction:column;gap:5px;}
+.strategy-lesson>b{font-size:12px;color:#e6e5d4;}
+.strategy-lesson>span{font-size:11px;line-height:1.45;color:#bdcdd0;}
+.strategy-lesson>small{font-size:10px;line-height:1.35;color:#87c8b9;}
+.strategy-hint{border:1px solid #ac9f6a77;background:#514d2a3d;border-radius:9px;padding:12px 14px;color:#dce7e4;display:flex;flex-direction:column;gap:5px;}
+.strategy-hint b{font-size:13px;color:#f8dfae;}
+.strategy-hint p,.strategy-hint small,.strategy-hint span{font-size:11px;color:#b8ccc9;margin:0;line-height:1.5;}
+.strategy-lab footer{font-size:10px;color:#86b0b1;line-height:1.55;margin-top:15px;}
+@media(max-width:650px){.strategy-lab{width:97vw;padding:16px;}.strategy-stats{grid-template-columns:1fr;}.strategy-lessons{grid-template-columns:1fr;}}
