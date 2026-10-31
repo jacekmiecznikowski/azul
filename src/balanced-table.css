@@ -1,0 +1,71 @@
+/* Four equal-size boards, including the human board. Side boards span the entire tabletop. */
+.tabletop-grid,
+.tabletop-players-2 .tabletop-grid,
+.tabletop-players-3 .tabletop-grid,
+.tabletop-players-4 .tabletop-grid {
+  --seat-length: min(calc(100dvh - 118px), calc((100vw - 35px) * .625), 1100px);
+  --seat-depth: calc(var(--seat-length) * .29);
+  display:grid;
+  grid-template-columns:var(--seat-depth) minmax(0,1fr) var(--seat-depth);
+  grid-template-rows:var(--seat-depth) minmax(0,1fr) var(--seat-depth);
+  grid-template-areas:'. north .' 'west market east' '. south .';
+  gap:4px;padding:6px;
+}
+.tabletop-grid > .tabletop-seat-slot-north{grid-area:north;grid-column:2;grid-row:1}
+.tabletop-grid > .tabletop-seat-slot-south{grid-area:south;grid-column:2;grid-row:3}
+.tabletop-grid > .tabletop-seat-slot-west{grid-area:west;grid-column:1;grid-row:1/4}
+.tabletop-grid > .tabletop-seat-slot-east{grid-area:east;grid-column:3;grid-row:1/4}
+.tabletop-grid > .tabletop-market{grid-area:market;grid-column:2;grid-row:2}
+.tabletop-grid > .tabletop-seat-slot{position:relative;overflow:visible;min-width:0;min-height:0;container-type:size}
+.tabletop-grid .tabletop-seat-slot .tabletop-seat{
+  position:absolute;left:50%;top:50%;
+  width:var(--seat-length);height:var(--seat-depth);
+  padding:5px 7px;transform:translate(-50%,-50%);transform-origin:center center;
+  border-radius:10px;
+}
+.physical-orientation .tabletop-seat-slot-north .tabletop-seat{transform:translate(-50%,-50%) rotate(180deg)}
+.physical-orientation .tabletop-seat-slot-west .tabletop-seat,
+.readable-orientation .tabletop-seat-slot-west .tabletop-seat{transform:translate(-50%,-50%) rotate(-90deg)}
+.physical-orientation .tabletop-seat-slot-east .tabletop-seat,
+.readable-orientation .tabletop-seat-slot-east .tabletop-seat{transform:translate(-50%,-50%) rotate(90deg)}
+.readable-orientation .tabletop-seat-slot-north .tabletop-seat{transform:translate(-50%,-50%)}
+.tabletop-grid .tabletop-seat-header{height:25px;min-height:25px;gap:7px}
+.tabletop-grid .tabletop-seat-name strong{font-size:12px}
+.tabletop-grid .tabletop-seat-score{font-size:14px}
+.tabletop-grid .tabletop-seat-windows{margin-top:3px}
+.tabletop-grid .window-row{gap:5px}
+.tabletop-grid .window-strip{padding:4px 4px 3px}
+.tabletop-grid .pattern-cell .glass{width:min(90cqi,90cqb,35px)}
+.tabletop-grid .reverse-preview{height:18px;min-height:18px}
+.tabletop-grid .reverse-dot{width:8px;height:8px}
+.tabletop-grid .palace-window{height:19px;min-height:19px}
+.tabletop-seat-human{border-color:#ddc78d;box-shadow:inset 0 0 0 1px #d7c18565,0 0 12px #d2bd7440}
+.tabletop-seat-reset{display:flex;align-items:center;justify-content:center;gap:5px;min-height:22px;padding:2px 8px;border-radius:5px;border:1px solid #a9dbbe;background:#d7f1dc;color:#18443b;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap}
+.tabletop-seat-reset:disabled{opacity:.45;cursor:not-allowed}
+.tabletop-seat-reset:not(:disabled):hover{background:#faf1cd}
+.tabletop-seat-reset:focus-visible{outline:2px solid #f3d799;outline-offset:2px}
+.tabletop-grid .tabletop-market{min-height:0;grid-template-columns:minmax(160px,.9fr) minmax(225px,1.5fr) minmax(175px,1fr);gap:5px;padding:5px;border-radius:12px}
+.tabletop-grid .tabletop-market .market-playground{width:min(98cqi,95cqb,28dvh,305px)}
+.tabletop-grid .tabletop-hud-action{min-height:26px}
+@media (min-width:1051px) and (max-height:780px){
+  .tabletop-grid .tabletop-seat-header{height:20px;min-height:20px}
+  .tabletop-grid .reverse-preview{height:15px;min-height:15px}
+  .tabletop-grid .palace-window{height:15px;min-height:15px}
+  .tabletop-grid .tabletop-market .factory{width:clamp(38px,5.4dvh,50px);height:clamp(38px,5.4dvh,50px)}
+}
+@media (max-width:1050px){
+  .tabletop-app{height:auto;min-height:100dvh;overflow:visible}
+  .tabletop-app main.tabletop-container{height:auto;min-height:0}
+  .tabletop-surface{overflow-x:auto;overflow-y:hidden}
+  .tabletop-grid,.tabletop-players-2 .tabletop-grid,.tabletop-players-3 .tabletop-grid,.tabletop-players-4 .tabletop-grid{
+    --seat-length:620px;--seat-depth:180px;
+    width:1070px;min-width:1070px;height:755px;
+    grid-template-columns:180px minmax(0,1fr) 180px;
+    grid-template-rows:180px minmax(0,1fr) 180px;
+  }
+  .tabletop-grid .tabletop-market .market-playground{width:230px}
+}
+@media (max-width:600px){
+  .tabletop-grid,.tabletop-players-2 .tabletop-grid,.tabletop-players-3 .tabletop-grid,.tabletop-players-4 .tabletop-grid{height:750px}
+  .tabletop-title-hint{display:none}
+}
