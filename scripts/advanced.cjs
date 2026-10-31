@@ -162,7 +162,7 @@ function train(cfg) {
   for (let g = checkpoint.generation; g < cfg.generations; g++) {
     if (!checkpoint.pending) {
       const sigma = 0.9 * Math.pow(0.78, g)
-      const candidates = [incumbent, checkpoint.best.weights]
+      const candidates = g === 0 ? [incumbent] : [incumbent, checkpoint.best.weights]
       while(candidates.length < cfg.population) candidates.push(mutate(rng, checkpoint.center, sigma))
       checkpoint.pending = { candidates: candidates.slice(0, cfg.population), trials: [], sigma }
       checkpoint.rngState = rng.state
