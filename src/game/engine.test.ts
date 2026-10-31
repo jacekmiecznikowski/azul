@@ -227,14 +227,13 @@ describe('punktacja według instrukcji (strony 4–6)', () => {
   })
 })
 
-
 describe('weryfikacja 32 fizycznych kwater i Szklanej Wieży', () => {
   it('ma osobne komplety ośmiu dwustronnych kwater dla każdego koloru gracza', async () => {
     const { PHYSICAL_STRIPS, PALACE_COLORS, decodeStrip } = await import('./engine')
     const game = newGame({ opponents: 3, seed: 153 })
-    expect(game.players.map(player => player.palaceColor)).toEqual(PALACE_COLORS)
+    expect(new Set(game.players.map(player => player.palaceColor)).size).toBe(4)
     for (const [index, player] of game.players.entries()) {
-      const original = PHYSICAL_STRIPS[PALACE_COLORS[index]]
+      const original = PHYSICAL_STRIPS[player.palaceColor ?? PALACE_COLORS[index]]
       expect(original).toHaveLength(8)
       for (const strip of player.strips) {
         const [a, b] = original[strip.patternId! - 1]
@@ -256,6 +255,7 @@ describe('weryfikacja 32 fizycznych kwater i Szklanej Wieży', () => {
     }
     // Uzupełnienie użytkownika: biała kwatera nr 2, rewers = 1 żółta + 4 czerwone.
     expect(PHYSICAL_STRIPS.white[1]).toEqual(['ROOOO', 'YRRRR'])
+    // Specjalne kwatery zawierające dwie szare tafle-jokery.
     expect(PHYSICAL_STRIPS.red[7][1]).toBe('JJOWB')
     expect(PHYSICAL_STRIPS.yellow[0][1]).toBe('JJORY')
     expect(PHYSICAL_STRIPS.blue[0][1]).toBe('JJWRO')
@@ -276,5 +276,77 @@ describe('weryfikacja 32 fizycznych kwater i Szklanej Wieży', () => {
       }
       expect(state.phase).toBe('finished')
     }
+  })
+})
+
+
+describe('poprawki v13: joker, kolory graczy, tury', () => {
+  it('pozwala świadomie zachować jokera lub użyć go zamiast zwykłego pola', async () => {
+    const { placementChoices } = await import('./engine')
+    const state = newGame({ opponents: 1, seed: 504 })
+    const player = state.players[state.currentPlayer]
+    // Ten sam czerwony kolor może być ułożony na czerwonym polu albo jokerze.
+    const strip = player.strips[0]
+    strip.front = ['wild','rose','citrine','cyan','amber']
+    strip.side = 0
+    strip.panes = [null,null,null,null,null]
+    state.factories = state.factories.map((_, i) => i === 0 ? ['rose', 'cyan'] : [])
+    state.center = []
+    const options = placementChoices(strip,'rose',1)
+    expect(options).toEqual([[1],[0]]) // zwykłe pole jest domyślnie pierwsze
+    const moves = legalMoves(state).filter(m => m.kind === 'take' &&
+      m.source.type === 'factory' && m.source.index === 0 && m.color === 'rose' && m.windowIndex === 0)
+    expect(moves).toHaveLength(2)
+    const ordinary = moves.find(m => m.kind === 'take' && m.slots?.join() === '1')!
+    const joker = moves.find(m => m.kind === 'take' && m.slots?.join() === '0')!
+    const afterOrdinary = applyMove(state, ordinary)
+    const afterJoker = applyMove(state, joker)
+    expect(afterOrdinary.players[state.currentPlayer].strips[0].panes.slice(0,2)).toEqual([null,'rose'])
+    expect(afterJoker.players[state.currentPlayer].strips[0].panes.slice(0,2)).toEqual(['rose',null])
+    expect(state.players[state.currentPlayer].strips[0].panes.slice(0,2)).toEqual([null,null])
+  })
+  it('nigdy nie pozwala dobrowolnie stłuc tafli, jeśli pasuje do jokera', () => {
+    const state = newGame({ opponents: 1, seed: 505 })
+    const strip = state.players[state.currentPlayer].strips[0]
+    strip.front = ['wild','wild','cyan','amber','rose']
+    strip.side = 0
+    state.factories = state.factories.map((_, i) => i === 0 ? ['slate'] : [])
+    state.center = []
+    const moves = legalMoves(state).filter(m => m.kind === 'take' && m.source.type === 'factory' && m.color === 'slate')
+    expect(moves.every(m => m.kind === 'take' && m.windowIndex !== null)).toBe(true)
+    expect(moves.some(m => m.kind === 'take' && m.slots?.join() === '0')).toBe(true)
+    expect(moves.some(m => m.kind === 'take' && m.slots?.join() === '1')).toBe(true)
+  })
+  it('kolejność graczy jest zgodna z ruchem wskazówek zegara, nie z indeksami', async () => {
+    const { nextClockwisePlayer } = await import('./engine')
+    expect([1,2,0,3].map(i => nextClockwisePlayer(i,4))).toEqual([2,0,3,1])
+    expect([1,2,0].map(i => nextClockwisePlayer(i,3))).toEqual([2,0,1])
+    expect(nextClockwisePlayer(1,2)).toBe(0)
+    expect(nextClockwisePlayer(0,2)).toBe(1)
+    const state = newGame({ opponents: 3, seed: 506 })
+    const current = state.currentPlayer
+    const next = applyMove(state, legalMoves(state).find(m=>m.kind==='take' && m.source.type==='factory')!)
+    expect(next.currentPlayer).toBe(nextClockwisePlayer(current,4))
+  })
+  it('losuje kolory bez duplikatów i odtwarza ten sam układ przy tym samym seed', () => {
+    const found = new Set<string>()
+    for (let seed=1;seed<=80;seed++) {
+      const state = newGame({opponents:3,seed})
+      const colors = state.players.map(p=>p.palaceColor)
+      expect(new Set(colors).size).toBe(4)
+      expect(newGame({opponents:3,seed}).players.map(p=>p.palaceColor)).toEqual(colors)
+      found.add(state.players[0].palaceColor!)
+    }
+    expect(found.size).toBe(4)
+  })
+  it('przez całą partię zachowuje 100 tafli po rozgałęzieniach z jokerami', async () => {
+    const { glassInventory } = await import('./engine')
+    let state = newGame({opponents:1,seed:1207})
+    for(let turn=0;turn<400 && state.phase !== 'finished';turn++) {
+      const moves=legalMoves(state)
+      state=applyMove(state,moves[(turn*11+3)%moves.length])
+      expect(glassInventory(state).total).toBe(100)
+    }
+    expect(state.phase).toBe('finished')
   })
 })
