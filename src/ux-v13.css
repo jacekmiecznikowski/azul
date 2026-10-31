@@ -1,0 +1,65 @@
+/* V13 — gameplay clarity, joker-choice UI, player colors, round indicators. */
+.sg-round-colors { gap:10px; padding:4px 3px 4px 12px; min-height:30px; }
+.sg-header-round .sg-round-colors .sg-color-dot {
+  width:11px; height:11px; transition:opacity .2s, filter .2s, scale .2s;
+}
+.sg-header-round .sg-round-colors .sg-color-now {
+  scale:1.42; z-index:1; outline:1px solid #fbe6b9;
+  outline-offset:4px; box-shadow:0 0 9px #ffdf8ca8;
+}
+.sg-header-round .sg-round-colors .sg-color-past {
+  opacity:.32; filter:grayscale(.75) brightness(.7);
+}
+/* End-of-match controls are an actual centered game overlay, not a footer. */
+.sg-finish {
+  position:fixed; inset:auto; top:50%; left:50%; bottom:auto;
+  transform:translate(-50%, -50%); z-index:60;
+  background:#21474eee; box-shadow:0 0 0 999vmax #05141ea9,0 24px 70px #000c;
+  padding:14px 19px; border-radius:13px; width:max-content; max-width:calc(100vw - 32px);
+}
+/* The instruction is the FIRST row of the scrollable game-history pane. */
+.sg-center {grid-template-rows:minmax(0,1fr);}
+.sg-history-live {
+  display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+  color:#e2ebe4;background:#214a4c;border:1px solid #b5d0b03b;
+  border-radius:6px;margin:6px 7px 5px;padding:7px 9px;
+  font-size:11px;line-height:1.35;
+}
+.sg-history-live>span {flex:1 1 150px;min-width:0;}
+.sg-history-live button {border-radius:5px;border:1px solid #a9c9c75a;background:#336b69;color:#fff;padding:4px 8px;white-space:nowrap;font-size:11px;}
+.sg-history-live .sg-history-discard {background:#784b4b;border-color:#d69b8a8e;}
+.sg-instruction {display:none!important;}
+/* Palette belongs to the randomized palace color, not to player index. */
+.sg-palace-red {--sg-player-accent:#de777a;}
+.sg-palace-yellow {--sg-player-accent:#e9c769;}
+.sg-palace-blue {--sg-player-accent:#6ac5df;}
+.sg-palace-white {--sg-player-accent:#d7e2e8;}
+.sg-board .sg-board-name {display:flex;align-items:baseline;gap:6px;}
+.sg-board .sg-palace-label {font:800 8px 'DM Sans',sans-serif;color:var(--sg-player-accent);letter-spacing:.8px;}
+.sg-board .sg-board-top .sg-player-icon {background:color-mix(in srgb,var(--sg-player-accent),#163740 33%);border-color:var(--sg-player-accent);}
+.sg-board.sg-board-current {border-color:color-mix(in srgb,var(--sg-player-accent),#e6c778 40%);}
+.sg-pawn-color-red {background:#de777a!important;}
+.sg-pawn-color-yellow {background:#e9c769!important;}
+.sg-pawn-color-blue {background:#6ac5df!important;}
+.sg-pawn-color-white {background:#d7e2e8!important;}
+/* Players choose exactly which panes receive selected glass when a joker offers alternatives. */
+.sg-placement-overlay {z-index:91;}
+.sg-placement-dialog {width:min(580px,94vw);max-height:89dvh;overflow:auto;text-align:left;}
+.sg-placement-dialog>h2 {font:700 25px 'Playfair Display',Georgia,serif;color:#f2ddb0;margin:0 32px 8px 0;}
+.sg-placement-dialog>p {font-size:13px;line-height:1.55;color:#bcd2d4;margin:0 0 15px;}
+.sg-placement-list {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.sg-placement-list>button {display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;
+ border:1px solid #658b8e;border-radius:9px;background:linear-gradient(145deg,#234651,#122e3e);color:#d8eee7;padding:12px 8px;}
+.sg-placement-list>button:hover,.sg-placement-list>button:focus-visible {border-color:#f2cf86;box-shadow:0 0 0 2px #e5c78038;outline:none;}
+.sg-placement-number {font-weight:800;font-size:12px;letter-spacing:.3px;}
+.sg-placement-slots {display:flex;justify-content:center;gap:5px;}
+.sg-placement-slot {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+ width:33px;min-height:38px;border:1px solid #476873;border-radius:5px;background:#0a2835;opacity:.53;}
+.sg-placement-slot.sg-placement-active {border-color:#edd28d;opacity:1;background:#376567;}
+.sg-placement-slot .sg-glass {height:18px;width:18px;}
+.sg-placement-slot small {color:#bddce1;font-size:9px;}
+.sg-placement-list>button>small {font-size:10px;color:#a9c6bf;}
+@media(max-width:560px) {
+  .sg-placement-list {grid-template-columns:1fr;}
+  .sg-finish {flex-wrap:wrap;justify-content:center;text-align:center;}
+}
