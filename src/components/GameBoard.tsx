@@ -52,11 +52,11 @@ export function GameBoard({ player, index, isCurrent, isHuman = false, isHumanTu
   canReset?: boolean; onReset?: () => void; isStartingPlayer?: boolean; hasFirstToken?: boolean
 }) {
   const completed = player.strips.filter(s => s.side === 2).length
-  return <section className={`sg-board sg-player-${index}${isCurrent ? ' sg-board-current' : ''}${isHuman ? ' sg-board-human' : ''}`}
+  return <section className={`sg-board sg-player-${index} sg-palace-${player.palaceColor ?? 'red'}${isCurrent ? ' sg-board-current' : ''}${isHuman ? ' sg-board-human' : ''}`}
     aria-label={`Plansza gracza ${player.name} (${player.palaceColor === 'red' ? 'czerwona' : player.palaceColor === 'yellow' ? 'żółta' : player.palaceColor === 'blue' ? 'niebieska' : 'biała'})`}>
     <div className="sg-board-top">
-      <span className={`sg-player-icon sg-player-icon-${index}`}>{avatars[index]}</span>
-      <span className="sg-board-name">{isHuman ? 'Twoje witraże' : player.name}</span>
+      <span className={`sg-player-icon sg-player-icon-${index} sg-palace-icon-${player.palaceColor ?? 'red'}`}>{avatars[index]}</span>
+      <span className="sg-board-name">{isHuman ? 'Twoje witraże' : player.name} <small className="sg-palace-label">{({red:'CZERWONY', yellow:'ŻÓŁTY', blue:'NIEBIESKI', white:'BIAŁY'} as const)[player.palaceColor ?? 'red']}</small></span>
       <span className="sg-board-label">{isCurrent ? 'TERAZ GRA' : isStartingPlayer ? 'ROZPOCZĄŁ RUNDĘ' : isHuman ? 'TWOJA PLANSZA' : `AI · ${player.difficulty === 'expert' ? 'EKSPERT' : player.difficulty === 'hard' ? 'TRUDNY' : player.difficulty === 'easy' ? 'ŁATWY' : 'NORMALNY'}`}</span>
       {hasFirstToken && <span className="sg-start-tile sg-start-on-board" title="Ten gracz zdobył żeton pierwszego gracza i rozpocznie kolejną rundę">1</span>}
       <span className="sg-board-stat">{completed}/8 <small>okien</small></span>
