@@ -1,4 +1,5 @@
 import { applyMove, availableSources, legalMoves, patternFor, remainingSlots, WINDOW_POINTS } from './engine'
+import { chooseLearnedMove } from './learnedPolicy'
 import type { Difficulty, GameState, Move, Player } from './engine'
 
 /** AI uses exactly the same legal-move list and reducer as the human player. */
@@ -50,6 +51,7 @@ export function chooseAIMove(state: GameState, difficulty: Difficulty): Move | n
   if (!moves.length) return null
   if (difficulty === 'easy') return moves[Math.floor(Math.random() * moves.length)]
   if (difficulty === 'expert') return expertMove(state, moves)
+  if (difficulty === 'master') return chooseLearnedMove(state)
   const scored = moves.map((move) => ({ move, value: evaluate(state, applyMove(state, move), move, difficulty) }))
   scored.sort((a, b) => b.value - a.value)
   if (difficulty === 'normal') {

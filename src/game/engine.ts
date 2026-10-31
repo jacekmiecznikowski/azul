@@ -2,7 +2,7 @@
 export const COLORS = ['rose', 'citrine', 'cyan', 'amber', 'slate'] as const
 export type GlassColor = (typeof COLORS)[number]
 export type SlotColor = GlassColor | 'wild'
-export type Difficulty = 'easy' | 'normal' | 'hard' | 'expert'
+export type Difficulty = 'easy' | 'normal' | 'hard' | 'expert' | 'master'
 export type PalaceSide = 'A' | 'B'
 export type Controller = 'human' | 'ai'
 export type EventKind = 'start' | 'take' | 'reset' | 'round' | 'final'

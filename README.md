@@ -87,3 +87,45 @@ podczas `npm run build`). W uruchomionej grze:
 **Dostarczenie pliku:** źródłowe nagranie `background.mp3` jest w paczce ZIP z gry.
 Kod odtwarzacza znajduje się na GitHubie. Po sklonowaniu repozytorium bez pliku MP3
 skopiuj nagranie do `public/background.mp3`; plik może być wersjonowany w GitHubie.
+
+## Laboratorium strategii (wytrenowany bot Mistrz)
+
+Ta aktualizacja dodaje nowy poziom AI **Trenowany** i przycisk **Strategia** w nagłówku.
+W każdej turze gracz może podejrzeć ruch proponowany przez model; nie wykonuje
+on ruchów za gracza. Panel zawiera osobne wyniki testów dwu- i czteroosobowych,
+porównanie z ręczną heurystyką wyjściową oraz eksperymenty ablacyjne.
+
+Model nie jest siecią neuronową ani usługą online. Jest interpretowalną,
+17-cechową funkcją oceny ruchów, której wagi dostraja komputerowa symulacja
+całych partii (evolutionary / cross-entropy search). Silnik jest tym samym
+kodem, którego używa gra. Podczas wybierania ruchu bot nie ma dostępu do
+przyszłej kolejności tafli w woreczku.
+
+### Powtórzenie eksperymentu
+
+Wymagany Node.js i zainstalowane zależności projektu:
+
+```bash
+npm install
+npm run train:ai
+npm run test
+npm run build
+```
+
+`npm run train:ai` kompiluje silnik do tymczasowego `.sim-dist/`, przeprowadza
+strojenie wag i fazę dodatkowej selekcji, a następnie zapisuje
+`src/game/trained-weights.json` i `reports/ai-training-results.json`.
+Trening może potrwać kilka minut; szybki test infrastruktury:
+`npm run train:quick`. Uwaga: tryb szybki nadpisuje zestaw wag testową,
+mniejszą próbą; po jego użyciu uruchom pełny trening lub przywróć plik
+`src/game/trained-weights.json` przez Git.
+
+**Ograniczenia:** rezultaty są szacowane w ograniczonej liczbie partii i
+zależą od poziomu przeciwnika, liczby graczy oraz naszej cyfrowej implementacji
+zasad. Nie należy utożsamiać wysokiej skuteczności na danych treningowych
+z poprawą na nieznanych partiach. Raport dokumentuje również nieudane próby.
+Zasady i wzory kwater pozostają zgodne z aktualną adaptacją, a dokładna kolejność
+pięciu kolorów na fizycznych paskach jest nadal umowna.
+
+Zobacz [raport strategii](reports/STRATEGY.md) i
+[dane eksperymentu](reports/ai-training-results.json).

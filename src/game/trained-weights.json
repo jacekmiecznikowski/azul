@@ -1,0 +1,192 @@
+{
+  "version": 2,
+  "algorithm": "CEM + independent candidate refinement",
+  "selected": "trained-checkpoint",
+  "weights": {
+    "pointsNow": 0.3655,
+    "placed": 2.1477,
+    "complete": 1.6449,
+    "rightChain": 0,
+    "futureLeft": 0.5715,
+    "openUpper": 0.8401,
+    "roundBonus": 0.8662,
+    "palaceSynergy": 0.8026,
+    "penaltyCost": 1.8861,
+    "brokenCount": 0.927,
+    "jokerUse": 0.9198,
+    "walking": 1.1877,
+    "skippedWork": 0,
+    "marketAvailability": 0.2578,
+    "resetOpportunity": 1.1971,
+    "firstToken": 0,
+    "leaveToCenter": 0
+  },
+  "training": {
+    "generations": 6,
+    "population": 10,
+    "perCandidate": 18,
+    "initialTrainingGames": 1080,
+    "selectionCandidates": 17,
+    "selectionGames": 1275,
+    "trainingGames": 2355,
+    "randomSeed": 334460,
+    "optimizationOpponent": "hard"
+  },
+  "protocol": {
+    "selectionSeeds": [
+      6200000,
+      6700000
+    ],
+    "finalValidationSeeds": [
+      8200000,
+      8800000
+    ],
+    "ablationSeed": 9300000,
+    "opponents": "hard",
+    "palaceSides": "A and B alternated",
+    "seats": "rotated",
+    "hiddenBagKnownToAgent": false
+  },
+  "validation": {
+    "duelVsHard": {
+      "games": 180,
+      "winRate": 0.5861111111111111,
+      "avgScore": 58.35,
+      "avgMargin": 5.06,
+      "avgWindowPoints": 44.71,
+      "avgColorBonus": 9.94,
+      "avgCompletions": 9.59,
+      "avgPlaced": 57.74,
+      "avgPicked": 61.57,
+      "avgBroken": 3.83,
+      "avgGlassLost": 14.56,
+      "avgPenalty": 7.36,
+      "avgPalaceBonus": 15.32,
+      "avgResets": 7.7,
+      "avgTurns": 37.72,
+      "avgRoundPoints": 47.46
+    },
+    "baselineVsHard": {
+      "games": 180,
+      "winRate": 0.6388888888888888,
+      "avgScore": 61.47,
+      "avgMargin": 7.47,
+      "avgWindowPoints": 46.97,
+      "avgColorBonus": 9.64,
+      "avgCompletions": 9.74,
+      "avgPlaced": 56.98,
+      "avgPicked": 60.48,
+      "avgBroken": 3.5,
+      "avgGlassLost": 13.18,
+      "avgPenalty": 7.38,
+      "avgPalaceBonus": 15.58,
+      "avgResets": 8.32,
+      "avgTurns": 38.41,
+      "avgRoundPoints": 50.81
+    },
+    "fourVsHard": {
+      "games": 100,
+      "winRate": 0.225,
+      "avgScore": 43.36,
+      "avgMargin": -10.24,
+      "avgWindowPoints": 31.57,
+      "avgColorBonus": 6.95,
+      "avgCompletions": 8,
+      "avgPlaced": 49.49,
+      "avgPicked": 53,
+      "avgBroken": 3.51,
+      "avgGlassLost": 9.62,
+      "avgPenalty": 6.74,
+      "avgPalaceBonus": 11.66,
+      "avgResets": 4.75,
+      "avgTurns": 27.97,
+      "avgRoundPoints": 35.64
+    },
+    "fourBaselineVsHard": {
+      "games": 100,
+      "winRate": 0.27,
+      "avgScore": 45.63,
+      "avgMargin": -9.6,
+      "avgWindowPoints": 34.46,
+      "avgColorBonus": 7.02,
+      "avgCompletions": 8.15,
+      "avgPlaced": 48.62,
+      "avgPicked": 52.18,
+      "avgBroken": 3.56,
+      "avgGlassLost": 9.56,
+      "avgPenalty": 5.6,
+      "avgPalaceBonus": 11.41,
+      "avgResets": 5.25,
+      "avgTurns": 28.48,
+      "avgRoundPoints": 37.52
+    }
+  },
+  "ablation": {
+    "penaltyCost": {
+      "full": {
+        "games": 45,
+        "winRate": 0.4666666666666667
+      },
+      "without": {
+        "games": 45,
+        "winRate": 0.4888888888888889
+      }
+    },
+    "futureLeft": {
+      "full": {
+        "games": 45,
+        "winRate": 0.4666666666666667
+      },
+      "without": {
+        "games": 45,
+        "winRate": 0.6222222222222222
+      }
+    },
+    "palaceSynergy": {
+      "full": {
+        "games": 45,
+        "winRate": 0.4666666666666667
+      },
+      "without": {
+        "games": 45,
+        "winRate": 0.5111111111111111
+      }
+    },
+    "placed": {
+      "full": {
+        "games": 45,
+        "winRate": 0.4666666666666667
+      },
+      "without": {
+        "games": 45,
+        "winRate": 0.5111111111111111
+      }
+    },
+    "roundBonus": {
+      "full": {
+        "games": 45,
+        "winRate": 0.4666666666666667
+      },
+      "without": {
+        "games": 45,
+        "winRate": 0.4777777777777778
+      }
+    },
+    "resetOpportunity": {
+      "full": {
+        "games": 45,
+        "winRate": 0.4666666666666667
+      },
+      "without": {
+        "games": 45,
+        "winRate": 0.4222222222222222
+      }
+    }
+  },
+  "limitations": [
+    "Results are averages across digital Sintra games, not physical-world guarantees.",
+    "The trained checkpoint did not outperform the manual baseline on final held-out games.",
+    "Ablations use only 45 games per condition; differences are noisy and not causal proof.",
+    "Absolute positions of colored cells on physical window strips remain a reconstruction."
+  ]
+}
