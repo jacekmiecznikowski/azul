@@ -21,19 +21,21 @@ export function useAmbientMusic() {
     audio.loop = true
     audio.preload = 'auto'
     audio.volume = BACKGROUND_VOLUME
-    audio.addEventListener('error', () => setUnavailable(true))
+    audio.addEventListener('error', () => {
+      if (audioRef.current === audio) audioRef.current = null
+      setUnavailable(true)
+    })
     audioRef.current = audio
     return audio
   }, [])
 
   const play = useCallback(() => {
-    if (unavailable) return
     try {
       const audio = audioElement()
       // A browser may reject play() until a user click; retry on the next gesture.
       void audio.play().catch(() => {})
     } catch { /* Unsupported browser audio environment. */ }
-  }, [audioElement, unavailable])
+  }, [audioElement])
 
   const stop = useCallback(() => {
     audioRef.current?.pause()
@@ -45,7 +47,11 @@ export function useAmbientMusic() {
       return
     }
     // Don't autoplay on load. Start after the first user gesture.
-    const unlock = () => play()
+    const unlock = (event: Event) => {
+      // Switching music off should not start it momentarily on pointerdown.
+      if (event.target instanceof Element && event.target.closest('.sg-music-toggle')) return
+      play()
+    }
     window.addEventListener('pointerdown', unlock, true)
     window.addEventListener('keydown', unlock, true)
     return () => {
