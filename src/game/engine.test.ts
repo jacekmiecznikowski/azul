@@ -69,3 +69,68 @@ describe('silnik Sintra', () => {
     expect(availableSources(state).reduce((sum, source) => sum + source.count, 0)).toBe(20)
   })
 })
+
+describe('plansze, boty i historia partii', () => {
+  it('przydziela niezależne poziomy trudności każdemu botowi', () => {
+    const game = newGame({ opponents: 3, seed: 10, botDifficulties: ['easy', 'hard', 'normal'] })
+    expect(game.players.slice(1).map((p) => p.difficulty)).toEqual(['easy', 'hard', 'normal'])
+  })
+  it('używa oryginalnych wartości punktowych ośmiu okien', async () => {
+    const { WINDOW_POINTS } = await import('./engine')
+    expect(WINDOW_POINTS).toEqual([4, 3, 3, 2, 2, 1, 1, 2])
+  })
+  it('pokazuje pełny rewers i nie odsłania jokerów w losowanym układzie startowym', () => {
+    for (const seed of [2, 3, 5, 100]) {
+      const game = newGame({ opponents: 3, seed })
+      for (const player of game.players) {
+        expect(player.strips).toHaveLength(8)
+        expect(player.strips.filter(s => s.back.includes('wild'))).toHaveLength(1)
+        expect(player.strips.every(s => s.front.length === 5 && s.back.length === 5)).toBe(true)
+        expect(player.strips.every(s => !patternFor(s).includes('wild'))).toBe(true)
+      }
+    }
+  })
+  it('zapisuje w historii źródło, tafle, kwaterę i zmianę wyniku', () => {
+    const game = newGame({ opponents: 1, seed: 44 })
+    const move = legalMoves(game).find(m => m.kind === 'take')!
+    const next = applyMove(game, move)
+    const event = next.history.find(e => e.kind === 'take')!
+    expect(event).toBeDefined()
+    expect(event.playerIndex).toBe(0)
+    expect(event.picked).toBeGreaterThan(0)
+    expect(event.placed).toBeGreaterThanOrEqual(0)
+    expect(event.source).toEqual(move.kind === 'take' ? move.source : undefined)
+    expect(event.points).toBe(next.players[0].score - game.players[0].score)
+  })
+  it('nie gubi historii podczas wielorundowej symulacji', () => {
+    let state = newGame({ opponents: 2, seed: 95 })
+    let steps = 0
+    while (state.phase !== 'finished' && steps++ < 300) {
+      state = applyMove(state, chooseAIMove(state, 'normal')!)
+    }
+    expect(state.phase).toBe('finished')
+    expect(state.history.length).toBeGreaterThan(20)
+    expect(state.history[0].kind).toBe('final')
+    expect(state.history.some(e => e.kind === 'round')).toBe(true)
+    expect(state.history.some(e => e.kind === 'take')).toBe(true)
+  })
+})
+
+describe('tor stłuczonego szkła', () => {
+  it('odejmuje 18 natychmiast po wejściu na ostatnie pole i wraca na START', () => {
+    const game = newGame({ opponents: 1, seed: 57 })
+    game.players[0].brokenSteps = 7
+    game.center = ['rose']
+    game.factories = game.factories.map(() => [])
+    game.firstCenterTaken = false
+    // Brak dostępnych odpowiednich pól za witrażystą wymusiłby rozbicie;
+    // pobranie pierwszej tafli ze środka i tak dodaje 1 stłuczenie.
+    const move = legalMoves(game).find(m => m.kind === 'take' && m.source.type === 'center')!
+    expect(move).toBeDefined()
+    const next = applyMove(game, move)
+    expect(next.players[0].brokenSteps).toBe(0)
+    expect(next.players[0].glassLost).toBeGreaterThanOrEqual(18)
+    expect(next.players[0].score).toBeLessThanOrEqual(-18)
+    expect(next.history.some(e => e.kind === 'take' && e.firstPlayer)).toBe(true)
+  })
+})
