@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { applyMove, availableSources, availableTargets, COLORS, FACTORY_COUNT, legalMoves, newGame, patternFor, standings } from './engine'
+import { applyMove, availableSources, availableTargets, COLORS, FACTORY_COUNT, finalBreakdown, legalMoves, newGame, patternFor, standings } from './engine'
 import { chooseAIMove } from './ai'
 import type { GameState } from './engine'
 
@@ -161,5 +161,68 @@ describe('żeton pierwszego gracza', () => {
     expect(next.players[starter].brokenSteps).toBe(1)
     expect(next.history[0].kind).toBe('take')
     expect(next.history[0].firstPlayer).toBe(true)
+  })
+})
+
+
+describe('punktacja według instrukcji (strony 4–6)', () => {
+  it('nalicza każdą premię strony A oraz karę dopiero na końcu partii', () => {
+    const game = newGame({ opponents: 1, seed: 77, palaceSide: 'A' })
+    const player = game.players[0]
+    player.score = 20
+    player.brokenSteps = 5 // −8
+    player.glassLost = 18 // wcześniejsze przekroczenie toru już rozliczone
+    for (let i = 0; i < 7; i++) player.strips[i].panes[0] = 'cyan'
+    // 4, 3, 2, 1 oszklonych ram wokół ornamentów = 10 + 6 + 3 + 0.
+    player.strips[0].upper = 'rose'; player.strips[0].lower = 'rose'
+    player.strips[1].upper = 'rose'; player.strips[1].lower = 'rose'
+    player.strips[2].upper = 'rose'; player.strips[2].lower = 'rose'
+    player.strips[3].upper = 'rose'
+    player.strips[4].upper = 'rose'; player.strips[5].lower = 'rose'
+    player.strips[6].upper = 'rose'
+    const result = finalBreakdown(player, 'A')
+    expect(result.palaceDetails).toEqual([10, 6, 3, 0])
+    expect(result.remainingPanes).toBe(7)
+    expect(result.remainingPoints).toBe(2)
+    expect(result.glassPenalty).toBe(8)
+    expect(result.palaceBonus).toBe(19)
+    expect(result.roundPoints).toBe(20)
+    expect(result.total).toBe(33)
+    expect(result.totalGlassLost).toBe(26)
+  })
+  it('na stronie B mnoży pełne okna przez liczbę witraży dominującego koloru', () => {
+    const game = newGame({ opponents: 1, seed: 79, palaceSide: 'B' })
+    const player = game.players[0]
+    player.strips[0].upper = 'cyan'; player.strips[0].lower = 'cyan'
+    player.strips[1].upper = 'cyan'; player.strips[1].lower = 'citrine'
+    player.strips[2].upper = 'cyan'
+    player.strips[3].upper = 'cyan'
+    const result = finalBreakdown(player, 'B')
+    expect(result.fullyGlazedWindows).toBe(2)
+    expect(result.dominantColor).toBe('cyan')
+    expect(result.dominantColorCount).toBe(5)
+    expect(result.palaceBonus).toBe(10)
+  })
+  it('Ekspert wybiera ruch legalny, uwzględniając odpowiedź przeciwnika', () => {
+    for (const seed of [41, 51, 61]) {
+      const game = newGame({ opponents: 1, seed, botDifficulties: ['expert'] })
+      const move = chooseAIMove(game, 'expert')
+      expect(move).not.toBeNull()
+      expect(legalMoves(game)).toContainEqual(move)
+      expect(() => applyMove(game, move!)).not.toThrow()
+    }
+  })
+  it('zapamiętuje jawne składniki punktacji po prawdziwej pełnej partii', () => {
+    let state = newGame({ opponents: 1, seed: 244, palaceSide: 'A' })
+    let moves = 0
+    while (state.phase !== 'finished' && moves++ < 300) state = applyMove(state, chooseAIMove(state, 'normal')!)
+    expect(state.phase).toBe('finished')
+    expect(state.finalScores).toHaveLength(2)
+    for (const details of state.finalScores!) {
+      const player = state.players.find(p => p.id === details.playerId)!
+      expect(details.roundPoints + details.remainingPoints - details.glassPenalty + details.palaceBonus).toBe(player.score)
+      expect(details.totalGlassLost).toBe(player.glassLost)
+    }
+    expect(state.history.some(event => event.kind === 'final' && event.playerIndex !== null)).toBe(true)
   })
 })
