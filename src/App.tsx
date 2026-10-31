@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import {
   applyMove, availableSources, BROKEN_TRACK, COLORS, legalMoves,
-  newGame, standings, WINDOW_POINTS,
+  newGame, patternFor, standings, WINDOW_POINTS,
 } from './game/engine'
 import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Player, Source, WindowStrip } from './game/engine'
 import { chooseAIMove } from './game/ai'
