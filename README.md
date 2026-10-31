@@ -34,7 +34,6 @@ W kodzie logika jest oddzielona od interfejsu: `src/game/engine.ts`, `src/game/a
 
 Projekt fanowski, niezwiązany z autorem ani wydawcą gry. Nie wykorzystuje oficjalnych grafik ani dźwięków.
 
-
 ## Zestawy kwater graczy i bilans 100 tafli (v12)
 
 Zestawy **czerwony, żółty, niebieski, biały** mają osobne, dwustronne wzory 8 kwater,
@@ -53,3 +52,14 @@ W warsztatach widoczna jest **Szklana Wieża** i bilans tafli:
 **woreczek**, **wieża**, **tor rund**. Suma wszystkich pozycji zawsze wynosi **100**.
 Znaczniki kolorów rund nadal są taflami i muszą zostać uwzględnione w bilansie.
 Aby użyć nowych kwater, wybierz **Nowa gra** — wcześniejsze zapisane partie mają stare układy.
+
+## Zmiany v13 — mechanika i wygoda
+
+- **Jokery**: po wybraniu kwatery mającej więcej niż jeden legalny sposób rozmieszczenia tafli, pojawia się okno wyboru konkretnych pól. Można zachować joker na przyszłość lub zająć go teraz. Nadmiar nadal musi zostać stłuczony, a tafle muszą trafić na jedną kwaterę.
+- **Losowe kolory pałaców**: na początku nowej partii tasuje się czerwony, żółty, niebieski i biały komplet. Człowiek pozostaje na dole stołu, ale nie dostaje z góry czerwonego zestawu. Kolor widać przy nazwie i znacznikach toru.
+- **Kolejność zgodna z zegarem**: w grze 4-osobowej góra (Aurora) → prawo (Iris) → dół (Ty) → lewo (Noctis). Gracze rozpoczynający rundę nadal wynikają z zasad żetonu pierwszego gracza.
+- **Pasek rund**: aktywny kolor jest większy, rozegrane kolory przygaszone.
+- **Koniec gry**: pasek z akcjami jest wyśrodkowany w oknie.
+- **Historia**: komunikat „Twój ruch / gra bot” znajduje się na górze panelu historii; oddzielna dolna belka została usunięta.
+
+**Migracja zapisów:** rozpocznij **Nową grę**, aby zobaczyć losowy przydział kolorów i nowy sposób wyboru pól z jokerami. Wcześniejsze zapisy są nadal odczytywane, ale zachowują przydzielone wcześniej kolory i aktualny przebieg rozgrywki.
