@@ -5,7 +5,28 @@ export type SlotColor = GlassColor | 'wild'
 export type Difficulty = 'easy' | 'normal' | 'hard'
 export type PalaceSide = 'A' | 'B'
 export type Controller = 'human' | 'ai'
-export const WINDOW_POINTS = [3, 4, 4, 3, 2, 1, 2, 3] as const
+export type EventKind = 'start' | 'take' | 'reset' | 'round' | 'final'
+export interface GameEvent {
+  id: number
+  round: number
+  playerIndex: number | null
+  kind: EventKind
+  source?: Source
+  color?: GlassColor
+  picked?: number
+  placed?: number
+  broken?: number
+  windowIndex?: number | null
+  keepColor?: GlassColor
+  points?: number
+  framePoints?: number
+  bonusPoints?: number
+  firstPlayer?: boolean
+  flipped?: boolean
+  finished?: boolean
+  description: string
+}
+export const WINDOW_POINTS = [4, 3, 3, 2, 2, 1, 1, 2] as const
 export const BROKEN_TRACK = [0, 1, 2, 4, 6, 8, 11, 14, 18] as const
 export const FACTORY_COUNT: Record<number, number> = { 2: 5, 3: 7, 4: 9 }
 
@@ -21,6 +42,7 @@ export interface Player {
   id: string
   name: string
   controller: Controller
+  difficulty?: Difficulty
   score: number
   glazier: number
   brokenSteps: number
@@ -44,6 +66,7 @@ export interface GameState {
   palaceSide: PalaceSide
   turn: number
   log: string[]
+  history: GameEvent[]
 }
 export type Source = { type: 'factory'; index: number } | { type: 'center' }
 export type Move =
@@ -52,19 +75,26 @@ export type Move =
 export interface NewGameOptions {
   opponents: number
   difficulty?: Difficulty
+  botDifficulties?: Difficulty[]
   palaceSide?: PalaceSide
   seed?: number
 }
 
-const BASE_PATTERNS: GlassColor[][] = [
-  ['rose', 'rose', 'cyan', 'amber', 'slate'],
-  ['citrine', 'citrine', 'amber', 'cyan', 'rose'],
-  ['cyan', 'cyan', 'slate', 'rose', 'citrine'],
-  ['amber', 'amber', 'citrine', 'slate', 'cyan'],
-  ['slate', 'slate', 'rose', 'amber', 'citrine'],
-  ['rose', 'amber', 'cyan', 'cyan', 'citrine'],
-  ['citrine', 'slate', 'rose', 'rose', 'amber'],
-  ['cyan', 'amber', 'slate', 'citrine', 'slate'],
+/**
+ * Eight paired pattern strips. Distributions follow photographed physical
+ * Sintra tiles (not scans). Exact color-to-reverse pairing is a visual
+ * reconstruction; keep this data isolated for future verified transcription.
+ * Each of the four player colors receives its own shuffled set of 8 strips.
+ */
+const PATTERN_STRIPS: ReadonlyArray<readonly [SlotColor[], SlotColor[]]> = [
+  [['rose','rose','slate','slate','slate'], ['cyan','cyan','cyan','amber','amber']],
+  [['cyan','cyan','cyan','cyan','cyan'], ['amber','amber','amber','amber','amber']],
+  [['citrine','citrine','amber','amber','amber'], ['rose','rose','rose','slate','slate']],
+  [['amber','amber','amber','amber','amber'], ['citrine','citrine','citrine','citrine','citrine']],
+  [['slate','slate','citrine','citrine','citrine'], ['cyan','cyan','slate','slate','slate']],
+  [['citrine','rose','rose','rose','rose'], ['amber','amber','rose','rose','rose']],
+  [['cyan','citrine','citrine','citrine','citrine'], ['slate','slate','slate','slate','slate']],
+  [['amber','slate','slate','slate','slate'], ['rose','cyan','wild','amber','wild']],
 ]
 
 function nextRandom(state: GameState): number {
@@ -104,13 +134,22 @@ function refillFactories(state: GameState): void {
   state.nextStartingPlayer = null
 }
 function makeStrips(state: GameState): WindowStrip[] {
-  const strips = BASE_PATTERNS.map((pattern, i): WindowStrip => {
-    const back: SlotColor[] = pattern.map((_, slot) => COLORS[(COLORS.indexOf(pattern[(slot + 2) % 5]) + i + 1) % 5])
-    // One double-sided strip has two joker spaces on its reverse.
-    if (i === 7) { back[1] = 'wild'; back[3] = 'wild' }
-    return { front: pattern, back, side: 0, panes: [null, null, null, null, null], upper: null, lower: null }
+  const strips = PATTERN_STRIPS.map(([a, b]): WindowStrip => {
+    const hasWildcard = b.includes('wild') || a.includes('wild')
+    // Original setup: random face, except the joker side must begin face down.
+    const flipped = !hasWildcard && nextRandom(state) < 0.5
+    return {
+      front: [...(flipped ? b : a)], back: [...(flipped ? a : b)],
+      side: 0, panes: [null, null, null, null, null], upper: null, lower: null,
+    }
   })
   return shuffle(state, strips)
+}
+function addHistory(state: GameState, event: Omit<GameEvent, 'id' | 'round'>): void {
+  state.history ??= []
+  state.history.unshift({ ...event, id: state.turn, round: state.round })
+  // A whole game is ordinarily well under 250 turns, but cap persisted saves.
+  if (state.history.length > 500) state.history.length = 500
 }
 
 export function newGame(options: NewGameOptions): GameState {
@@ -120,7 +159,7 @@ export function newGame(options: NewGameOptions): GameState {
     round: 1, roundColors: [], factories: [], center: [], bag: [], tower: [],
     players: [], currentPlayer: 0, startingPlayer: 0, nextStartingPlayer: null,
     firstCenterTaken: false, phase: 'playing', palaceSide: options.palaceSide ?? 'A', turn: 0,
-    log: ['Rozpoczęto nową partię. Powodzenia!'],
+    log: ['Rozpoczęto nową partię. Powodzenia!'], history: [],
   }
   state.bag = shuffle(state, COLORS.flatMap((color) => Array.from({ length: 20 }, () => color)))
   // Five different color markers for rounds II–VI, plus a random marker for I.
@@ -129,10 +168,12 @@ export function newGame(options: NewGameOptions): GameState {
   state.roundColors = [state.bag.pop()!, ...distinctColors]
   const labels = ['Ty', 'Aurora', 'Iris', 'Noctis']
   state.players = Array.from({ length: count }, (_, i) => ({
-    id: `player-${i}`, name: labels[i], controller: i === 0 ? 'human' : 'ai', score: 0,
+    id: `player-${i}`, name: labels[i], controller: i === 0 ? 'human' : 'ai',
+    difficulty: i === 0 ? undefined : (options.botDifficulties?.[i - 1] ?? options.difficulty ?? 'normal'), score: 0,
     glazier: 0, brokenSteps: 0, glassLost: 0, strips: makeStrips(state),
   }))
   refillFactories(state)
+  addHistory(state, { playerIndex: null, kind: 'start', description: `Rozpoczęto partię ${count} graczy. Runda 1/6.` })
   return state
 }
 export function patternFor(strip: WindowStrip): SlotColor[] {
@@ -213,7 +254,7 @@ function breakGlass(state: GameState, player: Player, count: number): void {
     }
   }
 }
-function completeStrip(state: GameState, player: Player, index: number, keepColor: GlassColor): void {
+function completeStrip(state: GameState, player: Player, index: number, keepColor: GlassColor): { bonus: number; points: number; flipped: boolean } {
   const strip = player.strips[index]
   const bonusColor = state.roundColors[state.round - 1]
   const bonus = strip.panes.filter((pane) => pane === bonusColor).length
@@ -223,13 +264,15 @@ function completeStrip(state: GameState, player: Player, index: number, keepColo
   if (keepIndex < 0) throw new Error('Wybrana tafla nie znajduje się w ukończonej kwaterze.')
   panes.splice(keepIndex, 1)
   state.tower.push(...panes)
-  if (strip.side === 0) { strip.upper = keepColor; strip.side = 1 }
+  const flipped = strip.side === 0
+  if (flipped) { strip.upper = keepColor; strip.side = 1 }
   else { strip.lower = keepColor; strip.side = 2 }
   strip.panes = [null, null, null, null, null]
   const chainScore = WINDOW_POINTS[index] + player.strips.reduce((sum, other, otherIndex) =>
     sum + (otherIndex > index && other.upper ? WINDOW_POINTS[otherIndex] : 0), 0)
   player.score += chainScore
   state.log.unshift(`${player.name} ukończył(a) okno ${index + 1}: +${bonus + chainScore} pkt.`)
+  return { bonus, points: chainScore, flipped }
 }
 function endGame(state: GameState): void {
   state.phase = 'finished'
@@ -253,6 +296,7 @@ function endGame(state: GameState): void {
     }
   }
   state.log.unshift('Koniec gry! Naliczono punkty finałowe.')
+  addHistory(state, { playerIndex: null, kind: 'final', description: 'Koniec gry: naliczono premię za pozostałe tafle, karę z toru stłuczeń i bonus pałacu.' })
 }
 function finishTurn(state: GameState): void {
   state.turn++
@@ -265,6 +309,7 @@ function finishTurn(state: GameState): void {
     state.currentPlayer = state.startingPlayer
     refillFactories(state)
     state.log.unshift(`Runda ${state.round} — nowy kolor premii.`)
+    addHistory(state, { playerIndex: null, kind: 'round', description: `Rozpoczęła się runda ${state.round}/6. Nowa premia: ${colorName(state.roundColors[state.round - 1])}.` })
   } else {
     state.currentPlayer = (state.currentPlayer + 1) % state.players.length
   }
@@ -273,14 +318,18 @@ function finishTurn(state: GameState): void {
 export function applyMove(current: GameState, move: Move): GameState {
   if (!legalMoves(current).some((candidate) => sameMove(candidate, move))) throw new Error('Niedozwolony ruch.')
   const state = structuredClone(current) as GameState
-  const player = state.players[state.currentPlayer]
+  const playerIndex = state.currentPlayer
+  const player = state.players[playerIndex]
+  const scoreBefore = player.score
   if (move.kind === 'reset') {
     player.glazier = activeStrips(player)[0]
     state.log.unshift(`${player.name} cofa witrażystę.`)
+    addHistory(state, { playerIndex, kind: 'reset', description: `${player.name} przesunął witrażystę do pierwszej dostępnej kwatery (${player.glazier + 1}).` })
     finishTurn(state)
     return state
   }
   const tiles = sourceTiles(state, move.source)
+  let firstPlayer = false
   const selected = tiles.filter((color) => color === move.color)
   const remaining = tiles.filter((color) => color !== move.color)
   if (move.source.type === 'factory') {
@@ -290,12 +339,14 @@ export function applyMove(current: GameState, move: Move): GameState {
     state.center = remaining
     if (!state.firstCenterTaken) {
       state.firstCenterTaken = true
+      firstPlayer = true
       state.nextStartingPlayer = state.currentPlayer
       breakGlass(state, player, 1)
       state.log.unshift(`${player.name} zdobywa znacznik pierwszego gracza.`)
     }
   }
   let placed = 0
+  let completed: ReturnType<typeof completeStrip> | undefined
   if (move.windowIndex !== null) {
     const strip = player.strips[move.windowIndex]
     player.glazier = move.windowIndex
@@ -306,11 +357,22 @@ export function applyMove(current: GameState, move: Move): GameState {
         placed++
       }
     }
-    if (strip.panes.every(Boolean)) completeStrip(state, player, move.windowIndex, move.keepColor!)
+    if (strip.panes.every(Boolean)) completed = completeStrip(state, player, move.windowIndex, move.keepColor!)
   }
   const broken = selected.length - placed
   if (broken) { state.tower.push(...selected.slice(0, broken)); breakGlass(state, player, broken) }
   state.log.unshift(`${player.name}: ${selected.length} ${colorName(move.color)} • ułożono ${placed}${broken ? ` • stłuczono ${broken}` : ''}.`)
+  const sourceLabel = move.source.type === 'center' ? 'ze środka stołu' : `z warsztatu ${move.source.index + 1}`
+  const effect = completed ? ` Ukończono ${completed.flipped ? 'pierwszą' : 'drugą'} stronę okna ${move.windowIndex! + 1} (+${completed.points} za okna, +${completed.bonus} za kolor rundy).` : ''
+  addHistory(state, {
+    playerIndex, kind: 'take', source: move.source, color: move.color,
+    picked: selected.length, placed, broken, windowIndex: move.windowIndex,
+    keepColor: completed ? move.keepColor : undefined,
+    points: player.score - scoreBefore, framePoints: completed?.points,
+    bonusPoints: completed?.bonus, firstPlayer, flipped: completed?.flipped,
+    finished: completed ? !completed.flipped : undefined,
+    description: `${player.name} pobrał ${selected.length} ${colorName(move.color)} ${sourceLabel}. Ułożył ${placed}${broken ? `, stłukł ${broken}` : ''}.${firstPlayer ? ' Zdobył znacznik pierwszego gracza (+1 stłuczenie).' : ''}${effect}`,
+  })
   finishTurn(state)
   return state
 }
