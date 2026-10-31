@@ -46,10 +46,10 @@ function Window({ strip, index, glazier, target, selected, isHumanTurn, onTarget
 
 const avatars = ['✦', '✧', '✳', '❖']
 export function GameBoard({ player, index, isCurrent, isHuman = false, isHumanTurn = false,
-  targets, selected = false, onTarget, canReset = false, onReset }: {
+  targets, selected = false, onTarget, canReset = false, onReset, isStartingPlayer = false, hasFirstToken = false }: {
   player: Player; index: number; isCurrent: boolean; isHuman?: boolean; isHumanTurn?: boolean
   targets?: ReadonlySet<number>; selected?: boolean; onTarget?: (index: number) => void
-  canReset?: boolean; onReset?: () => void
+  canReset?: boolean; onReset?: () => void; isStartingPlayer?: boolean; hasFirstToken?: boolean
 }) {
   const completed = player.strips.filter(s => s.side === 2).length
   return <section className={`sg-board sg-player-${index}${isCurrent ? ' sg-board-current' : ''}${isHuman ? ' sg-board-human' : ''}`}
@@ -57,7 +57,8 @@ export function GameBoard({ player, index, isCurrent, isHuman = false, isHumanTu
     <div className="sg-board-top">
       <span className={`sg-player-icon sg-player-icon-${index}`}>{avatars[index]}</span>
       <span className="sg-board-name">{isHuman ? 'Twoje witraże' : player.name}</span>
-      <span className="sg-board-label">{isCurrent ? 'TERAZ GRA' : isHuman ? 'TWOJA PLANSZA' : `AI · ${player.difficulty === 'hard' ? 'TRUDNY' : player.difficulty === 'easy' ? 'ŁATWY' : 'NORMALNY'}`}</span>
+      <span className="sg-board-label">{isCurrent ? 'TERAZ GRA' : isStartingPlayer ? 'ROZPOCZĄŁ RUNDĘ' : isHuman ? 'TWOJA PLANSZA' : `AI · ${player.difficulty === 'hard' ? 'TRUDNY' : player.difficulty === 'easy' ? 'ŁATWY' : 'NORMALNY'}`}</span>
+      {hasFirstToken && <span className="sg-start-tile sg-start-on-board" title="Ten gracz zdobył żeton pierwszego gracza i rozpocznie kolejną rundę">1</span>}
       <span className="sg-board-stat">{completed}/8 <small>okien</small></span>
       <span className="sg-board-stat">{player.brokenSteps}/8 <small>stłuczeń</small></span>
       <strong className="sg-board-score">{player.score}<small> pkt</small></strong>
