@@ -226,3 +226,55 @@ describe('punktacja według instrukcji (strony 4–6)', () => {
     expect(state.history.some(event => event.kind === 'final' && event.playerIndex !== null)).toBe(true)
   })
 })
+
+
+describe('weryfikacja 32 fizycznych kwater i Szklanej Wieży', () => {
+  it('ma osobne komplety ośmiu dwustronnych kwater dla każdego koloru gracza', async () => {
+    const { PHYSICAL_STRIPS, PALACE_COLORS, decodeStrip } = await import('./engine')
+    const game = newGame({ opponents: 3, seed: 153 })
+    expect(game.players.map(player => player.palaceColor)).toEqual(PALACE_COLORS)
+    for (const [index, player] of game.players.entries()) {
+      const original = PHYSICAL_STRIPS[PALACE_COLORS[index]]
+      expect(original).toHaveLength(8)
+      for (const strip of player.strips) {
+        const [a, b] = original[strip.patternId! - 1]
+        const face = [decodeStrip(a), decodeStrip(b)]
+        expect(face.some(colors => JSON.stringify(colors) === JSON.stringify(strip.front))).toBe(true)
+        expect(face.some(colors => JSON.stringify(colors) === JSON.stringify(strip.back))).toBe(true)
+        expect(strip.front.includes('wild')).toBe(false)
+      }
+      expect(player.strips.flatMap(strip => [...strip.front, ...strip.back]).filter(color => color === 'wild')).toHaveLength(2)
+    }
+  })
+  it('koduje każdą parę w dokładnie pięciu polach i nie miesza ich między graczami', async () => {
+    const { PHYSICAL_STRIPS, PALACE_COLORS, decodeStrip } = await import('./engine')
+    for (const color of PALACE_COLORS) {
+      for (const [front, back] of PHYSICAL_STRIPS[color]) {
+        expect(decodeStrip(front)).toHaveLength(5)
+        expect(decodeStrip(back)).toHaveLength(5)
+      }
+    }
+    // Uzupełnienie użytkownika: biała kwatera nr 2, rewers = 1 żółta + 4 czerwone.
+    expect(PHYSICAL_STRIPS.white[1]).toEqual(['ROOOO', 'YRRRR'])
+    expect(PHYSICAL_STRIPS.red[7][1]).toBe('JJOWB')
+    expect(PHYSICAL_STRIPS.yellow[0][1]).toBe('JJORY')
+    expect(PHYSICAL_STRIPS.blue[0][1]).toBe('JJWRO')
+    expect(PHYSICAL_STRIPS.white[7][1]).toBe('JJYBR')
+  })
+  it('wlicza woreczek, wieżę, rynek, witraże i znaczniki rund do sumy stu tafli', async () => {
+    const { glassInventory } = await import('./engine')
+    for (const opponents of [1, 2, 3]) {
+      let state = newGame({ opponents, seed: 300 + opponents })
+      for (let turn = 0; turn < 220; turn++) {
+        const balance = glassInventory(state)
+        expect(balance.table).toBe(balance.factories + balance.center)
+        expect(balance.total).toBe(100)
+        expect(balance.table + balance.playerBoards + balance.bag + balance.tower + balance.roundTrack).toBe(100)
+        if (state.phase === 'finished') break
+        const moves = legalMoves(state)
+        state = applyMove(state, moves[(turn * 17 + opponents) % moves.length])
+      }
+      expect(state.phase).toBe('finished')
+    }
+  })
+})

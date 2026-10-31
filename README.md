@@ -33,3 +33,23 @@ W kodzie logika jest oddzielona od interfejsu: `src/game/engine.ts`, `src/game/a
 ## Ważne
 
 Projekt fanowski, niezwiązany z autorem ani wydawcą gry. Nie wykorzystuje oficjalnych grafik ani dźwięków.
+
+
+## Zestawy kwater graczy i bilans 100 tafli (v12)
+
+Zestawy **czerwony, żółty, niebieski, biały** mają osobne, dwustronne wzory 8 kwater,
+zgodnie z ręcznym zestawieniem przekazanym dla fizycznej gry. Przypisanie do miejsc:
+Ty — czerwony, Aurora — żółty, Iris — niebieski, Noctis — biały.
+Kwatery są losowo tasowane; każda strona poza jokerami może być losowo stroną początkową.
+Strona z dwoma jokerami jest zawsze początkowo odwrócona.
+
+**Ważne:** zestawienie podaje *liczbę* szkiełek każdego koloru na danej stronie,
+lecz nie dokładną kolejność ich położenia w pionowym pasku. Z tego względu rozkłady
+liczbowe i pary stron odpowiadają zapisanym danym, ale pionowa kolejność pól jest
+umowna. Można ją później skorygować w `PHYSICAL_STRIPS` w `src/game/engine.ts`.
+
+W warsztatach widoczna jest **Szklana Wieża** i bilans tafli:
+**na stole** (warsztaty + środek), **witraże** (pola kwater i zachowane oszklenia),
+**woreczek**, **wieża**, **tor rund**. Suma wszystkich pozycji zawsze wynosi **100**.
+Znaczniki kolorów rund nadal są taflami i muszą zostać uwzględnione w bilansie.
+Aby użyć nowych kwater, wybierz **Nowa gra** — wcześniejsze zapisane partie mają stare układy.

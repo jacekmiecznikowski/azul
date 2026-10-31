@@ -3,7 +3,7 @@ import { patternFor, WINDOW_POINTS } from '../game/engine'
 import type { GlassColor, Player, SlotColor, WindowStrip } from '../game/engine'
 
 const colors: Record<GlassColor, string> = {
-  rose: 'różowy', citrine: 'żółty', cyan: 'turkusowy', amber: 'pomarańczowy', slate: 'biały',
+  rose: 'czerwony', citrine: 'żółty', cyan: 'niebieski', amber: 'pomarańczowy', slate: 'biały',
 }
 
 export function GlassPiece({ color, placed = true, small = false }: {
@@ -53,7 +53,7 @@ export function GameBoard({ player, index, isCurrent, isHuman = false, isHumanTu
 }) {
   const completed = player.strips.filter(s => s.side === 2).length
   return <section className={`sg-board sg-player-${index}${isCurrent ? ' sg-board-current' : ''}${isHuman ? ' sg-board-human' : ''}`}
-    aria-label={`Plansza gracza ${player.name}`}>
+    aria-label={`Plansza gracza ${player.name} (${player.palaceColor === 'red' ? 'czerwona' : player.palaceColor === 'yellow' ? 'żółta' : player.palaceColor === 'blue' ? 'niebieska' : 'biała'})`}>
     <div className="sg-board-top">
       <span className={`sg-player-icon sg-player-icon-${index}`}>{avatars[index]}</span>
       <span className="sg-board-name">{isHuman ? 'Twoje witraże' : player.name}</span>

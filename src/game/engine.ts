@@ -34,6 +34,7 @@ export const FACTORY_COUNT: Record<number, number> = { 2: 5, 3: 7, 4: 9 }
 export interface WindowStrip {
   front: SlotColor[]
   back: SlotColor[]
+  patternId?: number
   side: 0 | 1 | 2
   panes: (GlassColor | null)[]
   upper: GlassColor | null
@@ -58,6 +59,7 @@ export interface Player {
   name: string
   controller: Controller
   difficulty?: Difficulty
+  palaceColor?: PalaceColor
   score: number
   glazier: number
   brokenSteps: number
@@ -96,22 +98,68 @@ export interface NewGameOptions {
   seed?: number
 }
 
+/** Physical palace colors (not the colors of the glass pieces). */
+export const PALACE_COLORS = ['red', 'yellow', 'blue', 'white'] as const
+export type PalaceColor = (typeof PALACE_COLORS)[number]
+
 /**
- * Eight paired pattern strips. Distributions follow photographed physical
- * Sintra tiles (not scans). Exact color-to-reverse pairing is a visual
- * reconstruction; keep this data isolated for future verified transcription.
- * Each of the four player colors receives its own shuffled set of 8 strips.
+ * 32 paired, player-colored strips transcribed from the supplied list.
+ * R=red, Y=yellow, B=blue, O=orange, W=white, J=joker.
+ * Five-character strings encode COUNTS and a stable display order; the user
+ * did not specify the precise physical top-to-bottom position of every field.
+ * The strip order is randomized at setup. The joker face always starts down.
  */
-const PATTERN_STRIPS: ReadonlyArray<readonly [SlotColor[], SlotColor[]]> = [
-  [['rose','rose','slate','slate','slate'], ['cyan','cyan','cyan','amber','amber']],
-  [['cyan','cyan','cyan','cyan','cyan'], ['amber','amber','amber','amber','amber']],
-  [['citrine','citrine','amber','amber','amber'], ['rose','rose','rose','slate','slate']],
-  [['amber','amber','amber','amber','amber'], ['citrine','citrine','citrine','citrine','citrine']],
-  [['slate','slate','citrine','citrine','citrine'], ['cyan','cyan','slate','slate','slate']],
-  [['citrine','rose','rose','rose','rose'], ['amber','amber','rose','rose','rose']],
-  [['cyan','citrine','citrine','citrine','citrine'], ['slate','slate','slate','slate','slate']],
-  [['amber','slate','slate','slate','slate'], ['rose','cyan','wild','amber','wild']],
-]
+export const PHYSICAL_STRIPS: Record<PalaceColor, readonly (readonly [string, string])[]> = {
+  red: [
+    ['YYYYY', 'YYOOO'], // #1
+    ['BBRRR', 'BBBBB'], // #2
+    ['RRWWW', 'RRRRR'], // #3
+    ['WWWWW', 'WWYYY'], // #4
+    ['OOBBB', 'OOOOO'], // #5
+    ['OWWWW', 'OOOOR'], // #6
+    ['BYYYY', 'BBBBW'], // #7
+    ['RRRRY', 'JJOWB'], // #8
+  ],
+  yellow: [
+    ['WBBBB', 'JJORY'], // #1
+    ['WWYYY', 'WWWWW'], // #2
+    ['OOBBB', 'OOOOO'], // #3
+    ['RRWWW', 'RRRRR'], // #4
+    ['BBRRR', 'BBBBB'], // #5
+    ['ROOOO', 'WWWWO'], // #6
+    ['BYYYY', 'RRRRY'], // #7
+    ['YYOOO', 'YYYYY'], // #8
+  ],
+  blue: [
+    ['BYYYY', 'JJWRO'], // #1
+    ['WWWWW', 'WWYYY'], // #2
+    ['YYOOO', 'YYYYY'], // #3
+    ['OOBBB', 'OOOOO'], // #4
+    ['RRWWW', 'RRRRR'], // #5
+    ['BBBBB', 'BBRRR'], // #6
+    ['YRRRR', 'OOOOO'], // #7
+    ['OWWWW', 'WBBBB'], // #8
+  ],
+  white: [
+    ['OOBBB', 'OOOOO'], // #1
+    ['ROOOO', 'YRRRR'], // #2 — supplied as follow-up
+    ['WWWWW', 'WWYYY'], // #3
+    ['BBRRR', 'BBBBB'], // #4
+    ['YYYYY', 'YYOOO'], // #5
+    ['WBBBB', 'BYYYY'], // #6
+    ['RRWWW', 'RRRRR'], // #7
+    ['OWWWW', 'JJYBR'], // #8
+  ],
+}
+const LETTER_COLORS: Record<string, SlotColor> = {
+  R: 'rose', Y: 'citrine', B: 'cyan', O: 'amber', W: 'slate', J: 'wild',
+}
+export function decodeStrip(pattern: string): SlotColor[] {
+  if (pattern.length !== 5 || [...pattern].some(letter => !(letter in LETTER_COLORS))) {
+    throw new Error(`Niepoprawny wzór kwatery: ${pattern}`)
+  }
+  return [...pattern].map(letter => LETTER_COLORS[letter])
+}
 
 function nextRandom(state: GameState): number {
   let x = state.seed | 0
@@ -149,18 +197,21 @@ function refillFactories(state: GameState): void {
   state.firstCenterTaken = false
   state.nextStartingPlayer = null
 }
-function makeStrips(state: GameState): WindowStrip[] {
-  const strips = PATTERN_STRIPS.map(([a, b]): WindowStrip => {
-    const hasWildcard = b.includes('wild') || a.includes('wild')
-    // Original setup: random face, except the joker side must begin face down.
+function makeStrips(state: GameState, palaceColor: PalaceColor): WindowStrip[] {
+  const strips = PHYSICAL_STRIPS[palaceColor].map(([front, back], patternIndex): WindowStrip => {
+    const a = decodeStrip(front)
+    const b = decodeStrip(back)
+    const hasWildcard = a.includes('wild') || b.includes('wild')
     const flipped = !hasWildcard && nextRandom(state) < 0.5
     return {
-      front: [...(flipped ? b : a)], back: [...(flipped ? a : b)],
+      front: flipped ? b : a, back: flipped ? a : b,
+      patternId: patternIndex + 1,
       side: 0, panes: [null, null, null, null, null], upper: null, lower: null,
     }
   })
   return shuffle(state, strips)
 }
+
 function addHistory(state: GameState, event: Omit<GameEvent, 'id' | 'round'>): void {
   state.history ??= []
   state.history.unshift({ ...event, id: state.turn, round: state.round })
@@ -186,7 +237,8 @@ export function newGame(options: NewGameOptions): GameState {
   state.players = Array.from({ length: count }, (_, i) => ({
     id: `player-${i}`, name: labels[i], controller: i === 0 ? 'human' : 'ai',
     difficulty: i === 0 ? undefined : (options.botDifficulties?.[i - 1] ?? options.difficulty ?? 'normal'), score: 0,
-    glazier: 0, brokenSteps: 0, glassLost: 0, strips: makeStrips(state),
+    glazier: 0, brokenSteps: 0, glassLost: 0, palaceColor: PALACE_COLORS[i],
+    strips: makeStrips(state, PALACE_COLORS[i]),
   }))
   // In the physical game the first player is chosen before the first round.
   // With no real-world "last window washer", draw the starter deterministically from the seed.
@@ -295,6 +347,32 @@ function completeStrip(state: GameState, player: Player, index: number, keepColo
   return { bonus, points: chainScore, flipped }
 }
 /** Independent, transparent final scoring. In-game -18 penalties are already in player.score. */
+export interface GlassInventory {
+  factories: number
+  center: number
+  table: number
+  bag: number
+  tower: number
+  playerBoards: number
+  roundTrack: number
+  total: number
+}
+/** Accounts for all 100 physical glass tiles, including round markers. */
+export function glassInventory(state: GameState): GlassInventory {
+  const factories = state.factories.reduce((total, factory) => total + factory.length, 0)
+  const center = state.center.length
+  const playerBoards = state.players.reduce((total, player) => total + player.strips.reduce(
+    (count, strip) => count + strip.panes.filter((pane) => pane !== null).length +
+      Number(strip.upper !== null) + Number(strip.lower !== null), 0), 0)
+  // Used round markers are put in the tower; unplayed/current markers stay on the round track.
+  const roundTrack = state.phase === 'finished' ? 0 : (7 - state.round)
+  const bag = state.bag.length
+  const tower = state.tower.length
+  const table = factories + center
+  return { factories, center, table, bag, tower, playerBoards, roundTrack,
+    total: table + bag + tower + playerBoards + roundTrack }
+}
+
 export function finalBreakdown(player: Player, side: PalaceSide): FinalScoreBreakdown {
   const remainingPanes = player.strips.reduce((sum, strip) => sum + strip.panes.filter(Boolean).length, 0)
   const remainingPoints = Math.floor(remainingPanes / 3)
@@ -424,5 +502,5 @@ export function standings(state: GameState): Player[] {
   return [...state.players].sort((a, b) => b.score - a.score || a.glassLost - b.glassLost)
 }
 export function colorName(color: GlassColor): string {
-  return { rose: 'różowych', citrine: 'żółtych', cyan: 'turkusowych', amber: 'pomarańczowych', slate: 'szarych' }[color]
+  return { rose: 'czerwonych', citrine: 'żółtych', cyan: 'niebieskich', amber: 'pomarańczowych', slate: 'białych' }[color]
 }
