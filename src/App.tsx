@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  ArrowLeft, ArrowRight, BookOpen, Bot, Check, Crown, Gem, History,
-  Info, Layers3, RotateCcw, Settings2, Shield, Trophy, RefreshCw,
+  ArrowRight, BookOpen, Bot, Check, Crown, Gem, History,
+  Info, Layers3, RotateCcw, Settings2, Trophy, RefreshCw,
   X,
 } from 'lucide-react'
 import {
@@ -14,6 +14,7 @@ import { BrokenGlassTrack, GameTimeline, TableSeat } from './components/MatchPan
 import { Glass, WindowCard } from './components/WindowBoard'
 import './match.css'
 import './tabletop.css'
+import './balanced-table.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = {
@@ -119,6 +120,7 @@ export default function App() {
   }))
   const [selection, setSelection] = useState<Selection | null>(null)
   const [inspect, setInspect] = useState(0)
+  const [inspectedBoard, setInspectedBoard] = useState<number | null>(null)
   const [finishing, setFinishing] = useState<Move[] | null>(null)
   const [showSetup, setShowSetup] = useState(false)
   const [showRules, setShowRules] = useState(false)
@@ -129,10 +131,9 @@ export default function App() {
   const sourceOptions = useMemo(() => availableSources(game), [game])
   const selectionMoves = useMemo(() => selection ? moves.filter((move) => move.kind === 'take' &&
     sourceEquals(move.source, selection.source) && move.color === selection.color) : [], [moves, selection])
-  const targetIndices = new Set(selectionMoves.filter((move) => move.kind === 'take' && move.windowIndex !== null).map((move) => move.kind === 'take' ? move.windowIndex : null))
+  const targetIndices = new Set<number>(selectionMoves.flatMap((move) => move.kind === 'take' && move.windowIndex !== null ? [move.windowIndex] : []))
   const best = standings(game)
   const current = game.players[game.currentPlayer]
-  const selectedPlayer = game.players[inspect] ?? game.players[0]
   const canReset = humanTurn && moves.some((move) => move.kind === 'reset')
 
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(game)) }, [game])
@@ -151,6 +152,7 @@ export default function App() {
     setSelection(null)
     setFinishing(null)
     setInspect(0)
+    setInspectedBoard(null)
   }
   function chooseSource(source: Source, color: GlassColor) {
     if (!humanTurn || inspect !== 0 || finishing) return
@@ -177,6 +179,7 @@ export default function App() {
     setSelection(null)
     setFinishing(null)
     setInspect(0)
+    setInspectedBoard(null)
     setShowSetup(false)
   }
 
@@ -195,13 +198,13 @@ export default function App() {
         <section className={`tabletop-surface tabletop-players-${game.players.length}${physicalOrientation ? ' physical-orientation' : ' readable-orientation'}`} aria-label="Wspólny stół z planszami graczy i warsztatami">
           <div className="tabletop-grid">
             {game.players[3] && <div className="tabletop-seat-slot tabletop-seat-slot-west">
-              <TableSeat player={game.players[3]} index={3} location="west" isCurrent={game.currentPlayer === 3 && game.phase === 'playing'} onInspect={() => {setInspect(3);setSelection(null)}} />
+              <TableSeat player={game.players[3]} index={3} location="west" isCurrent={game.currentPlayer === 3 && game.phase === 'playing'} onInspect={() => {setInspect(3);setInspectedBoard(3);setSelection(null)}} />
             </div>}
             {game.players[1] && <div className="tabletop-seat-slot tabletop-seat-slot-north">
-              <TableSeat player={game.players[1]} index={1} location="north" isCurrent={game.currentPlayer === 1 && game.phase === 'playing'} onInspect={() => {setInspect(1);setSelection(null)}} />
+              <TableSeat player={game.players[1]} index={1} location="north" isCurrent={game.currentPlayer === 1 && game.phase === 'playing'} onInspect={() => {setInspect(1);setInspectedBoard(1);setSelection(null)}} />
             </div>}
             {game.players[2] && <div className="tabletop-seat-slot tabletop-seat-slot-east">
-              <TableSeat player={game.players[2]} index={2} location="east" isCurrent={game.currentPlayer === 2 && game.phase === 'playing'} onInspect={() => {setInspect(2);setSelection(null)}} />
+              <TableSeat player={game.players[2]} index={2} location="east" isCurrent={game.currentPlayer === 2 && game.phase === 'playing'} onInspect={() => {setInspect(2);setInspectedBoard(2);setSelection(null)}} />
             </div>}
 
             <section className="tabletop-market" aria-label="Warsztaty, punktacja i historia">
@@ -222,7 +225,7 @@ export default function App() {
                   <History size={16}/><span>Historia rozgrywki</span><b>{game.history?.length ?? 0}</b>
                 </button>
                 <button className="tabletop-hud-action tabletop-orient-action" type="button" aria-pressed={physicalOrientation} onClick={() => setPhysicalOrientation(v => !v)}>
-                  <RefreshCw size={15}/><span>{physicalOrientation ? 'Odwróć orientację' : 'Układ jak przy stole'}</span>
+                  <RefreshCw size={15}/><span>{physicalOrientation ? 'Zmień kierunek plansz' : 'Układ jak przy stole'}</span>
                 </button>
               </div>
 
@@ -240,10 +243,15 @@ export default function App() {
               <div className="tabletop-market-help" aria-live="polite"><Info size={15}/><span>{selection ? `Wybrano ${COLORS_PL[selection.color].toLowerCase()} — wskaż podświetloną kwaterę na swojej planszy.` : humanTurn ? 'Twój ruch — wybierz kolor z warsztatu lub ze środka.' : game.phase === 'finished' ? 'Partia zakończona.' : `Ruch: ${current.name} (AI)`}</span>{selection && <button className="clear-pick" onClick={() => setSelection(null)}>Anuluj <X size={13}/></button>}{selection && selectionMoves.some(move => move.kind === 'take' && move.windowIndex === null) && <button className="btn btn-warn tabletop-discard" onClick={() => chooseTarget(null)}>Stłucz tafle</button>}</div>
             </section>
 
-            <section className={`tabletop-human${game.currentPlayer === 0 && game.phase === 'playing' ? ' tabletop-human-active' : ''}`} aria-label="Twoja plansza witraży" id="my-board">
-              <div className="tabletop-human-heading"><div className="tabletop-human-identity"><span className="player-avatar avatar-0">{PLAYER_AVATARS[0]}</span><div><h2>Twoje witraże <span>✧</span></h2></div></div><div className="tabletop-human-stats"><span><Gem size={14}/> {game.players[0].score} pkt</span><span><Shield size={14}/> {game.players[0].brokenSteps}/8 stłuczeń</span><button className="btn btn-reset tabletop-reset" disabled={!canReset || !!finishing || inspect !== 0} onClick={() => commitMove({ kind: 'reset' })} title="Zamiast pobierać szkło, cofnij witrażystę do początku dostępnych kwater"><ArrowLeft size={14}/> Cofnij witrażystę</button></div></div>
-              <div className="board-scroll"><div className="board-area"><div className="window-row">{game.players[0].strips.map((strip, index) => <WindowCard key={index} strip={strip} index={index} glazier={game.players[0].glazier} highlighted={targetIndices.has(index)} active={selection !== null} isHumanTurn={humanTurn} onClick={() => chooseTarget(index)}/>)}</div></div></div>
-            </section>
+            <div className="tabletop-seat-slot tabletop-seat-slot-south">
+              <TableSeat player={game.players[0]} index={0} location="south"
+                isCurrent={game.currentPlayer === 0 && game.phase === 'playing'}
+                isHuman isHumanTurn={humanTurn} activeSelection={selection !== null}
+                highlightedTargets={targetIndices} onTarget={chooseTarget}
+                canReset={canReset && !finishing}
+                onReset={() => commitMove({kind: 'reset'})}
+                onInspect={() => {setInspect(0);setInspectedBoard(0)}} />
+            </div>
           </div>
         </section>
       </div>
@@ -254,7 +262,7 @@ export default function App() {
         <GameTimeline state={game}/>
       </div>
     </div>}
-    {inspect > 0 && <div className="modal-backdrop" onMouseDown={() => setInspect(0)}><div className="modal tabletop-inspect-modal" role="dialog" aria-modal="true" aria-label={`Plansza gracza ${selectedPlayer.name}`} onMouseDown={(e) => e.stopPropagation()}><button className="close-btn" onClick={() => setInspect(0)} aria-label="Zamknij podgląd"><X size={18}/></button><div className="tabletop-inspect-heading"><span className={`player-avatar avatar-${inspect}`}>{PLAYER_AVATARS[inspect]}</span><div><span className="overline">PODGLĄD PRZECIWNIKA</span><h2>{selectedPlayer.name} <small>{selectedPlayer.score} pkt</small></h2></div></div><p>Witraże i pozycja witrażysty przeciwnika. Kliknij poza planszą lub użyj ×, aby wrócić do stołu.</p><div className="board-scroll"><div className="board-area"><div className="window-row">{selectedPlayer.strips.map((strip, index) => <WindowCard key={index} strip={strip} index={index} glazier={selectedPlayer.glazier} highlighted={false} active={false} isHumanTurn={false} onClick={() => undefined}/>)}</div></div></div></div></div>}
+    {inspectedBoard !== null && <div className="modal-backdrop" onMouseDown={() => {setInspectedBoard(null);setInspect(0)}}><div className="modal tabletop-inspect-modal" role="dialog" aria-modal="true" aria-label={`Plansza gracza ${game.players[inspectedBoard].name}`} onMouseDown={e => e.stopPropagation()}><button className="close-btn" onClick={() => {setInspectedBoard(null);setInspect(0)}} aria-label="Zamknij podgląd"><X size={18}/></button><div className="tabletop-inspect-heading"><span className={`player-avatar avatar-${inspectedBoard}`}>{PLAYER_AVATARS[inspectedBoard]}</span><div><span className="overline">PEŁNOWYMIAROWA PLANSZA</span><h2>{game.players[inspectedBoard].name} <small>{game.players[inspectedBoard].score} pkt</small></h2></div></div><p>{inspectedBoard === 0 ? 'Twoje kwatery. Po wybraniu szkła na stole możesz również wskazać kwaterę tutaj.' : 'Pełny podgląd kwater i pozycji witrażysty przeciwnika.'}</p><div className="board-scroll"><div className="board-area"><div className="window-row">{game.players[inspectedBoard].strips.map((strip, index) => <WindowCard key={index} strip={strip} index={index} glazier={game.players[inspectedBoard].glazier} highlighted={inspectedBoard === 0 && targetIndices.has(index)} active={selection !== null} isHumanTurn={inspectedBoard === 0 && humanTurn} onClick={() => inspectedBoard === 0 && chooseTarget(index)}/>)}</div></div></div></div></div>}
     {game.phase === 'finished' && <div className="result-float"><Crown size={18}/><span>Partia zakończona — wygrywa <strong>{best[0].name}</strong>!</span><button onClick={() => setShowSetup(true)}>Zagraj ponownie <ArrowRight size={15}/></button></div>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
