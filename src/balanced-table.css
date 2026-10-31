@@ -4,7 +4,7 @@
 .tabletop-players-3 .tabletop-grid,
 .tabletop-players-4 .tabletop-grid {
   --seat-length: min(calc(100dvh - 118px), calc((100vw - 35px) * .625), 1100px);
-  --seat-depth: calc(var(--seat-length) * .29);
+  --seat-depth: calc(var(--seat-length) * .31);
   display:grid;
   grid-template-columns:var(--seat-depth) minmax(0,1fr) var(--seat-depth);
   grid-template-rows:var(--seat-depth) minmax(0,1fr) var(--seat-depth);
@@ -29,16 +29,16 @@
 .physical-orientation .tabletop-seat-slot-east .tabletop-seat,
 .readable-orientation .tabletop-seat-slot-east .tabletop-seat{transform:translate(-50%,-50%) rotate(90deg)}
 .readable-orientation .tabletop-seat-slot-north .tabletop-seat{transform:translate(-50%,-50%)}
-.tabletop-grid .tabletop-seat-header{height:25px;min-height:25px;gap:7px}
+.tabletop-grid .tabletop-seat-header{height:22px;min-height:22px;gap:7px}
 .tabletop-grid .tabletop-seat-name strong{font-size:12px}
 .tabletop-grid .tabletop-seat-score{font-size:14px}
 .tabletop-grid .tabletop-seat-windows{margin-top:3px}
 .tabletop-grid .window-row{gap:5px}
 .tabletop-grid .window-strip{padding:4px 4px 3px}
-.tabletop-grid .pattern-cell .glass{width:min(90cqi,90cqb,35px)}
-.tabletop-grid .reverse-preview{height:18px;min-height:18px}
+.tabletop-grid .pattern-cell .glass{width:min(97cqi,97cqb,36px)}
+.tabletop-grid .reverse-preview{height:15px;min-height:15px}
 .tabletop-grid .reverse-dot{width:8px;height:8px}
-.tabletop-grid .palace-window{height:19px;min-height:19px}
+.tabletop-grid .palace-window{height:17px;min-height:17px}
 .tabletop-seat-human{border-color:#ddc78d;box-shadow:inset 0 0 0 1px #d7c18565,0 0 12px #d2bd7440}
 .tabletop-seat-reset{display:flex;align-items:center;justify-content:center;gap:5px;min-height:22px;padding:2px 8px;border-radius:5px;border:1px solid #a9dbbe;background:#d7f1dc;color:#18443b;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap}
 .tabletop-seat-reset:disabled{opacity:.45;cursor:not-allowed}
