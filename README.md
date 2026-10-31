@@ -30,15 +30,19 @@ npm.cmd run dev
 Node.js 22.18.0 jest zgodny z Vite 8 i Vitest 5. Nie próbuj instalować npm 12 na tej wersji Node.
 
 
-## Widok fizycznego stołu (v4)
+## Widok fizycznego stołu (v5 — równe plansze)
 
 - **Cztery plansze wokół warsztatów:** twoja na dole, bot naprzeciwko do góry nogami, a dwaj pozostali po bokach (obróceni o 90°). Tak samo, jak przy prawdziwym stole. Dla 2–3 graczy nieobecne miejsca są pomijane.
 - **Pełne kwatery:** wszystkie plansze korzystają z tego samego komponentu `WindowCard`; żadnych uproszczonych miniaturek. Kliknij ikonę powiększenia przy graczu, aby obejrzeć planszę z bliska.
 - **Kwadratowe tafle:** naprawiono problem z zawężaniem szkła przez procentową wysokość w automatycznej siatce CSS. Wielkość tafli zależy od rozmiaru pola, zachowuje proporcje 1:1.
 - **Mniejsze warsztaty** są w centrum stołu. Wyniki, stan tury, tor stłuczeń i przycisk historii znajdują się obok nich, bez zabierania miejsca czterem planszom.
 - Historia partii otwiera się w dużym oknie z filtrami, zamiast zajmować stale widoczną kolumnę; tor stłuczonego szkła pozostaje widoczny.
-- Na desktopie o wysokości co najmniej 710 px gra automatycznie dopasowuje się do okna. Na małych ekranach stół jest przewijany, aby nie upychać ośmiu kwater w kilka pikseli.
+- Na typowych desktopach plansze dopasowują się do wysokości okna. Na niskich i wąskich ekranach stół może być przewijany, aby nie zmniejszać tafli do kilku pikseli.
 - Przycisk **„Odwróć orientację”** zmienia orientację planszy naprzeciwko i kierunek obrotu plansz bocznych.
+
+### Równe rozmiary plansz (v5)
+
+Wszyscy czterej gracze mają dokładnie ten sam komponent `TableSeat`, osiem kwater i taki sam bazowy rozmiar. Plansze boczne zajmują całą wysokość stołu zamiast być ściskane do środkowego rzędu; plansza człowieka nie jest już renderowana osobno na całą szerokość. W małych oknach korzystaj z ikon powiększenia, a w bardzo wąskich układ może wymagać przewijania. Zasady i AI pozostają bez zmian.
 
 ## Co jest zaimplementowane
 
