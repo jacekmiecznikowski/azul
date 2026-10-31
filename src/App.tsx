@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, X, ListChecks } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, patternFor, standings } from './game/engine'
-import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source, WindowStrip } from './game/engine'
+import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
 import { LiveHistory } from './components/LiveHistory'
 import { FinalResults } from './components/FinalResults'
@@ -108,9 +108,9 @@ function PenaltyTrack({ game }: { game: GameState }) {
       <div key={i} className={`sg-track-step${i === 8 ? ' sg-track-last' : ''}`}>
         <span>{i === 0 ? 'START' : i}</span>
         <strong>{value === 0 ? '0' : `−${value}`}</strong>
-        <div className="sg-track-pawns">{game.players.map((p, j) => p.brokenSteps === i && <i key={p.id} className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`} title={`${p.name}: ${i}/8`}/>)}</div>
+        <div className="sg-track-pawns">{game.players.map(p => p.brokenSteps === i && <i key={p.id} className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`} title={`${p.name}: ${i}/8`}/>)}</div>
       </div>)}</div>
-    <div className="sg-track-legend">{game.players.map((p, i) => <span key={p.id}><i className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`}/>{p.name} <b>{p.brokenSteps}/8</b></span>)}</div>
+    <div className="sg-track-legend">{game.players.map(p => <span key={p.id}><i className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`}/>{p.name} <b>{p.brokenSteps}/8</b></span>)}</div>
   </section>
 }
 
