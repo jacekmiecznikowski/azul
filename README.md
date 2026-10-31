@@ -129,3 +129,65 @@ pięciu kolorów na fizycznych paskach jest nadal umowna.
 
 Zobacz [raport strategii](reports/STRATEGY.md) i
 [dane eksperymentu](reports/ai-training-results.json).
+
+
+## Laboratorium strategii — trening v3
+
+Poprzednie polecenie `train:ai` uruchamiało 6 generacji, a potem jeszcze kilka
+tysięcy partii walidacji i `refine.cjs`. Dlatego po `Generation 6` proces mógł
+długo nie wypisywać nowych informacji. Poprzednią metodę zachowano pod nazwą
+`npm run train:legacy`.
+
+Nowe polecenie `train:ai` wywołuje trener `scripts/advanced.cjs`:
+- ocenia na jednakowych nasionach (z takim samym startem i stroną pałacu)
+  kandydata i bieżącego bota, przy 2/3/4 graczach;
+- mierzy nie tylko zwycięstwa, ale też średnią różnicę punktów, stłuczenia,
+  premie, ukończone kwatery i cofnięcia witrażysty;
+- zapisuje **checkpoint po każdym kandydacie** i wypisuje postęp pracy;
+- oddziela nasiona użyte podczas strojenia od finalnych rozgrywek walidacyjnych;
+- wymaga znaczącej przewagi w niezależnej walidacji, zanim **automatycznie
+  podmieni** `src/game/trained-weights.json`; inaczej zachowuje stare wagi;
+- zapisuje dokładne wyniki i wnioski do `reports/strategy-advanced.json` oraz
+  `reports/strategy-advanced.md`.
+
+Po `git pull` dostępne są profile:
+
+```powershell
+npm.cmd run train:quick      # mała próbka, kontrola działania
+npm.cmd run train:ai         # normalny trening i walidacja
+npm.cmd run train:deep       # szeroki, kosztowny trening
+```
+
+Można ustawić parametry niezależnie, na przykład:
+
+```powershell
+npm.cmd run train:ai -- --generations 8 --population 12 --games 20 --holdout 120 --h2h 200 --seed 20261101
+```
+
+Obsługiwane opcje: `--preset quick|balanced|deep`, `--generations`,
+`--population`, `--games` (na format i kandydata), `--holdout` (liczba gier na
+format w finalnym teście), `--h2h` (bezpośrednie pojedynki z obecnym botem),
+`--ablate`, `--participants 2,3,4`, `--rival hard|expert`, `--seed`,
+`--patience`, `--budget-minutes`, `--no-promote`, `--resume`.
+
+Bezpieczne przerwanie: naciśnij **Ctrl+C raz**, poczekaj na komunikat o
+checkpoincie, potem:
+
+```powershell
+npm.cmd run train:resume
+```
+
+Dla niestandardowych parametrów powtórz te same argumenty i dodaj `--resume`
+(np. `npm.cmd run train:ai -- --preset deep --resume`). Wznowienie następuje
+od następnego **kandydata**, nie od początku treningu. Opcja
+`--budget-minutes 20` pozwala ustalić budżet czasu: po skończeniu aktualnie
+liczonego kandydata zapisze checkpoint.
+
+**Uwaga:** starego treningu już trwającego w PowerShell nie da się przekształcić
+w nowy w trakcie działania. Najpierw pozwól mu zakończyć obliczenia albo
+zatrzymaj go świadomie — jego aktualna wersja nie obsługuje wznowienia.
+Nie uruchamiaj dwóch treningów naraz w tym samym repozytorium, bo mogłyby
+nadpisać pliki wyników.
+
+Eksperymentalne ablacje pokazują **korelacje** przy wyłączaniu cech modelu,
+a nie dowód uniwersalnej strategii dla każdej partii.
