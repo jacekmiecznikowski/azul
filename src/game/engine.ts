@@ -172,8 +172,12 @@ export function newGame(options: NewGameOptions): GameState {
     difficulty: i === 0 ? undefined : (options.botDifficulties?.[i - 1] ?? options.difficulty ?? 'normal'), score: 0,
     glazier: 0, brokenSteps: 0, glassLost: 0, strips: makeStrips(state),
   }))
+  // In the physical game the first player is chosen before the first round.
+  // With no real-world "last window washer", draw the starter deterministically from the seed.
+  state.startingPlayer = Math.floor(nextRandom(state) * count)
+  state.currentPlayer = state.startingPlayer
   refillFactories(state)
-  addHistory(state, { playerIndex: null, kind: 'start', description: `Rozpoczęto partię ${count} graczy. Runda 1/6.` })
+  addHistory(state, { playerIndex: null, kind: 'start', description: `Rozpoczęto partię ${count} graczy. Pierwszą rundę rozpoczyna ${state.players[state.startingPlayer].name}.` })
   return state
 }
 export function patternFor(strip: WindowStrip): SlotColor[] {
@@ -309,7 +313,7 @@ function finishTurn(state: GameState): void {
     state.currentPlayer = state.startingPlayer
     refillFactories(state)
     state.log.unshift(`Runda ${state.round} — nowy kolor premii.`)
-    addHistory(state, { playerIndex: null, kind: 'round', description: `Rozpoczęła się runda ${state.round}/6. Nowa premia: ${colorName(state.roundColors[state.round - 1])}.` })
+    addHistory(state, { playerIndex: null, kind: 'round', description: `Rozpoczęła się runda ${state.round}/6. Zaczyna ${state.players[state.startingPlayer].name}. Nowa premia: ${colorName(state.roundColors[state.round - 1])}.` })
   } else {
     state.currentPlayer = (state.currentPlayer + 1) % state.players.length
   }
