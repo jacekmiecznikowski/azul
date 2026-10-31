@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, BookOpen, Bot, Check, Gem, History, Info, RotateCcw, Settings2, Trophy, X } from 'lucide-react'
+import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, X } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, legalMoves, newGame, standings } from './game/engine'
 import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
-import { GameTimeline } from './components/MatchPanels'
+import { LiveHistory } from './components/LiveHistory'
+import { useGameAudio } from './hooks/useGameAudio'
 import { GameBoard, GlassPiece } from './components/GameBoard'
 import './match.css'
 import './redesign.css'
+import './center-v9.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Róż', citrine: 'Złoto', cyan: 'Turkus', amber: 'Bursztyn', slate: 'Srebro' }
@@ -62,10 +64,13 @@ function Market({ game, selection, disabled, onPick }: {
             className={`sg-center-choice${selection?.source.type === 'center' && selection.color === color ? ' sg-token-selected' : ''}`}>
             <GlassPiece color={color} small/><b>{count}</b>
           </button>) : <span className="sg-center-quiet">✧</span>}</div>
+        {!game.firstCenterTaken && <span className="sg-start-tile sg-start-on-market" title="Żeton pierwszego gracza — pierwszy pobór ze środka oznacza +1 stłuczenie">1</span>}
         {!game.firstCenterTaken && <small className="sg-center-penalty">+1 stłuczenie</small>}
       </div>
     </div>
-    <div className="sg-first-token"><span className="sg-first-mark">1</span>{game.firstCenterTaken ? `${game.players[game.nextStartingPlayer ?? game.startingPlayer].name} rozpocznie następną rundę` : 'Żeton pierwszego gracza'}</div>
+    <div className="sg-first-token">{game.firstCenterTaken
+      ? <>Żeton zdobył(a): <strong>{game.players[game.nextStartingPlayer ?? game.startingPlayer].name}</strong> · start w następnej rundzie</>
+      : <>Rundę rozpoczął(a) <strong>{game.players[game.startingPlayer].name}</strong> · żeton na środku</>}</div>
   </section>
 }
 
@@ -74,7 +79,7 @@ function PenaltyTrack({ game }: { game: GameState }) {
     <div className="sg-panel-title"><span>STŁUCZONE SZKŁO</span><small>tor kar</small></div>
     <div className="sg-track-cells">{BROKEN_TRACK.map((value, i) =>
       <div key={i} className={`sg-track-step${i === 8 ? ' sg-track-last' : ''}`}>
-        <span>{i === 0 ? 'START' : `${i} szkieł`}</span>
+        <span>{i === 0 ? 'START' : i}</span>
         <strong>{value === 0 ? '0' : `−${value}`}</strong>
         <div className="sg-track-pawns">{game.players.map((p, j) => p.brokenSteps === i && <i key={p.id} className={`sg-pawn sg-pawn-${j}`} title={`${p.name}: ${i}/8`}/>)}</div>
       </div>)}</div>
@@ -82,7 +87,7 @@ function PenaltyTrack({ game }: { game: GameState }) {
   </section>
 }
 
-function TurnSummary({ game, onHistory, onRules }: { game: GameState; onHistory: () => void; onRules: () => void }) {
+function TurnSummary({ game }: { game: GameState }) {
   const current = game.players[game.currentPlayer]
   return <section className="sg-turn sg-center-card" aria-label="Tura i wyniki">
     <div className="sg-panel-title"><span>PRZY STOLE</span><span className="sg-live-dot"/></div>
@@ -91,11 +96,10 @@ function TurnSummary({ game, onHistory, onRules }: { game: GameState; onHistory:
       <small>{game.phase === 'finished' ? 'Zobacz końcowe wyniki' : current.controller === 'human' ? 'Wybierz tafle i kwaterę' : 'Przeciwnik rozważa ruch…'}</small></div>
       {current.controller === 'ai' && game.phase === 'playing' && <span className="sg-thinking" aria-label="AI myśli"><i/><i/><i/></span>}
     </div>
-    <div className="sg-score-heading"><Trophy size={14}/> WYNIKI</div>
+
     <div className="sg-scores">{game.players.map((p, i) => <div key={p.id} className={`sg-score-line${game.currentPlayer === i && game.phase === 'playing' ? ' sg-score-current' : ''}`}>
       <i className={`sg-pawn sg-pawn-${i}`}/><span>{p.name}</span><b>{p.score}</b></div>)}</div>
-    <div className="sg-turn-actions"><button type="button" onClick={onHistory}><History size={15}/> Historia <b>{game.history?.length ?? 0}</b></button>
-    <button type="button" onClick={onRules}><BookOpen size={15}/> Zasady</button></div>
+
   </section>
 }
 function SetupModal({ settings, onClose, onStart }: {
@@ -153,7 +157,7 @@ export default function App() {
   const [finishing, setFinishing] = useState<Move[] | null>(null)
   const [showSetup, setShowSetup] = useState(false)
   const [showRules, setShowRules] = useState(false)
-  const [showHistory, setShowHistory] = useState(false)
+  const { enabled: soundEnabled, toggle: toggleSound, play } = useGameAudio()
   const humanTurn = game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
   const moves = useMemo(() => legalMoves(game), [game])
   const sourceOptions = useMemo(() => availableSources(game), [game])
@@ -172,20 +176,27 @@ export default function App() {
     const delay = base + Math.round(Math.random() * 450)
     const timer = window.setTimeout(() => {
       const move = chooseAIMove(game, difficulty)
-      if (move) setGame(prev => applyMove(prev, move))
+      if (move) {
+        const next = applyMove(game, move)
+        setGame(next)
+        play(next.round !== game.round ? 'round' : next.players[game.currentPlayer].score > game.players[game.currentPlayer].score ? 'score' : 'place')
+      }
     }, delay)
     return () => window.clearTimeout(timer)
-  }, [game, finishing])
+  }, [game, finishing, play])
   useEffect(() => { if (!humanTurn) { setSelection(null); setFinishing(null) } }, [humanTurn])
 
   function commit(move: Move) {
-    setGame(previous => applyMove(previous, move))
+    const next = applyMove(game, move)
+    setGame(next)
+    play(next.round !== game.round ? 'round' : next.players[game.currentPlayer].score > game.players[game.currentPlayer].score ? 'score' : 'place')
     setSelection(null)
     setFinishing(null)
   }
   function chooseSource(source: Source, color: GlassColor) {
     if (!humanTurn || finishing) return
     if (!sourceOptions.some(option => option.color === color && sourceEquals(option.source, source))) return
+    play('pick')
     setSelection(prev => prev && prev.color === color && sourceEquals(prev.source, source) ? null : { source, color })
   }
   function chooseTarget(index: number | null) {
@@ -200,6 +211,7 @@ export default function App() {
   function startNew(options: Settings) {
     setSettings(options)
     setGame(newGame({ ...options, botDifficulties: options.difficulties }))
+    play('round')
     setSelection(null); setFinishing(null); setShowSetup(false)
   }
   function seat(index: number, place: 'north' | 'west' | 'east' | 'south') {
@@ -209,7 +221,9 @@ export default function App() {
       <div className="sg-seat-rotation"><GameBoard player={player} index={index} isCurrent={game.currentPlayer === index && game.phase === 'playing'}
         isHuman={index === 0} isHumanTurn={humanTurn} selected={!!selection}
         targets={index === 0 ? targets : undefined} onTarget={index === 0 ? i => chooseTarget(i) : undefined}
-        canReset={canReset && !finishing} onReset={() => commit({ kind: 'reset' })}/></div>
+        canReset={canReset && !finishing} onReset={() => commit({ kind: 'reset' })}
+        isStartingPlayer={game.startingPlayer === index}
+        hasFirstToken={game.firstCenterTaken && game.nextStartingPlayer === index}/></div>
     </div>
   }
 
@@ -218,7 +232,7 @@ export default function App() {
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span><small>WITRAŻE SINTRY · EDYCJA CYFROWA</small></div>
       <div className="sg-header-round"><span>RUNDA</span><strong>{game.round} <small>/ 6</small></strong><div className="sg-round-colors">{game.roundColors.map((c, i) =>
         <i key={i} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : ''}`}/>)}</div></div>
-      <div className="sg-header-actions"><span className="sg-offline"><i/> OFFLINE</span><button onClick={() => setShowRules(true)}><BookOpen size={16}/> Zasady</button>
+      <div className="sg-header-actions"><button type="button" onClick={toggleSound} title={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-label={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-pressed={soundEnabled} className="sg-audio-toggle">{soundEnabled ? <Volume2 size={16}/> : <VolumeX size={16}/>}<span>{soundEnabled ? 'Dźwięk' : 'Cisza'}</span></button><button onClick={() => setShowRules(true)}><BookOpen size={16}/> Zasady</button>
         <button className="sg-new" onClick={() => setShowSetup(true)}><RotateCcw size={16}/> Nowa gra</button></div>
     </header>
     <main className="sg-stage" aria-label="Wspólny stół Sintra Glass">
@@ -227,9 +241,9 @@ export default function App() {
         {seat(3, 'west')}
         {seat(2, 'east')}
         <div className="sg-center">
-          <TurnSummary game={game} onHistory={() => setShowHistory(true)} onRules={() => setShowRules(true)}/>
+          <div className="sg-side-left"><TurnSummary game={game}/><PenaltyTrack game={game}/></div>
           <Market game={game} selection={selection} disabled={!humanTurn || !!finishing} onPick={chooseSource}/>
-          <PenaltyTrack game={game}/>
+          <LiveHistory state={game}/>
           <div className="sg-instruction" aria-live="polite"><Info size={15}/><span>{selection ? `Wybrano: ${COLORS_PL[selection.color]}. Kliknij podświetloną kwaterę na swojej planszy.` : game.phase === 'finished' ? `Zwycięża ${best[0].name}!` : humanTurn ? 'Twój ruch: wybierz tafle w warsztacie lub na środku.' : `${current.name} rozważa kolejny ruch…`}</span>
             {selection && <><button onClick={() => setSelection(null)}>Anuluj</button>
               {selectionMoves.some(m => m.kind === 'take' && m.windowIndex === null) && <button className="sg-discard" onClick={() => chooseTarget(null)}>Stłucz tafle</button>}</>}
@@ -239,7 +253,6 @@ export default function App() {
       </div>
     </main>
     {game.phase === 'finished' && <div className="sg-finish"><Trophy size={17}/> Zwycięża {best[0].name}! <button onClick={() => setShowSetup(true)}>Nowa partia <ArrowRight size={14}/></button></div>}
-    {showHistory && <div className="modal-backdrop" onMouseDown={() => setShowHistory(false)}><div className="sg-history-dialog" role="dialog" aria-modal="true" aria-label="Historia partii" onMouseDown={e => e.stopPropagation()}><button type="button" className="sg-dialog-close" onClick={() => setShowHistory(false)}><X size={20}/></button><GameTimeline state={game}/></div></div>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
     {finishing && <div className="modal-backdrop" onMouseDown={() => setFinishing(null)}><div className="modal keep-modal" role="dialog" aria-modal="true" aria-label="Wybierz taflę do zachowania" onMouseDown={e => e.stopPropagation()}><button className="close-btn" onClick={() => setFinishing(null)} aria-label="Zamknij"><X size={18}/></button><div className="modal-icon"><Gem size={24}/></div><h2>Wybierz taflę do okna</h2><p>Jedna tafla zostanie w pałacowym witrażu.</p><div className="keep-options">{finishing.filter(m => m.kind === 'take' && m.keepColor).map(m => m.kind === 'take' && m.keepColor ? <button key={m.keepColor} onClick={() => commit(m)}><GlassPiece color={m.keepColor}/><span>{COLORS_PL[m.keepColor]}</span></button> : null)}</div></div></div>}
