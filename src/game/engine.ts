@@ -89,7 +89,7 @@ export interface GameState {
 export type Source = { type: 'factory'; index: number } | { type: 'center' }
 export type Move =
   | { kind: 'reset' }
-  | { kind: 'take'; source: Source; color: GlassColor; windowIndex: number | null; keepColor?: GlassColor }
+  | { kind: 'take'; source: Source; color: GlassColor; windowIndex: number | null; keepColor?: GlassColor; slots?: number[] }
 export interface NewGameOptions {
   opponents: number
   difficulty?: Difficulty
@@ -234,11 +234,12 @@ export function newGame(options: NewGameOptions): GameState {
   for (const color of distinctColors) state.bag.splice(state.bag.indexOf(color), 1)
   state.roundColors = [state.bag.pop()!, ...distinctColors]
   const labels = ['Ty', 'Aurora', 'Iris', 'Noctis']
+  const palaceColors = shuffle(state, [...PALACE_COLORS])
   state.players = Array.from({ length: count }, (_, i) => ({
     id: `player-${i}`, name: labels[i], controller: i === 0 ? 'human' : 'ai',
     difficulty: i === 0 ? undefined : (options.botDifficulties?.[i - 1] ?? options.difficulty ?? 'normal'), score: 0,
-    glazier: 0, brokenSteps: 0, glassLost: 0, palaceColor: PALACE_COLORS[i],
-    strips: makeStrips(state, PALACE_COLORS[i]),
+    glazier: 0, brokenSteps: 0, glassLost: 0, palaceColor: palaceColors[i],
+    strips: makeStrips(state, palaceColors[i]),
   }))
   // In the physical game the first player is chosen before the first round.
   // With no real-world "last window washer", draw the starter deterministically from the seed.
@@ -282,6 +283,32 @@ export function availableTargets(state: GameState, color: GlassColor): number[] 
   const fitting = reachable.filter((index) => remainingSlots(player.strips[index], color) > 0)
   return fitting
 }
+/** All different legal placements when a joker could compete with an ordinary field.
+ * Other placements are deterministic because swapping identical-color fields
+ * does not change any future choice. The maximum is C(5,2)=10 variants.
+ */
+export function placementChoices(strip: WindowStrip, color: GlassColor, amount: number): number[][] {
+  const pattern = patternFor(strip)
+  const eligible = pattern.flatMap((slot, i) =>
+    strip.panes[i] === null && (slot === color || slot === 'wild') ? [i] : [])
+  const toPlace = Math.min(amount, eligible.length)
+  if (toPlace === 0) return []
+  if (!eligible.some(i => pattern[i] === 'wild') || toPlace === eligible.length) {
+    return [eligible.slice(0, toPlace)]
+  }
+  const combinations: number[][] = []
+  function pick(start: number, chosen: number[]): void {
+    if (chosen.length === toPlace) { combinations.push(chosen); return }
+    for (let i = start; i <= eligible.length - (toPlace - chosen.length); i++) {
+      pick(i + 1, [...chosen, eligible[i]])
+    }
+  }
+  pick(0, [])
+  // Prefer ordinary fields. Players can still explicitly choose a joker.
+  return combinations.sort((a, b) =>
+    a.filter(i => pattern[i] === 'wild').length - b.filter(i => pattern[i] === 'wild').length)
+}
+
 export function legalMoves(state: GameState): Move[] {
   if (state.phase === 'finished') return []
   const player = state.players[state.currentPlayer]
@@ -296,13 +323,15 @@ export function legalMoves(state: GameState): Move[] {
     }
     for (const windowIndex of targets) {
       const strip = player.strips[windowIndex]
-      if (strip.panes.filter(Boolean).length + Math.min(count, remainingSlots(strip, color)) === 5) {
-        const panes = [...strip.panes, ...Array.from({ length: Math.min(count, remainingSlots(strip, color)) }, () => color)]
-        for (const keepColor of [...new Set(panes.filter((pane): pane is GlassColor => pane !== null))]) {
-          moves.push({ kind: 'take', source, color, windowIndex, keepColor })
+      for (const slots of placementChoices(strip, color, count)) {
+        if (strip.panes.filter(Boolean).length + slots.length === 5) {
+          const panes = [...strip.panes.filter((pane): pane is GlassColor => pane !== null), ...slots.map(() => color)]
+          for (const keepColor of new Set(panes)) {
+            moves.push({ kind: 'take', source, color, windowIndex, slots, keepColor })
+          }
+        } else {
+          moves.push({ kind: 'take', source, color, windowIndex, slots })
         }
-      } else {
-        moves.push({ kind: 'take', source, color, windowIndex })
       }
     }
   }
@@ -313,7 +342,8 @@ export function sameMove(a: Move, b: Move): boolean {
   if (a.kind === 'reset' || b.kind === 'reset') return true
   return a.source.type === b.source.type &&
     (a.source.type === 'center' || (b.source.type === 'factory' && a.source.index === b.source.index)) &&
-    a.color === b.color && a.windowIndex === b.windowIndex && a.keepColor === b.keepColor
+    a.color === b.color && a.windowIndex === b.windowIndex && a.keepColor === b.keepColor &&
+    (a.slots?.join(',') ?? '') === (b.slots?.join(',') ?? '')
 }
 function breakGlass(state: GameState, player: Player, count: number): void {
   for (let i = 0; i < count; i++) {
@@ -418,6 +448,17 @@ function endGame(state: GameState): void {
   state.log.unshift('Koniec gry! Naliczono punkty finałowe.')
   addHistory(state, { playerIndex: null, kind: 'final', description: 'Koniec szóstej rundy — rozliczono pozostałe tafle, stłuczone szkło i premie pałacu.' })
 }
+/** Clockwise seating around the table: north → east → south → west.
+ * Player indices are stable (human=0 south, Aurora=1 north, Iris=2 east,
+ * Noctis=3 west), and absent seats are skipped in 2/3-player games.
+ */
+export function nextClockwisePlayer(playerIndex: number, playerCount: number): number {
+  const seats = [1, 2, 0, 3].filter(index => index < playerCount)
+  const currentSeat = seats.indexOf(playerIndex)
+  if (currentSeat === -1) throw new Error('Nieprawidłowy numer gracza.')
+  return seats[(currentSeat + 1) % seats.length]
+}
+
 function finishTurn(state: GameState): void {
   state.turn++
   const tableEmpty = state.center.length === 0 && state.factories.every((f) => f.length === 0)
@@ -431,7 +472,7 @@ function finishTurn(state: GameState): void {
     state.log.unshift(`Runda ${state.round} — nowy kolor premii.`)
     addHistory(state, { playerIndex: null, kind: 'round', description: `Rozpoczęła się runda ${state.round}/6. Zaczyna ${state.players[state.startingPlayer].name}. Nowa premia: ${colorName(state.roundColors[state.round - 1])}.` })
   } else {
-    state.currentPlayer = (state.currentPlayer + 1) % state.players.length
+    state.currentPlayer = nextClockwisePlayer(state.currentPlayer, state.players.length)
   }
   state.log = state.log.slice(0, 12)
 }
@@ -472,11 +513,15 @@ export function applyMove(current: GameState, move: Move): GameState {
     const strip = player.strips[move.windowIndex]
     player.glazier = move.windowIndex
     const pattern = patternFor(strip)
-    for (let slot = 0; slot < 5 && placed < selected.length; slot++) {
-      if (strip.panes[slot] === null && (pattern[slot] === move.color || pattern[slot] === 'wild')) {
-        strip.panes[slot] = move.color
-        placed++
+    // The chosen slots are part of the validated move: a joker is never
+    // silently consumed if the player picked another legal placement.
+    const chosenSlots = move.slots ?? placementChoices(strip, move.color, selected.length)[0] ?? []
+    for (const slot of chosenSlots) {
+      if (strip.panes[slot] !== null || (pattern[slot] !== move.color && pattern[slot] !== 'wild')) {
+        throw new Error('Niepoprawne pola dla wybranych tafli.')
       }
+      strip.panes[slot] = move.color
+      placed++
     }
     if (strip.panes.every(Boolean)) completed = completeStrip(state, player, move.windowIndex, move.keepColor!)
   }
