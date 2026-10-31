@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, X } from 'lucide-react'
+import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, X, ListChecks } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, legalMoves, newGame, standings } from './game/engine'
 import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
 import { LiveHistory } from './components/LiveHistory'
+import { FinalResults } from './components/FinalResults'
 import { useGameAudio } from './hooks/useGameAudio'
 import { GameBoard, GlassPiece } from './components/GameBoard'
 import './match.css'
 import './redesign.css'
 import './center-v9.css'
+import './center-v10.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Róż', citrine: 'Złoto', cyan: 'Turkus', amber: 'Bursztyn', slate: 'Srebro' }
@@ -119,7 +121,7 @@ function SetupModal({ settings, onClose, onStart }: {
       {Array.from({length: local.opponents}, (_, i) => <div key={i} className="bot-setting-row">
         <label htmlFor={`bot-level-${i}`}><Bot size={16}/><span>{['Aurora','Iris','Noctis'][i]}</span></label>
         <select id={`bot-level-${i}`} value={local.difficulties[i] ?? 'normal'} onChange={(e) => setLocal(prev => ({...prev, difficulties: prev.difficulties.map((level, idx) => idx === i ? e.target.value as Difficulty : level)}))}>
-          <option value="easy">Łatwy · losowy</option><option value="normal">Normalny · zachłanny</option><option value="hard">Trudny · strategiczny</option>
+          <option value="easy">Łatwy · losowy</option><option value="normal">Normalny · zachłanny</option><option value="hard">Trudny · strategiczny</option><option value="expert">Ekspert · przewiduje przeciwników</option>
         </select>
       </div>)}
       <label className="field-label" htmlFor="palace-side">Punktowanie finałowe</label>
@@ -157,6 +159,7 @@ export default function App() {
   const [finishing, setFinishing] = useState<Move[] | null>(null)
   const [showSetup, setShowSetup] = useState(false)
   const [showRules, setShowRules] = useState(false)
+  const [showResults, setShowResults] = useState(false)
   const { enabled: soundEnabled, toggle: toggleSound, play } = useGameAudio()
   const humanTurn = game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
   const moves = useMemo(() => legalMoves(game), [game])
@@ -169,10 +172,11 @@ export default function App() {
   const best = standings(game)
 
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(game)) }, [game])
+  useEffect(() => { if (game.phase === 'finished') setShowResults(true) }, [game.phase])
   useEffect(() => {
     if (game.phase !== 'playing' || game.players[game.currentPlayer].controller !== 'ai' || finishing) return
     const difficulty = game.players[game.currentPlayer].difficulty ?? 'normal'
-    const base = difficulty === 'easy' ? 1100 : difficulty === 'normal' ? 1500 : 1900
+    const base = difficulty === 'easy' ? 1100 : difficulty === 'normal' ? 1500 : difficulty === 'expert' ? 2200 : 1900
     const delay = base + Math.round(Math.random() * 450)
     const timer = window.setTimeout(() => {
       const move = chooseAIMove(game, difficulty)
@@ -212,7 +216,7 @@ export default function App() {
     setSettings(options)
     setGame(newGame({ ...options, botDifficulties: options.difficulties }))
     play('round')
-    setSelection(null); setFinishing(null); setShowSetup(false)
+    setSelection(null); setFinishing(null); setShowSetup(false); setShowResults(false)
   }
   function seat(index: number, place: 'north' | 'west' | 'east' | 'south') {
     const player = game.players[index]
@@ -252,7 +256,8 @@ export default function App() {
         {seat(0, 'south')}
       </div>
     </main>
-    {game.phase === 'finished' && <div className="sg-finish"><Trophy size={17}/> Zwycięża {best[0].name}! <button onClick={() => setShowSetup(true)}>Nowa partia <ArrowRight size={14}/></button></div>}
+    {game.phase === 'finished' && <div className="sg-finish"><Trophy size={17}/> Koniec partii <button onClick={() => setShowResults(true)}><ListChecks size={14}/> Zobacz podliczenie</button><button onClick={() => setShowSetup(true)}>Nowa partia <ArrowRight size={14}/></button></div>}
+    {showResults && game.phase === 'finished' && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
     {finishing && <div className="modal-backdrop" onMouseDown={() => setFinishing(null)}><div className="modal keep-modal" role="dialog" aria-modal="true" aria-label="Wybierz taflę do zachowania" onMouseDown={e => e.stopPropagation()}><button className="close-btn" onClick={() => setFinishing(null)} aria-label="Zamknij"><X size={18}/></button><div className="modal-icon"><Gem size={24}/></div><h2>Wybierz taflę do okna</h2><p>Jedna tafla zostanie w pałacowym witrażu.</p><div className="keep-options">{finishing.filter(m => m.kind === 'take' && m.keepColor).map(m => m.kind === 'take' && m.keepColor ? <button key={m.keepColor} onClick={() => commit(m)}><GlassPiece color={m.keepColor}/><span>{COLORS_PL[m.keepColor]}</span></button> : null)}</div></div></div>}

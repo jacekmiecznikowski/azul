@@ -2,7 +2,7 @@
 export const COLORS = ['rose', 'citrine', 'cyan', 'amber', 'slate'] as const
 export type GlassColor = (typeof COLORS)[number]
 export type SlotColor = GlassColor | 'wild'
-export type Difficulty = 'easy' | 'normal' | 'hard'
+export type Difficulty = 'easy' | 'normal' | 'hard' | 'expert'
 export type PalaceSide = 'A' | 'B'
 export type Controller = 'human' | 'ai'
 export type EventKind = 'start' | 'take' | 'reset' | 'round' | 'final'
@@ -21,6 +21,7 @@ export interface GameEvent {
   points?: number
   framePoints?: number
   bonusPoints?: number
+  penaltyPoints?: number
   firstPlayer?: boolean
   flipped?: boolean
   finished?: boolean
@@ -37,6 +38,20 @@ export interface WindowStrip {
   panes: (GlassColor | null)[]
   upper: GlassColor | null
   lower: GlassColor | null
+}
+export interface FinalScoreBreakdown {
+  playerId: string
+  roundPoints: number
+  remainingPanes: number
+  remainingPoints: number
+  glassPenalty: number
+  palaceBonus: number
+  palaceDetails: number[]
+  fullyGlazedWindows: number
+  dominantColor?: GlassColor
+  dominantColorCount?: number
+  total: number
+  totalGlassLost: number
 }
 export interface Player {
   id: string
@@ -67,6 +82,7 @@ export interface GameState {
   turn: number
   log: string[]
   history: GameEvent[]
+  finalScores?: FinalScoreBreakdown[]
 }
 export type Source = { type: 'factory'; index: number } | { type: 'center' }
 export type Move =
@@ -278,29 +294,51 @@ function completeStrip(state: GameState, player: Player, index: number, keepColo
   state.log.unshift(`${player.name} ukończył(a) okno ${index + 1}: +${bonus + chainScore} pkt.`)
   return { bonus, points: chainScore, flipped }
 }
+/** Independent, transparent final scoring. In-game -18 penalties are already in player.score. */
+export function finalBreakdown(player: Player, side: PalaceSide): FinalScoreBreakdown {
+  const remainingPanes = player.strips.reduce((sum, strip) => sum + strip.panes.filter(Boolean).length, 0)
+  const remainingPoints = Math.floor(remainingPanes / 3)
+  const glassPenalty = BROKEN_TRACK[player.brokenSteps]
+  let palaceBonus = 0
+  let palaceDetails: number[] = []
+  let dominantColor: GlassColor | undefined
+  let dominantColorCount: number | undefined
+  const fullyGlazedWindows = player.strips.filter(strip => !!strip.upper && !!strip.lower).length
+  if (side === 'A') {
+    palaceDetails = [[0, 1], [2, 3], [4, 5], [6, 7]].map(([a, b]) => {
+      const frames = [player.strips[a].upper, player.strips[a].lower, player.strips[b].upper, player.strips[b].lower].filter(Boolean).length
+      return frames === 4 ? 10 : frames === 3 ? 6 : frames === 2 ? 3 : 0
+    })
+    palaceBonus = palaceDetails.reduce((sum, value) => sum + value, 0)
+  } else {
+    const glassCounts = COLORS.map(color => player.strips.reduce((sum, strip) => sum + Number(strip.upper === color) + Number(strip.lower === color), 0))
+    const best = Math.max(...glassCounts)
+    dominantColor = COLORS[glassCounts.indexOf(best)]
+    dominantColorCount = best
+    palaceBonus = fullyGlazedWindows * best
+  }
+  return {
+    playerId: player.id, roundPoints: player.score, remainingPanes, remainingPoints,
+    glassPenalty, palaceBonus, palaceDetails, fullyGlazedWindows, dominantColor, dominantColorCount,
+    total: player.score + remainingPoints - glassPenalty + palaceBonus,
+    totalGlassLost: player.glassLost + glassPenalty,
+  }
+}
 function endGame(state: GameState): void {
   state.phase = 'finished'
-  for (const player of state.players) {
-    const left = player.strips.reduce((count, strip) => count + strip.panes.filter(Boolean).length, 0)
-    player.score += Math.floor(left / 3)
-    const penalty = BROKEN_TRACK[player.brokenSteps]
-    player.score -= penalty
-    player.glassLost += penalty
-    if (state.palaceSide === 'A') {
-      for (const [a, b] of [[0, 1], [2, 3], [4, 5], [6, 7]]) {
-        const glazed = [player.strips[a].upper, player.strips[a].lower, player.strips[b].upper, player.strips[b].lower]
-          .filter(Boolean).length
-        player.score += glazed === 4 ? 10 : glazed === 3 ? 6 : glazed === 2 ? 3 : 0
-      }
-    } else {
-      const complete = player.strips.filter((strip) => strip.upper && strip.lower).length
-      const glassCounts = COLORS.map((color) => player.strips.reduce((sum, strip) =>
-        sum + Number(strip.upper === color) + Number(strip.lower === color), 0))
-      player.score += complete * Math.max(...glassCounts)
-    }
-  }
+  state.finalScores = state.players.map(player => finalBreakdown(player, state.palaceSide))
+  state.finalScores.forEach((breakdown, index) => {
+    const player = state.players[index]
+    player.score = breakdown.total
+    player.glassLost = breakdown.totalGlassLost
+    addHistory(state, {
+      playerIndex: index, kind: 'final', points: breakdown.remainingPoints - breakdown.glassPenalty + breakdown.palaceBonus,
+      bonusPoints: breakdown.palaceBonus, penaltyPoints: -breakdown.glassPenalty,
+      description: `${player.name}: tafle na kwaterach ${breakdown.remainingPanes} = +${breakdown.remainingPoints} pkt; tor szkła −${breakdown.glassPenalty} pkt; bonus pałacu +${breakdown.palaceBonus} pkt. Wynik: ${breakdown.total} pkt.`,
+    })
+  })
   state.log.unshift('Koniec gry! Naliczono punkty finałowe.')
-  addHistory(state, { playerIndex: null, kind: 'final', description: 'Koniec gry: naliczono premię za pozostałe tafle, karę z toru stłuczeń i bonus pałacu.' })
+  addHistory(state, { playerIndex: null, kind: 'final', description: 'Koniec szóstej rundy — rozliczono pozostałe tafle, stłuczone szkło i premie pałacu.' })
 }
 function finishTurn(state: GameState): void {
   state.turn++
@@ -325,6 +363,7 @@ export function applyMove(current: GameState, move: Move): GameState {
   const playerIndex = state.currentPlayer
   const player = state.players[playerIndex]
   const scoreBefore = player.score
+  const lostBefore = player.glassLost
   if (move.kind === 'reset') {
     player.glazier = activeStrips(player)[0]
     state.log.unshift(`${player.name} cofa witrażystę.`)
@@ -373,6 +412,7 @@ export function applyMove(current: GameState, move: Move): GameState {
     picked: selected.length, placed, broken, windowIndex: move.windowIndex,
     keepColor: completed ? move.keepColor : undefined,
     points: player.score - scoreBefore, framePoints: completed?.points,
+    penaltyPoints: -(player.glassLost - lostBefore),
     bonusPoints: completed?.bonus, firstPlayer, flipped: completed?.flipped,
     finished: completed ? !completed.flipped : undefined,
     description: `${player.name} pobrał ${selected.length} ${colorName(move.color)} ${sourceLabel}. Ułożył ${placed}${broken ? `, stłukł ${broken}` : ''}.${firstPlayer ? ' Zdobył znacznik pierwszego gracza (+1 stłuczenie).' : ''}${effect}`,
