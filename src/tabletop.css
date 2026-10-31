@@ -1,265 +1,233 @@
-/* Full-viewport digital tabletop. Every player uses the SAME real WindowCard renderer.
-   At desktop sizes the page does not scroll; the move log scrolls independently. */
-.tabletop-app{background:radial-gradient(ellipse 70% 85% at 50% 0%,#183b4750,transparent 80%),#091521;color:#edf5f0}
-.tabletop-container{width:min(1760px,calc(100% - 24px));margin-inline:auto}
-.tabletop-app .site-header{background:#0a1823f5;border-bottom:1px solid #7caaa430;flex:none}
-.tabletop-app .nav-inner{height:53px}
-.tabletop-app .brand-mark{height:31px;width:31px;border-radius:8px}
-.tabletop-app .brand-mark svg{width:19px}
-.tabletop-app .brand-name{font-size:15px}
-.tabletop-app .brand-label{font-size:8px;padding:4px 6px}
-.tabletop-app .nav-right{gap:17px}
-.tabletop-app .nav-right .btn{padding:8px 11px;font-size:11px}
-.tabletop-app .online-indicator{font-size:9px}
-.tabletop-app .nav-link{font-size:11px}
-.tabletop-app main.tabletop-container{display:flex;flex-direction:column;min-height:0;padding:7px 0 10px}
-.tabletop-topline{display:flex;justify-content:space-between;align-items:center;gap:12px;flex:none;padding:0 7px 7px;min-height:39px}
-.tabletop-title{display:flex;align-items:baseline;flex-wrap:wrap;gap:10px}
-.tabletop-title>strong{font-size:12px;letter-spacing:.17em;color:#d5efdc}
-.tabletop-title-hint{font-size:10px;color:#91afb4}
-.tabletop-round-counter{display:flex;align-items:center;gap:9px;background:#17323d;border:1px solid #82b5ab65;border-radius:9px;padding:4px 10px;min-height:30px}
-.tabletop-round-counter>span{font-size:9px;font-weight:800;color:#a8d3c7;letter-spacing:.13em}
-.tabletop-round-counter strong{font:600 22px Georgia,serif;color:#f5e5bb;line-height:1}
-.tabletop-round-counter small{font:600 10px 'DM Sans',sans-serif;color:#96b7bd;margin-left:3px}
-.tabletop-round-pips{display:flex;gap:5px;align-items:center}
-.tabletop-round-pips span{width:9px;height:9px;border-radius:2px;transform:rotate(45deg);opacity:.36;box-shadow:inset 0 0 0 1px #fff7}
-.tabletop-round-pips .current{opacity:1;outline:1px solid #e9e9cd;outline-offset:2px}
-.tabletop-layout{display:grid;grid-template-columns:minmax(0,1fr) 282px;align-items:stretch;gap:10px;flex:1;min-height:0}
-.tabletop-surface{min-width:0;min-height:0;overflow:hidden;position:relative;isolation:isolate;border:7px solid #39332d;border-radius:20px;background:radial-gradient(ellipse 80% 75% at center,#20565a 0%,#153a44 68%,#102c3a 100%);box-shadow:inset 0 0 0 2px #ab92695a,0 0 0 1px #98806076,0 12px 25px #020c13aa}
-.tabletop-surface:before{content:'';position:absolute;inset:3px;border:1px solid #a99d6e55;border-radius:12px;pointer-events:none;z-index:2}
-.tabletop-surface:after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(32deg,#ffffff02 0 1px,transparent 1px 5px);pointer-events:none;z-index:-1}
-.tabletop-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.48fr) minmax(0,1fr);grid-template-rows:minmax(0,.89fr) minmax(0,1.44fr) minmax(0,1.04fr);grid-template-areas:'. north .' 'west market east' 'south south south';align-items:stretch;gap:7px;height:100%;min-height:0;padding:8px}
-.tabletop-seat,.tabletop-human{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;background:linear-gradient(148deg,#27434cfa,#142d39fa);border:1px solid #b9b28c70;border-radius:11px;box-shadow:0 5px 16px #07121b6b;padding:5px 6px}
-.tabletop-seat-current,.tabletop-human-active{border-color:#e8d49b;box-shadow:0 0 0 1px #ded3a77f,0 0 15px #cfca9440}
-.tabletop-seat-north{grid-area:north;width:min(100%,670px);justify-self:center}
-.tabletop-seat-west{grid-area:west}
-.tabletop-seat-east{grid-area:east}
-.tabletop-seat-header{display:flex;align-items:center;gap:5px;flex:none;height:23px;min-height:23px}
-.tabletop-seat-header .player-avatar{width:20px;height:20px;border-radius:6px;font-size:12px}
-.tabletop-seat-name{display:flex;flex-direction:row;align-items:baseline;gap:5px;flex:1;min-width:0}
-.tabletop-seat-name strong{color:#f8ecda;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tabletop-seat-name small{color:#a7c5c6;font-size:9px;white-space:nowrap}
-.tabletop-seat-current .tabletop-seat-name small{color:#f3df9c}
-.tabletop-seat-meta{color:#b2cdd0;font-size:9px;display:flex;align-items:center;gap:3px;white-space:nowrap}
-.tabletop-seat-meta svg{width:10px;height:10px}
-.tabletop-seat-score{font:800 15px 'DM Sans',sans-serif;color:#f6f0df;white-space:nowrap}
-.tabletop-seat-score small{font:500 9px 'DM Sans',sans-serif;color:#b4cad1}
-button.tabletop-seat-zoom{border:1px solid #81bdb261;color:#bde5d7;background:#25576155;border-radius:5px;width:23px;height:22px;display:grid;place-items:center;padding:0;flex:none}
-button.tabletop-seat-zoom:hover,button.tabletop-seat-zoom:focus-visible{outline:2px solid #b2f0da}
-.tabletop-seat-windows{flex:1;min-height:0;min-width:0;margin-top:4px}
-.tabletop-human{grid-area:south;padding:6px 9px 8px}
-.tabletop-human-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;flex:none;height:31px}
-.tabletop-human-identity{display:flex;align-items:center;gap:7px;min-width:0}
-.tabletop-human-identity .player-avatar{width:26px;height:26px;font-size:14px}
-.tabletop-human-identity .overline{display:none}
-.tabletop-human-identity h2{font:600 16px 'Playfair Display',Georgia,serif;color:#f6edda;white-space:nowrap}
-.tabletop-human-identity h2 span{color:#edce8a}
-.tabletop-human-stats{display:flex;align-items:center;justify-content:flex-end;flex-wrap:nowrap;gap:6px}
-.tabletop-human-stats>span{display:flex;gap:4px;align-items:center;color:#d6e7df;font-size:10px;font-weight:800;white-space:nowrap}
-.tabletop-human-stats>span svg{width:12px}
-.tabletop-human-stats .tabletop-reset{width:auto;flex:none;font-size:10px;padding:5px 8px;border-radius:6px;min-height:25px}
-.tabletop-human .board-scroll{flex:1;min-height:0;overflow:visible;padding:2px 0 0}
-.tabletop-human .board-area{height:100%;width:100%;min-width:0;max-width:none;padding:0}
-.tabletop-human .window-row{height:100%;min-height:0;gap:5px}
-/* The real eight-window panes shown for all players. Heights respond to available grid space. */
-.tabletop-grid .window-row{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));min-width:0}
-.tabletop-grid .window-strip{height:100%;min-height:0;min-width:0;overflow:hidden;border:1px solid #82aeb25e;border-radius:8px 8px 4px 4px;padding:2px 3px 3px;background:linear-gradient(#345766,#1b3b4e);display:flex;flex-direction:column}
-.tabletop-grid .window-head{height:15px;min-height:15px;flex:none}
-.tabletop-grid .window-n,.tabletop-grid .window-side{font-size:8px;line-height:1}
-.tabletop-grid .window-side{border-radius:3px;padding:2px 3px}
-.tabletop-grid .artisan{position:absolute;top:0;left:47%;height:14px;width:14px;border-radius:4px;z-index:2}
+/* Sintra Glass — physical tabletop layout, responsive and size-aware.
+   Four real boards surround a central, compact workshop. The sidebar is
+   deliberately replaced with in-table status and a history drawer. */
+.tabletop-app{background:#091522;color:#eef5f0}
+.tabletop-container{width:calc(100% - 24px);max-width:1900px;margin-inline:auto}
+.tabletop-app .site-header{flex:none;position:relative;background:#0c1925ef;border-bottom:1px solid #76aaa32c}
+.tabletop-app .nav-inner{height:47px;min-height:47px}
+.tabletop-app .brand-mark{width:29px;height:29px;border-radius:7px}.tabletop-app .brand-mark svg{width:18px}
+.tabletop-app .brand-name{font-size:14px}.tabletop-app .brand-label{font-size:8px;padding:4px 6px}
+.tabletop-app .nav-right{gap:16px}.tabletop-app .nav-right .btn{padding:7px 11px;font-size:11px}
+.tabletop-app .online-indicator,.tabletop-app .nav-link{font-size:10px}
+.tabletop-app main.tabletop-container{padding:6px 0 9px;display:flex;flex-direction:column;min-height:0}
+.tabletop-topline{height:30px;min-height:30px;padding:0 8px 5px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none}
+.tabletop-title{display:flex;align-items:baseline;gap:9px}.tabletop-title>strong{font-size:11px;letter-spacing:.17em;color:#ddf1df}.tabletop-title-hint{font-size:10px;color:#a1bbb8}
+.tabletop-round-counter{display:flex;align-items:center;gap:7px;padding:3px 9px;border:1px solid #7fb6ad4e;border-radius:7px;background:#1c4145}
+.tabletop-round-counter>span{font-size:9px;font-weight:800;letter-spacing:.1em;color:#a4d4cc}.tabletop-round-counter strong{font:700 16px Georgia,serif;color:#ffebbc}.tabletop-round-counter small{font:600 10px 'DM Sans',sans-serif;color:#bdd1cb;margin-left:2px}
+.tabletop-round-pips{display:flex;gap:5px}.tabletop-round-pips>span{width:8px;height:8px;border-radius:2px;transform:rotate(45deg);opacity:.48}.tabletop-round-pips .current{opacity:1;outline:1px solid #e9d09b;outline-offset:2px}
+.tabletop-layout{min-height:0;flex:1;display:flex}
+.tabletop-surface{position:relative;isolation:isolate;flex:1;min-width:0;min-height:0;overflow:hidden;border:6px solid #4c4034;border-radius:19px;background:radial-gradient(ellipse 67% 75% at center,#1c4a4c 0%,#12323c 70%,#112634 100%);box-shadow:inset 0 0 0 2px #d7b88261,0 1px 0 1px #ad936a99,0 12px 35px #030c17a8}
+.tabletop-surface:before{content:'';position:absolute;inset:3px;border:1px solid #ddc18f69;border-radius:12px;pointer-events:none;z-index:5}
+.tabletop-surface:after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(33deg,#ffffff02 0 1px,transparent 1px 5px);pointer-events:none;z-index:-1}
+.tabletop-grid{display:grid;grid-template-columns:minmax(150px,1.16fr) minmax(0,5.85fr) minmax(150px,1.16fr);grid-template-rows:minmax(0,1.26fr) minmax(0,1.65fr) minmax(0,1.26fr);grid-template-areas:'. north .' 'west market east' 'south south south';gap:6px;padding:7px;height:100%;min-height:0}
+.tabletop-players-3 .tabletop-grid{grid-template-areas:'. north .' 'market market east' 'south south south'}
+.tabletop-players-2 .tabletop-grid{grid-template-areas:'. north .' 'market market market' 'south south south'}
+/* Seat rotation uses size container units: rotated board fills the same bounds,
+   without CSS zoom and without shrinking its eight columns into the side rail. */
+.tabletop-seat-slot{position:relative;min-width:0;min-height:0;overflow:hidden;container-type:size}
+.tabletop-seat-slot-north{grid-area:north}.tabletop-seat-slot-west{grid-area:west}.tabletop-seat-slot-east{grid-area:east}
+.tabletop-seat,.tabletop-human{border:1px solid #9aada17a;background:linear-gradient(170deg,#31545d,#173846 65%,#193440);border-radius:9px;box-shadow:0 4px 12px #020c15a0;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.tabletop-seat-current,.tabletop-human-active{border-color:#e5d095;box-shadow:inset 0 0 0 1px #d8bf6d73,0 0 12px #d2bd7440}
+.tabletop-seat-slot .tabletop-seat{position:absolute;left:0;top:0;width:100%;height:100%;padding:3px 5px}
+.physical-orientation .tabletop-seat-slot-north .tabletop-seat{transform:rotate(180deg)}
+.physical-orientation .tabletop-seat-slot-west .tabletop-seat{left:50%;top:50%;width:100cqb;height:100cqi;transform:translate(-50%,-50%) rotate(-90deg)}
+.physical-orientation .tabletop-seat-slot-east .tabletop-seat{left:50%;top:50%;width:100cqb;height:100cqi;transform:translate(-50%,-50%) rotate(90deg)}
+.readable-orientation .tabletop-seat-slot-west .tabletop-seat{left:50%;top:50%;width:100cqb;height:100cqi;transform:translate(-50%,-50%) rotate(90deg)}
+.readable-orientation .tabletop-seat-slot-east .tabletop-seat{left:50%;top:50%;width:100cqb;height:100cqi;transform:translate(-50%,-50%) rotate(-90deg)}
+.tabletop-seat-header{height:22px;min-height:22px;display:flex;align-items:center;gap:6px;flex:none}
+.tabletop-seat-header .player-avatar{height:19px;width:19px;border-radius:5px;font-size:11px}
+.tabletop-seat-name{display:flex;gap:6px;flex:1;align-items:baseline;min-width:0}
+.tabletop-seat-name strong{font-size:11px;color:#ffeddb;white-space:nowrap}.tabletop-seat-name small{font-size:9px;color:#b6d4d1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabletop-seat-meta{font-size:9px;display:flex;align-items:center;gap:3px;white-space:nowrap;color:#ccdfdb}.tabletop-seat-meta svg{width:11px;height:11px}
+.tabletop-seat-score{font-size:14px;color:#ffe6b5;white-space:nowrap}.tabletop-seat-score small{font-size:9px;color:#c0d4d7}
+button.tabletop-seat-zoom{width:23px;height:20px;flex:none;border-radius:5px;border:1px solid #85bbb5a3;background:#1f5360;color:#d1f2e8;padding:0;display:grid;place-items:center;cursor:pointer}
+button.tabletop-seat-zoom:hover,button.tabletop-seat-zoom:focus-visible{background:#357986;outline:2px solid #e6d292}
+.tabletop-seat-windows{flex:1;min-height:0;margin-top:2px}
+/* Single real WindowCard renderer: slot proportions remain the same on all four boards. */
+.tabletop-grid .window-row{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;min-height:0;min-width:0;height:100%}
+.tabletop-grid .window-strip{position:relative;display:flex;flex-direction:column;min-width:0;min-height:0;height:100%;overflow:hidden;padding:3px 3px 2px;background:linear-gradient(145deg,#355f70,#1b394b);border:1px solid #a4cbd380;border-radius:6px 6px 3px 3px;transition:border .12s,background .12s}
+.tabletop-grid .window-head{height:13px;min-height:13px;flex:none;display:flex;align-items:center;justify-content:space-between}
+.tabletop-grid .window-n,.tabletop-grid .window-side{font-size:8px;line-height:1.1;font-weight:800}.tabletop-grid .window-side{padding:2px 3px;border-radius:3px}
+.tabletop-grid .artisan{left:50%;top:-1px;transform:translateX(-50%);height:15px;width:15px;border-radius:4px;z-index:2}
 .tabletop-grid .artisan svg{height:11px;width:11px}
-.tabletop-grid .reverse-preview{flex:none;min-height:0;padding:2px 1px 3px;margin-bottom:3px;gap:2px;border-radius:4px 4px 2px 2px}
-.tabletop-grid .reverse-caption{font-size:6px;letter-spacing:0;line-height:1}
-.tabletop-grid .reverse-colors{display:flex;justify-content:center;flex-wrap:wrap;gap:2px;max-width:100%;height:auto}
-.tabletop-grid .reverse-dot{width:6px;height:6px;flex:none;transform:rotate(45deg) scale(.82)}
-.tabletop-grid .pattern-frame{flex:1;min-height:0;display:flex;flex-direction:column;gap:2px;border:1px solid #629bac;padding:2px;border-radius:15px 15px 3px 3px;box-shadow:inset 0 0 0 1px #152b37}
+.tabletop-grid .reverse-preview{display:flex;flex-direction:column;align-items:center;flex:none;gap:0;margin-bottom:1px;padding:2px 1px 1px;height:17px;min-height:17px;border-radius:3px;border-color:#b3987270;background:#152b3b}
+.tabletop-grid .reverse-caption{display:none}
+.tabletop-grid .reverse-colors{display:flex;flex-wrap:nowrap;gap:3px;justify-content:center}
+.tabletop-grid .reverse-dot{width:7px;height:7px;flex:none;transform:rotate(45deg) scale(.9);border-radius:1px}
+.tabletop-grid .pattern-frame{flex:1;min-height:0;display:grid;grid-template-rows:repeat(5,minmax(0,1fr));grid-template-columns:minmax(0,1fr);justify-content:stretch;align-content:stretch;gap:2px;padding:2px;background:linear-gradient(#102e4088,#142638d9);border:2px solid #789da3;border-radius:11px 11px 3px 3px;box-shadow:inset 0 0 0 1px #192d36}
 .tabletop-grid .pattern-frame:before{display:none}
-.tabletop-grid .pattern-cell{min-height:0;flex:1;border-radius:2px;display:grid;place-items:center}
-.tabletop-grid .pattern-cell .glass{width:min(80%,21px);height:min(88%,21px);min-height:8px;border-radius:3px}
-.tabletop-grid .pattern-cell .glass-spark{font-size:8px}
-.tabletop-grid .pattern-cell .glass:before{inset:3px}
-.tabletop-grid .palace-window{height:25px;min-height:25px;flex:none;margin-top:2px;padding:2px 4px;gap:1px;border-radius:9px 9px 2px 2px;box-shadow:inset 0 0 0 1px #2b2530}
-.tabletop-grid .palace-pane{min-height:0;border-radius:6px 6px 1px 1px}
-.tabletop-grid .palace-pane .glass{width:10px;height:9px;border-radius:2px}
+.tabletop-grid .pattern-cell{container-type:size;min-width:0;min-height:0;display:grid;place-items:center;overflow:hidden;border:1px solid #809faa50;border-radius:2px;background:#0e2330b7}
+/* cqi + cqb size limits ensure square pieces even in a short five-slot pane. */
+.tabletop-grid .pattern-cell .glass{width:min(84cqi,84cqb,31px);height:auto;aspect-ratio:1;min-height:0;flex:none;box-sizing:border-box;border:1px solid #ffffffe3;border-radius:4px;opacity:1;filter:none;box-shadow:inset 0 0 0 2px #ffffff3b,0 1px 5px #0009}
+.tabletop-grid .pattern-cell .glass-ghost{opacity:.72;filter:saturate(.84);box-shadow:inset 0 0 0 1px #ffffff61,0 1px 3px #0007}
+.tabletop-grid .pattern-cell .glass:before{inset:3px}.tabletop-grid .pattern-cell .glass-spark{font-size:10px}
+.tabletop-grid .palace-window{flex:none;display:grid;grid-template-rows:1fr 1fr;height:17px;min-height:17px;padding:1px 3px;margin-top:1px;gap:1px;border-radius:8px 8px 2px 2px}
+.tabletop-grid .palace-pane{min-height:0;border-radius:4px 4px 1px 1px}
+.tabletop-grid .palace-pane .glass{width:10px;height:10px;border-radius:2px}
 .tabletop-grid .pane-line{font-size:8px}
-.tabletop-grid .window-points{font-size:8px;line-height:1;flex:none;height:12px;margin-top:2px}
-.tabletop-grid .window-points svg{width:8px;height:8px}
-.tabletop-grid .pattern-finished{min-height:0;gap:3px}
-.tabletop-grid .pattern-finished svg{width:13px}
-.tabletop-grid .pattern-finished small{font-size:7px;letter-spacing:0}
-.tabletop-grid .window-highlight{border-color:#8bf3d5;box-shadow:0 0 0 1px #8bf3d5a8,inset 0 0 8px #8bf3d522}
-.tabletop-grid .window-clickable:not(:disabled):hover{transform:translateY(-2px)}
-.tabletop-grid .tabletop-human .window-strip{padding:3px 5px}
-.tabletop-grid .tabletop-human .pattern-cell .glass{height:min(90%,26px);width:min(85%,26px)}
-.tabletop-grid .tabletop-human .reverse-dot{width:8px;height:8px}
-.tabletop-grid .tabletop-human .reverse-caption{font-size:7px}
-.tabletop-grid .tabletop-human .palace-window{height:31px;min-height:31px}
-.tabletop-grid .tabletop-human .palace-pane .glass{height:12px;width:12px}
-.tabletop-grid .tabletop-human .window-head{height:19px;min-height:19px}
-.tabletop-grid .tabletop-human .window-points{height:15px;font-size:10px}
-/* Central physical drafting area stays inside its assigned row */
-.tabletop-market{grid-area:market;display:flex;flex-direction:column;justify-content:space-between;min-height:0;min-width:0;position:relative;padding:5px 3px 4px;border:1px solid #b9c99b5e;border-radius:21px;background:radial-gradient(ellipse at center,#1c4b51e3,#10303ce8);box-shadow:inset 0 0 0 1px #dff3d708}
-.tabletop-market-header{display:flex;align-items:center;justify-content:space-between;padding:0 10px;gap:7px;flex:none;min-height:26px}
-.tabletop-market-header .overline{display:none}
-.tabletop-market-header h2{font:500 16px 'Playfair Display',Georgia,serif;color:#f1e9ca;margin:0}
-.tabletop-market .market-chip{padding:3px 6px;font-size:9px;gap:4px}
-.tabletop-market .market-chip svg{width:11px;height:11px}
-.tabletop-market .market-playground{height:100%;min-height:0;max-height:100%;aspect-ratio:1;min-width:0;width:min(100%,370px);margin:auto;flex:1;position:relative}
-.tabletop-market .market-playground:before{font-size:190px}
-.tabletop-market .market-playground:after{font-size:120px}
-.tabletop-market .factory{width:clamp(38px,5.9vh,64px);height:clamp(38px,5.9vh,64px);border-width:1px}
-.tabletop-market .factory-id{font-size:7px;padding:1px 5px;top:-9px}
-.tabletop-market .factory-tiles{width:75%;gap:2px}
-.tabletop-market .factory-tiles .glass{width:min(100%,clamp(14px,2.25vh,23px));height:clamp(14px,2.25vh,23px)}
-.tabletop-market .factory-flower{font-size:24px}
-.tabletop-market .center-pile{width:clamp(86px,11.8vh,122px);min-height:clamp(86px,11.8vh,122px);padding:6px}
-.tabletop-market .center-eyebrow{font-size:7px;margin-bottom:5px}
-.tabletop-market .center-tiles{gap:2px;max-width:112px}
-.tabletop-market .center-choice{padding:1px 3px;font-size:9px}
-.tabletop-market .center-choice .glass{width:16px;height:16px}
-.tabletop-market .center-token{font-size:8px;margin-top:4px}
-.tabletop-first-player{display:flex;justify-content:center;align-items:center;gap:7px;min-height:25px;flex:none;color:#cde4d9;font-size:9px;white-space:nowrap}
-.first-player-tile{display:grid;place-items:center;height:22px;width:22px;flex:none;background:linear-gradient(#f0e8d5,#c5d8e1);color:#145077;border:2px solid #63a6b8;border-radius:5px;box-shadow:inset 0 0 0 1px #295d81,1px 2px 4px #0008;font:900 17px Georgia,serif}
-.tabletop-market-help{display:flex;gap:5px;align-items:center;min-height:24px;flex:none;border-top:1px solid #91c3b237;padding:4px 7px 0;margin:0 6px;color:#d1e9dd;font-size:9px;line-height:1.25}
-.tabletop-market-help>span{flex:1;min-width:0}
-.tabletop-market-help svg{width:12px;height:12px;flex:none}
-.tabletop-market-help .clear-pick{font-size:9px;padding:2px}
-.tabletop-market-help .tabletop-jump{display:none}
-.tabletop-market .tabletop-discard{font-size:9px;padding:3px 8px;margin:3px auto 0}
-/* Dock: live score and penalty rail always visible. The log alone is independently scrollable. */
-.tabletop-sidebar{display:flex;flex-direction:column;min-width:0;min-height:0;gap:7px;position:static}
-.tabletop-sidebar .panel{margin:0;flex:none;min-width:0;background:linear-gradient(145deg,#192f3b,#112330);border:1px solid #799e9a57;border-radius:11px;overflow:hidden}
-.tabletop-turn-card{padding:8px 10px}
-.tabletop-sidebar .turn-topline .overline{font-size:8px}
-.tabletop-current{display:flex;align-items:center;gap:7px;margin:5px 0 0}
-.tabletop-current .player-avatar{height:28px;width:28px;font-size:14px;border-radius:7px}
-.tabletop-current h2{font:600 16px 'Playfair Display',Georgia,serif;color:#f3eee1;margin:0}
-.tabletop-current p{font-size:9px;margin:2px 0 0;line-height:1.25}
-.tabletop-scores{padding:8px 10px}
-.tabletop-dock-heading{display:flex;align-items:center;gap:7px;padding-bottom:4px;font-size:10px}
-.tabletop-dock-heading svg{width:13px;height:13px;color:#e6c782}
-.tabletop-dock-heading span{font-size:8px;margin-left:auto;color:#a4ccbd}
-.tabletop-scores-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 4px}
-.tabletop-score-line{display:flex;align-items:center;gap:4px;padding:3px 5px;font-size:10px;min-width:0}
-.tabletop-score-line>span:nth-of-type(2){white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
-.tabletop-score-line.playing{background:#99eac31a;outline:1px solid #9beac263}
-.tabletop-score-line .score-rank{width:auto;font-size:8px}
-.tabletop-score-line .track-legend-pawn{height:8px;width:8px;flex:none}
-.tabletop-score-line strong{margin-left:auto;font-size:11px;white-space:nowrap}
-.tabletop-score-line strong small{font-size:8px}
-.tabletop-sidebar .section-heading{display:flex;padding:8px 10px 4px;gap:6px}
-.tabletop-sidebar .section-heading .overline{font-size:8px;letter-spacing:.09em}
-.tabletop-sidebar .section-heading h2{font:500 16px 'Playfair Display',Georgia,serif;margin:3px 0 0}
-.tabletop-sidebar .section-heading p{display:none}
-.tabletop-sidebar .section-heading-icon{display:none}
-.tabletop-sidebar .broken-track-scroll{padding:2px 8px 3px;overflow:hidden}
-.tabletop-sidebar .broken-track-rail{min-width:0;display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:2px}
-.tabletop-sidebar .broken-track-step{height:52px;min-height:52px;padding:4px 1px;gap:2px;border-radius:4px;min-width:0}
-.tabletop-sidebar .broken-track-position{font-size:7px}
-.tabletop-sidebar .broken-track-step strong{font-size:11px}
-.tabletop-sidebar .track-avatars{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;min-height:13px}
-.tabletop-sidebar .track-pawn{width:10px;height:10px;font-size:8px;border-radius:2px}
-.tabletop-sidebar .glass-track-legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 5px;padding:4px 8px 7px;font-size:9px}
-.tabletop-sidebar .glass-track-legend>span{width:auto;gap:3px;min-width:0;white-space:nowrap}
-.tabletop-sidebar .glass-track-legend>span span{white-space:nowrap}
-.tabletop-sidebar .broken-track-note{display:none}
-.tabletop-sidebar .full-history-panel{display:flex;flex-direction:column;flex:1;min-height:0}
-.tabletop-sidebar .full-history-panel .section-heading{flex:none}
-.tabletop-sidebar .timeline-toolbar{display:flex;flex-wrap:wrap;align-items:center;padding:5px 8px;gap:5px}
-.tabletop-sidebar .timeline-filters{width:100%;display:flex;gap:3px}
-.tabletop-sidebar .timeline-filters button{flex:1;font-size:9px;padding:4px 5px}
-.tabletop-sidebar .timeline-round-label{font-size:9px;gap:3px}
-.tabletop-sidebar .timeline-round-label select{font-size:9px;padding:3px;width:85px}
-.tabletop-sidebar .timeline-total{font-size:9px;margin-left:auto}
-.tabletop-sidebar .timeline-events{flex:1;min-height:0;max-height:none;overflow:auto;overscroll-behavior:contain;padding:6px 8px 4px;scrollbar-color:#527f83 #142c36}
-.tabletop-sidebar .timeline-event{grid-template-columns:17px 1fr;gap:5px;padding-bottom:6px}
-.tabletop-sidebar .timeline-symbol{width:17px;height:17px;border-radius:5px}
-.tabletop-sidebar .timeline-symbol svg{width:10px;height:10px}
-.tabletop-sidebar .timeline-event:not(:last-child):before{left:8px;top:20px}
-.tabletop-sidebar .timeline-event-body{padding:5px}
-.tabletop-sidebar .timeline-label{font-size:10px}
-.tabletop-sidebar .timeline-round{font-size:8px}
-.tabletop-sidebar .timeline-event-body>p{font-size:9px;margin-top:4px}
-.tabletop-sidebar .event-chip{font-size:8px;padding:2px 3px}
-.tabletop-sidebar .timeline-more{font-size:9px;padding:5px;margin:4px auto}
+.tabletop-grid .window-points{flex:none;margin:1px 0 0;height:9px;display:flex;align-items:center;justify-content:center;font-size:9px;line-height:1}
+.tabletop-grid .window-points svg{height:9px;width:9px}
+.tabletop-grid .window-highlight{border-color:#a4ffdf;box-shadow:inset 0 0 0 1px #a4ffdf,0 0 8px #76fbd6}
+.tabletop-grid .window-clickable:not(:disabled):hover{transform:translateY(-1px);border-color:#e0ffd8}
+.tabletop-grid .pattern-finished{min-height:0;gap:4px}.tabletop-grid .pattern-finished svg{width:14px}.tabletop-grid .pattern-finished small{font-size:7px}
+.tabletop-human{grid-area:south;padding:4px 6px 5px}
+.tabletop-human-heading{height:24px;min-height:24px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:7px}
+.tabletop-human-identity,.tabletop-human-stats{display:flex;align-items:center;gap:7px}
+.tabletop-human-identity .player-avatar{width:21px;height:21px;border-radius:6px;font-size:12px}
+.tabletop-human-identity h2{font-size:14px;font-family:'Playfair Display',Georgia,serif;color:#fbecdb;white-space:nowrap}
+.tabletop-human-identity h2 span{color:#edce8a}.tabletop-human-stats>span{display:flex;gap:3px;align-items:center;font-weight:800;font-size:10px;white-space:nowrap}
+.tabletop-human-stats>span svg{height:12px;width:12px}
+.tabletop-human-stats .tabletop-reset{width:auto;min-height:22px;padding:3px 8px;font-size:9px;border-radius:5px;white-space:nowrap}
+.tabletop-human .board-scroll{overflow:visible;min-height:0;flex:1;padding:0}
+.tabletop-human .board-area{padding:0;width:100%;max-width:none;min-width:0;height:100%}
+.tabletop-human .window-row{gap:6px}
+.tabletop-human .window-strip{padding-inline:5px}
+.tabletop-human .reverse-dot{width:8px;height:8px}
+.tabletop-human .pattern-cell .glass{width:min(88cqi,88cqb,34px)}
+/* Market occupies only the central area, leaving real boards wide. */
+.tabletop-market{grid-area:market;display:grid;grid-template-columns:minmax(150px,.85fr) minmax(250px,1.5fr) minmax(195px,1fr);grid-template-rows:minmax(0,1fr) auto;align-items:stretch;gap:6px;min-width:0;min-height:0;border:1px solid #6b978d5e;border-radius:14px;background:linear-gradient(145deg,#143b40ab,#15323c95);padding:7px}
+.tabletop-game-hud,.tabletop-market-core,.tabletop-track-area{min-width:0;min-height:0;border:1px solid #84b5a542;background:#102b39b8;border-radius:11px}
+.tabletop-game-hud{display:flex;flex-direction:column;gap:6px;padding:11px 10px}
+.tabletop-hud-label{display:flex;align-items:center;justify-content:space-between;gap:4px;color:#9fd5cd;letter-spacing:.14em;font-size:9px;font-weight:900}
+.tabletop-hud-label .live-dot{height:6px;width:6px}
+.tabletop-hud-player{display:flex;align-items:center;gap:8px;border-bottom:1px solid #8caba635;padding:4px 0 10px}
+.tabletop-hud-player .player-avatar{height:29px;width:29px;flex:none;border-radius:7px}
+.tabletop-hud-player>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.tabletop-hud-player strong{font:500 clamp(15px,1.3vw,22px) 'Playfair Display',Georgia,serif;color:#ffeedb;line-height:1.08}
+.tabletop-hud-player small{font-size:10px;color:#b2cfcc;line-height:1.25}
+.tabletop-scores-label{margin-top:1px;justify-content:flex-start;gap:6px}
+.tabletop-hud-scores{display:grid;grid-template-columns:1fr;gap:2px}
+.tabletop-hud-score{display:flex;align-items:center;gap:5px;min-width:0;padding:4px 5px;background:#ffffff05;border:1px solid transparent;border-radius:5px;font-size:10px;color:#d5e9e5}
+.tabletop-hud-score.is-current{background:#b6f2d614;border-color:#8ddbc879}
+.tabletop-hud-score>span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabletop-hud-score strong{font-weight:900;font-size:12px;color:#f4ecd0;white-space:nowrap}
+.tabletop-hud-score strong small{font-size:9px;font-weight:400;color:#abc5c3}
+.track-legend-pawn{width:9px;height:9px;border-radius:3px;display:inline-block;flex:none}
+.tabletop-hud-action{display:flex;align-items:center;gap:7px;width:100%;padding:7px 8px;border:1px solid #91c4b870;border-radius:6px;background:#305d6475;color:#e0f6ea;font-size:10px;font-weight:750;cursor:pointer;text-align:left}
+.tabletop-hud-action>span{flex:1}.tabletop-hud-action b{background:#bdecc122;color:#c7f5de;padding:3px 5px;border-radius:5px}
+.tabletop-hud-action:hover,.tabletop-hud-action:focus-visible{border-color:#e7daa7;background:#4e7d7c8c;outline:0}
+.tabletop-orient-action{margin-top:auto;background:#193e4473}
+.tabletop-market-core{display:flex;flex-direction:column;align-items:center;gap:1px;justify-content:space-between;padding:4px}
+.tabletop-market-header{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:2px 6px;flex:none}
+.tabletop-market-header h2{font:500 15px 'Playfair Display',Georgia,serif;color:#f9e8c8;white-space:nowrap}
+.tabletop-market .market-chip{padding:3px 5px;display:flex;align-items:center;gap:4px;font-size:9px;white-space:nowrap}
+.tabletop-market .market-chip svg{width:12px;height:12px}
+.tabletop-market .market-playground{position:relative;flex:none;height:auto;min-height:0;max-height:none;width:min(100%,28dvh,320px);aspect-ratio:1;margin:auto}
+.tabletop-market .market-playground:before{font-size:100px}.tabletop-market .market-playground:after{font-size:80px}
+.tabletop-market .factory{width:clamp(40px,5.7dvh,57px);height:clamp(40px,5.7dvh,57px);border-width:1px;box-shadow:inset 0 0 0 2px #c9f2da12,0 2px 8px #010a10ad}
+.tabletop-market .factory-tiles{width:77%;gap:2px}
+.tabletop-market .factory-tiles .glass{width:clamp(14px,2.2dvh,23px);height:auto;aspect-ratio:1;min-height:0;border-radius:4px}
+.tabletop-market .factory-id{top:-8px;padding:0 4px;font-size:8px}
+.tabletop-market .factory-flower{font-size:20px}
+.tabletop-market .center-pile{width:clamp(78px,10.1dvh,103px);min-height:clamp(78px,10.1dvh,103px);padding:5px}
+.tabletop-market .center-eyebrow{font-size:7px;letter-spacing:.05em;margin-bottom:3px}
+.tabletop-market .center-tiles{max-width:94px;gap:1px}.tabletop-market .center-choice{font-size:9px;gap:2px;padding:1px 2px}
+.tabletop-market .center-choice .glass{width:16px;height:16px}.tabletop-market .center-token{font-size:8px;margin-top:3px}
+.tabletop-first-player{display:flex;justify-content:center;align-items:center;gap:5px;flex:none;font-size:9px;min-height:24px;color:#c9e7d8}
+.first-player-tile{display:grid;place-items:center;width:20px;height:20px;background:#e5f0e8;color:#186381;border:2px solid #7bc8cc;border-radius:4px;font:900 15px Georgia,serif;box-shadow:0 1px 5px #0008}
+.tabletop-track-area{padding:5px 7px 6px;overflow:hidden}
+.tabletop-track-area .glass-track-panel{display:flex;flex-direction:column;margin:0;background:none;border:0;box-shadow:none;overflow:visible;height:100%;padding:0}
+.tabletop-track-area .section-heading{padding:3px 2px 6px;margin:0;display:flex;align-items:center;gap:5px}
+.tabletop-track-area .section-heading .overline{display:none}
+.tabletop-track-area .section-heading h2{font:500 15px 'Playfair Display',Georgia,serif;color:#f6e8d0;margin:0}
+.tabletop-track-area .section-heading p,.tabletop-track-area .section-heading-icon{display:none}
+.tabletop-track-area .broken-track-scroll{padding:0 1px;overflow:visible}
+.tabletop-track-area .broken-track-rail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));min-width:0;gap:4px}
+.tabletop-track-area .broken-track-step{min-height:0;height:clamp(37px,5.5dvh,55px);padding:3px 1px;gap:1px;border-radius:5px}
+.tabletop-track-area .broken-track-position{font-size:8px}
+.tabletop-track-area .broken-track-step strong{font:700 14px Georgia,serif;line-height:1;color:#f5e3cd}
+.tabletop-track-area .track-avatars{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:1px;min-height:11px}
+.tabletop-track-area .track-pawn{height:11px;width:11px;border-radius:2px;font-size:8px}
+.tabletop-track-area .glass-track-legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:6px 1px 0;gap:4px 3px;font-size:9px;line-height:1.25}
+.tabletop-track-area .glass-track-legend>span{display:flex;align-items:center;gap:3px;min-width:0;white-space:nowrap}
+.tabletop-track-area .glass-track-legend>span span{font-size:8px}
+.tabletop-track-area .broken-track-note{display:block;padding:7px 1px 0!important;margin:0!important;color:#98bac0;font-size:9px!important;line-height:1.3}
+.tabletop-track-area .broken-track-note svg{width:10px;height:10px;display:inline;vertical-align:middle}
+.tabletop-market-help{grid-column:1/-1;display:flex;align-items:center;gap:6px;min-height:21px;padding:4px 7px 0;border-top:1px solid #9bc8b04d;font-size:10px;color:#d7eee0;line-height:1.25}
+.tabletop-market-help>span{flex:1;min-width:0}.tabletop-market-help svg{width:13px;height:13px;flex:none}
+.tabletop-market-help .clear-pick,.tabletop-discard{font-size:10px;padding:3px 7px;margin:0}
+.tabletop-history-backdrop{z-index:12}
+.tabletop-history-dialog{position:relative;width:min(700px,calc(100vw - 28px));max-height:min(780px,90dvh);min-height:0;display:flex;flex-direction:column;overflow:hidden;padding:0;border-radius:16px;border:1px solid #9ac5b67a;box-shadow:0 20px 65px #000b;background:#132735}
+.tabletop-history-dialog>.close-btn{z-index:3;top:12px;right:12px}
+.tabletop-history-dialog .full-history-panel{margin:0;display:flex;flex-direction:column;overflow:hidden;min-height:0;flex:1;padding-top:8px}
+.tabletop-history-dialog .timeline-events{overflow:auto;flex:1;min-height:0;max-height:60dvh}
 .tabletop-inspect-modal{width:min(96vw,1180px);max-height:92dvh;overflow:auto}
-.tabletop-inspect-modal .board-area{min-width:800px}
-.tabletop-inspect-modal .pattern-frame{min-height:205px}
+.tabletop-inspect-modal .board-area{min-width:800px}.tabletop-inspect-modal .pattern-frame{min-height:205px}
 .tabletop-app .site-footer{display:none}
-/* Desktop: the entire table and all eight-column boards fit within the viewport. */
-@media(min-width:1200px) and (min-height:700px){
+@media(min-width:1050px) and (min-height:710px){
  html,body,#root{height:100%;min-height:0}
  .tabletop-app{height:100dvh;min-height:0;overflow:hidden;display:flex;flex-direction:column}
- .tabletop-app main.tabletop-container{height:calc(100dvh - 53px);min-height:0}
+ .tabletop-app main.tabletop-container{height:calc(100dvh - 47px);min-height:0}
 }
-@media(min-width:1200px) and (max-height:840px){
- .tabletop-grid{gap:5px;padding:5px;grid-template-rows:minmax(0,.85fr) minmax(0,1.5fr) minmax(0,1.1fr)}
- .tabletop-grid .reverse-preview{margin-bottom:1px;padding:1px;gap:1px}
- .tabletop-grid .reverse-dot{width:5px;height:5px}
- .tabletop-grid .window-head{height:13px;min-height:13px}
- .tabletop-grid .palace-window{height:20px;min-height:20px}
- .tabletop-grid .tabletop-human .palace-window{height:26px;min-height:26px}
- .tabletop-seat-header{height:21px;min-height:21px}
- .tabletop-market .market-playground{width:min(100%,310px)}
- .tabletop-market .factory{height:clamp(38px,5.5vh,53px);width:clamp(38px,5.5vh,53px)}
- .tabletop-market .center-pile{width:93px;min-height:93px}
- .tabletop-sidebar .broken-track-step{height:42px;min-height:42px}
- .tabletop-sidebar .section-heading h2{font-size:14px}
+@media(min-width:1050px) and (max-height:850px){
+ .tabletop-grid{grid-template-rows:minmax(0,1.26fr) minmax(0,1.65fr) minmax(0,1.26fr);gap:4px;padding:5px}
+ .tabletop-seat-header{height:19px;min-height:19px}
+ .tabletop-grid .window-head{height:12px;min-height:12px}
+ .tabletop-grid .reverse-preview{margin-bottom:1px;padding:2px 0 1px;gap:0;height:15px;min-height:15px}
+ .tabletop-grid .reverse-dot{width:6px;height:6px}
+ .tabletop-grid .palace-window{height:16px;min-height:16px}
+ .tabletop-grid .window-points{height:9px;font-size:8px}
+ .tabletop-human-heading{height:21px;min-height:21px}
+ .tabletop-game-hud{padding:7px 8px;gap:4px}
+ .tabletop-hud-player{padding-bottom:5px}
+ .tabletop-hud-score{padding:2px 4px}
+ .tabletop-hud-action{padding:5px 7px}
+ .tabletop-market .market-playground{width:min(100%,28dvh,300px)}
+ .tabletop-market .factory{height:clamp(39px,5.5dvh,52px);width:clamp(39px,5.5dvh,52px)}
+ .tabletop-market .center-pile{width:clamp(74px,9.5dvh,90px);min-height:clamp(74px,9.5dvh,90px)}
+ .tabletop-track-area .broken-track-step{height:clamp(33px,5.1dvh,44px)}
+ .tabletop-track-area .glass-track-legend{padding-top:4px;font-size:8px}
+ .tabletop-track-area .broken-track-note{display:none}
 }
-/* Narrow desktops and tablets: preserve readable panes, allow normal vertical scrolling. */
-@media(max-width:1199px){
- .tabletop-layout{grid-template-columns:minmax(0,1fr) 235px;align-items:start}
- .tabletop-surface{min-height:720px}
- .tabletop-grid{grid-template-rows:185px 280px 225px;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,1fr)}
- .tabletop-market .market-playground{width:min(100%,300px)}
- .tabletop-market .factory{width:52px;height:52px}
- .tabletop-market .factory-tiles .glass{height:19px;width:19px}
- .tabletop-seat-meta{display:none}
- .tabletop-sidebar .broken-track-rail{grid-template-columns:repeat(3,minmax(0,1fr))}
- .tabletop-sidebar .broken-track-step{min-height:43px;height:43px}
- .tabletop-sidebar .full-history-panel{max-height:470px}
- .tabletop-sidebar .timeline-events{max-height:280px}
+/* On narrower displays we keep controls readable by using a scrolling tabletop,
+   rather than making the stained-glass panes a few pixels wide. */
+@media(max-width:1049px), (max-height:709px){
+ .tabletop-app{min-height:100dvh;height:auto;overflow:visible}
+ .tabletop-app main.tabletop-container{height:auto}
+ .tabletop-surface{overflow:auto}
+ .tabletop-grid{min-width:930px;height:740px;grid-template-columns:160px minmax(0,1fr) 160px;grid-template-rows:175px 360px 175px}
+ .tabletop-market{grid-template-columns:minmax(135px,.9fr) minmax(245px,1.4fr) minmax(185px,1fr)}
+ .tabletop-market .market-playground{width:295px}
+ .tabletop-market .factory{width:49px;height:49px}
+ .tabletop-track-area .broken-track-step{height:40px}
+ .tabletop-grid .pattern-cell .glass{width:min(84cqi,84cqb,30px)}
 }
-@media(max-width:900px){
- .tabletop-layout{grid-template-columns:1fr}
- .tabletop-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) minmax(0,1fr)}
- .tabletop-sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:8px}
- .tabletop-sidebar .glass-track-panel{grid-column:2;grid-row:1/span 2}
- .tabletop-sidebar .full-history-panel{grid-column:1/-1;max-height:300px}
- .tabletop-sidebar .broken-track-rail{grid-template-columns:repeat(9,minmax(0,1fr))}
- .tabletop-sidebar .broken-track-step{min-height:50px;height:50px}
- .tabletop-sidebar .timeline-events{max-height:200px}
-}
-@media(max-width:650px){
- .tabletop-container{width:calc(100% - 12px)}
- .tabletop-app .brand-label,.tabletop-app .online-indicator,.tabletop-title-hint{display:none}
+@media(max-width:720px){
+ .tabletop-container{width:calc(100% - 10px)}
+ .tabletop-title-hint,.tabletop-app .brand-label,.tabletop-app .online-indicator{display:none}
+ .tabletop-surface{border-width:3px;border-radius:11px}
+ .tabletop-grid{min-width:930px;padding:5px}
  .tabletop-app .nav-right{gap:8px}
- .tabletop-app .brand-name{font-size:12px}
- .tabletop-app .nav-link{font-size:10px;gap:4px}
- .tabletop-title>strong{font-size:10px}
- .tabletop-surface{overflow:visible;min-height:0}
- .tabletop-grid{grid-template-columns:1fr;grid-template-rows:190px 320px repeat(2,190px) 235px;grid-template-areas:'north' 'market' 'west' 'east' 'south';padding:5px}
- .tabletop-seat,.tabletop-human{width:100%}
- .tabletop-seat-north{max-width:none}
- .tabletop-seat-west:not(:has(.window-row)),.tabletop-seat-east:not(:has(.window-row)){display:none}
- .tabletop-market .market-playground{width:min(100%,290px)}
- .tabletop-market .factory{width:50px;height:50px}
- .tabletop-market .factory-tiles .glass{height:18px;width:18px}
- .tabletop-human-heading{height:auto;min-height:32px;flex-wrap:wrap}
- .tabletop-human-stats{gap:5px}
- .tabletop-grid .tabletop-human .window-strip{padding:2px}
- .tabletop-grid .tabletop-human .pattern-cell .glass{height:16px;width:16px}
- .tabletop-grid .reverse-dot{width:5px;height:5px}
- .tabletop-sidebar{grid-template-columns:1fr}
- .tabletop-sidebar .glass-track-panel,.tabletop-sidebar .full-history-panel{grid-column:auto;grid-row:auto}
- .tabletop-sidebar .broken-track-rail{grid-template-columns:repeat(9,minmax(0,1fr))}
- .tabletop-sidebar .glass-track-legend{grid-template-columns:repeat(2,minmax(0,1fr))}
- .tabletop-grid .window-row{gap:2px}
- .tabletop-grid .palace-window{padding:1px;height:22px;min-height:22px}
+ .tabletop-app .nav-link{display:none}
+ .tabletop-topline{padding-inline:3px}
+ .tabletop-title>strong{font-size:9px}
+ .tabletop-history-dialog{max-height:94dvh}
 }
-
-@media(max-width:650px){
- .tabletop-players-2 .tabletop-grid{grid-template-rows:190px 320px 235px;grid-template-areas:'north' 'market' 'south'}
- .tabletop-players-3 .tabletop-grid{grid-template-rows:190px 320px 190px 235px;grid-template-areas:'north' 'market' 'east' 'south'}
+/* Final compact-market pass: the drafting ring is the focal point, not a huge panel. */
+.tabletop-market-core{position:relative;container-type:size;display:grid;place-items:center;padding:2px}
+.tabletop-market-core .tabletop-market-header{position:absolute;z-index:3;left:8px;top:4px;width:calc(100% - 16px);pointer-events:none}
+.tabletop-market-core .tabletop-market-header h2{font-size:12px;padding:2px 5px;border-radius:4px;background:#10313c94}
+.tabletop-market-core .market-chip{font-size:8px;background:#10313cb8}
+.tabletop-market-core .market-playground{width:min(98cqi,95cqb,30dvh,325px);height:auto;aspect-ratio:1;min-height:0;margin:auto}
+.tabletop-market-core .tabletop-first-player{position:absolute;z-index:4;bottom:2px;left:8px;min-height:20px;background:#10303cbb;padding:2px 6px;border-radius:5px;font-size:8px;max-width:calc(100% - 16px)}
+.tabletop-hud-scores{grid-template-columns:repeat(2,minmax(0,1fr));gap:3px}
+.tabletop-hud-score{font-size:9px;padding:4px 4px;gap:3px}
+.tabletop-hud-score strong{font-size:10px}
+.tabletop-hud-score strong small{font-size:8px}
+@media (min-width:1050px) and (max-height:850px){
+ .tabletop-market-core .market-playground{width:min(98cqi,95cqb,30dvh,325px)}
+ .tabletop-market-core .tabletop-market-header h2{font-size:11px}
+ .tabletop-hud-scores{gap:2px}
+ .tabletop-hud-score{padding:3px 3px;font-size:9px}
+ .tabletop-hud-action{font-size:9px}
+ .tabletop-track-area .broken-track-step{height:clamp(32px,4.3dvh,40px)}
+}
+/* Avoid marker overlap in the penalty rail at short desktop heights. */
+@media (min-width:1050px) and (max-height:850px){
+  .tabletop-track-area .broken-track-step{height:43px;min-height:43px;padding:2px 1px;gap:0}
+  .tabletop-track-area .broken-track-position{font-size:7px}
+  .tabletop-track-area .broken-track-step strong{font-size:12px;line-height:1}
+  .tabletop-track-area .track-avatars{min-height:9px}
+  .tabletop-track-area .track-pawn{width:9px;height:9px;font-size:7px}
+  .tabletop-track-area .glass-track-legend{font-size:8px;gap:2px}
 }
