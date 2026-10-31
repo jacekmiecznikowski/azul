@@ -48,7 +48,9 @@ function EventItem({ event, state }: { event: GameEvent; state: GameState }) {
 }
 
 /** Newest events are always first; scrolling never moves the rest of the table. */
-export function LiveHistory({ state }: { state: GameState }) {
+export function LiveHistory({ state, status, onCancel, onDiscard }: {
+  state: GameState; status: string; onCancel?: () => void; onDiscard?: () => void
+}) {
   const [filter, setFilter] = useState<Filter>('all')
   const listRef = useRef<HTMLOListElement>(null)
   const atTop = useRef(true)
@@ -60,6 +62,11 @@ export function LiveHistory({ state }: { state: GameState }) {
   useEffect(() => { if (atTop.current && listRef.current) listRef.current.scrollTop = 0 }, [latestId, filter])
   return <section className="sg-history sg-center-card" aria-label="Historia rozgrywki">
     <div className="sg-panel-title"><span><History size={15}/> HISTORIA RUCHÓW</span><small>{state.history?.length ?? 0} wpisów</small></div>
+    <div className="sg-history-live" aria-live="polite">
+      <span>{status}</span>
+      {onCancel && <button type="button" onClick={onCancel}>Anuluj</button>}
+      {onDiscard && <button type="button" className="sg-history-discard" onClick={onDiscard}>Stłucz tafle</button>}
+    </div>
     <div className="sg-history-filters" role="group" aria-label="Filtr historii">
       {([['all','Wszystkie'],['human','Moje'],['ai','Boty']] as const).map(([value, label]) =>
         <button type="button" key={value} aria-pressed={filter === value} className={filter === value ? 'sg-history-selected' : ''} onClick={() => {atTop.current = true; setFilter(value)}}>{label}</button>)}
