@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Activity, ArrowUpRight, Bot, Check, ChevronDown, ChevronUp, Clock3, Gem, History, ShieldAlert, Users } from 'lucide-react'
-import { BROKEN_TRACK, COLORS, patternFor, WINDOW_POINTS } from '../game/engine'
+import { BROKEN_TRACK, patternFor, WINDOW_POINTS } from '../game/engine'
+import { WindowCard } from './WindowBoard'
 import type { GameEvent, GameState, GlassColor, Player, SlotColor, WindowStrip } from '../game/engine'
 
 const COLOR_NAMES: Record<GlassColor, string> = { rose: 'różowe', citrine: 'żółte', cyan: 'turkusowe', amber: 'pomarańczowe', slate: 'szare' }
@@ -29,15 +30,18 @@ export function TableSeat({ player, index, location, isCurrent, onInspect }: {
   player: Player; index: number; location: 'north' | 'east' | 'west'; isCurrent: boolean; onInspect: () => void
 }) {
   const completed = player.strips.filter(strip => strip.side === 2).length
-  return <button type="button" className={`tabletop-seat tabletop-seat-${location}${isCurrent ? ' tabletop-seat-current' : ''}`} onClick={onInspect} aria-label={`Powiększ planszę gracza ${player.name}, wynik ${player.score} punktów`}>
+  return <section className={`tabletop-seat tabletop-seat-${location}${isCurrent ? ' tabletop-seat-current' : ''}`} aria-label={`Witraże gracza ${player.name}, ${player.score} punktów`}>
     <div className="tabletop-seat-header">
       <span className={`player-avatar avatar-${index}`}>{AVATARS[index]}</span>
       <span className="tabletop-seat-name"><strong>{player.name}</strong><small>{isCurrent ? 'TERAZ GRA' : `AI · ${DIFFICULTY[player.difficulty ?? 'normal']}`}</small></span>
+      <span className="tabletop-seat-meta"><Gem size={12}/>{completed}/8 <ShieldAlert size={12}/>{player.brokenSteps}/8</span>
       <span className="tabletop-seat-score">{player.score}<small> pkt</small></span>
+      <button type="button" className="tabletop-seat-zoom" onClick={onInspect} aria-label={`Powiększ witraże gracza ${player.name}`} title="Powiększ planszę"><ArrowUpRight size={16}/></button>
     </div>
-    <div className="rival-window-board tabletop-seat-windows" aria-hidden="true">{player.strips.map((strip, i) => <StripMini key={i} strip={strip} index={i} glazier={player.glazier} />)}</div>
-    <div className="tabletop-seat-footer"><span><Gem size={12}/> {completed}/8 okien</span><span><ShieldAlert size={12}/> {player.brokenSteps}/8</span><span className="tabletop-seat-zoom">Powiększ <ArrowUpRight size={12}/></span></div>
-  </button>
+    <div className="tabletop-seat-windows window-row" aria-label={`Osiem pełnych kwater gracza ${player.name}`}>
+      {player.strips.map((strip, i) => <WindowCard key={i} strip={strip} index={i} glazier={player.glazier} highlighted={false} active={false} isHumanTurn={false} onClick={() => undefined}/>)}
+    </div>
+  </section>
 }
 
 export function OpponentBoards({ state, inspect, onInspect }: { state: GameState; inspect: number; onInspect: (index: number) => void }) {
