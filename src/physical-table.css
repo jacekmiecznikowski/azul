@@ -1,0 +1,77 @@
+/* v7: One physical table. All four seats render the same unscaled WindowCard. */
+.tabletop-surface{--board-long:min(calc(100dvh - 112px),calc((100vw - 42px)/1.7),1040px);--board-depth:calc(var(--board-long)*.37);overflow:hidden}
+.tabletop-surface .tabletop-grid,.tabletop-players-2 .tabletop-grid,.tabletop-players-3 .tabletop-grid,.tabletop-players-4 .tabletop-grid{display:grid;width:100%;height:100%;min-height:0;grid-template-areas:'. north .' 'west market east' '. south .';grid-template-columns:var(--board-depth) minmax(0,1fr) var(--board-depth);grid-template-rows:var(--board-depth) minmax(0,1fr) var(--board-depth);gap:5px;padding:7px}
+.tabletop-grid>.tabletop-seat-slot{position:relative;min-height:0;min-width:0;overflow:visible;container-type:normal}
+.tabletop-grid>.tabletop-seat-slot-north{grid-area:north;grid-row:1;grid-column:2}
+.tabletop-grid>.tabletop-seat-slot-south{grid-area:south;grid-row:3;grid-column:2}
+.tabletop-grid>.tabletop-seat-slot-west{grid-area:west;grid-row:1/4;grid-column:1}
+.tabletop-grid>.tabletop-seat-slot-east{grid-area:east;grid-row:1/4;grid-column:3}
+.tabletop-grid>.tabletop-market{grid-area:market;grid-row:2;grid-column:2}
+.tabletop-grid .tabletop-seat-slot .tabletop-seat{position:absolute;top:50%;left:50%;width:var(--board-long);height:var(--board-depth);transform:translate(-50%,-50%);transform-origin:center;padding:5px 7px 6px;border-radius:12px;border:1px solid #94b3b5a1;background:linear-gradient(160deg,#2c505b,#183b4b 58%,#162f40);box-shadow:0 7px 22px #010f1e95,inset 0 0 0 1px #9fd3d622}
+.physical-orientation .tabletop-seat-slot-north .tabletop-seat{transform:translate(-50%,-50%) rotate(180deg)}
+.physical-orientation .tabletop-seat-slot-west .tabletop-seat,.readable-orientation .tabletop-seat-slot-west .tabletop-seat{transform:translate(-50%,-50%) rotate(-90deg)}
+.physical-orientation .tabletop-seat-slot-east .tabletop-seat,.readable-orientation .tabletop-seat-slot-east .tabletop-seat{transform:translate(-50%,-50%) rotate(90deg)}
+.readable-orientation .tabletop-seat-slot-north .tabletop-seat{transform:translate(-50%,-50%)}
+.tabletop-seat-current,.tabletop-seat-human{border-color:#e6cc88!important;box-shadow:0 0 0 1px #e3ca7975,0 8px 20px #020f1d99!important}
+.tabletop-grid .tabletop-seat-header{height:20px;min-height:20px;gap:7px}
+.tabletop-grid .tabletop-seat-name strong{font-size:12px}
+.tabletop-grid .tabletop-seat-name small{font-size:9px}
+.tabletop-grid .tabletop-seat-score{font-size:15px}
+.tabletop-grid .tabletop-seat-windows{margin-top:2px}
+.tabletop-grid .window-row{grid-template-columns:repeat(8,minmax(0,1fr));gap:5px}
+.tabletop-grid .window-strip{padding:2px 3px;border-radius:10px 10px 5px 5px;background:linear-gradient(145deg,#315368,#173245 75%);border-color:#8fb6ba9c}
+.tabletop-grid .window-head{height:12px;min-height:12px}
+.tabletop-grid .window-n,.tabletop-grid .window-side{font-size:9px}
+.tabletop-grid .reverse-preview{height:14px;min-height:14px;margin:1px 0 2px;padding:1px;border-radius:5px;gap:0}
+.tabletop-grid .reverse-caption{display:none}
+.tabletop-grid .reverse-colors{gap:5px}
+.tabletop-grid .reverse-dot{height:7px;width:7px}
+.tabletop-grid .pattern-frame{padding:2px;gap:2px;border:2px solid #86abb2;border-radius:16px 16px 4px 4px;box-shadow:inset 0 0 0 1px #9cd1d427}
+.tabletop-grid .pattern-cell{container-type:size;border-radius:4px}
+.tabletop-grid .pattern-cell .glass{width:min(96cqi,96cqb,44px);height:auto;aspect-ratio:1;border-radius:6px;box-shadow:inset 0 0 0 2px #ffffff52,0 2px 6px #000a}
+.tabletop-grid .pattern-cell .glass-ghost{opacity:.83;filter:saturate(.95)}
+.tabletop-grid .pattern-cell .glass-spark{font-size:12px}
+.tabletop-grid .palace-window{height:16px;min-height:16px;margin-top:2px;border-radius:11px 11px 2px 2px}
+.tabletop-grid .palace-pane .glass{width:12px;height:12px}
+.tabletop-grid .window-points{height:10px;min-height:10px;margin-top:1px;font-size:10px}
+.tabletop-grid .window-points svg{width:10px;height:10px}
+.tabletop-grid .tabletop-seat-reset{min-height:20px;font-size:10px}
+.tabletop-grid .tabletop-market{display:grid;grid-template-columns:minmax(0,.85fr) minmax(220px,1.26fr) minmax(0,1.14fr);grid-template-rows:minmax(0,1fr) auto;gap:6px;padding:5px;border:0;min-height:0}
+.tabletop-grid .tabletop-game-hud{padding:4px 7px;gap:2px}
+.tabletop-grid .tabletop-hud-label{font-size:9px}
+.tabletop-grid .tabletop-hud-player{padding:1px 0 2px}
+.tabletop-grid .tabletop-hud-player strong{font-size:16px}
+.tabletop-grid .tabletop-hud-player small{font-size:9px}
+.tabletop-grid .tabletop-hud-scores{gap:2px}
+.tabletop-grid .tabletop-hud-score{padding:2px 3px}
+.tabletop-grid .tabletop-hud-action{font-size:10px;min-height:22px;padding:2px 5px}
+.tabletop-grid .tabletop-orient-action{margin-top:auto}
+.tabletop-grid .tabletop-market-core{container-type:size;min-width:0;padding:3px}
+.tabletop-grid .tabletop-market-core .market-playground{width:min(94cqi,94cqb,255px);height:auto;aspect-ratio:1;max-height:none}
+.tabletop-grid .factory{width:clamp(29px,4dvh,42px);height:clamp(29px,4dvh,42px)}
+.tabletop-grid .factory-tiles .glass{width:clamp(11px,1.35dvh,16px);height:auto;aspect-ratio:1}
+.tabletop-grid .center-pile{width:clamp(54px,7dvh,75px);min-height:clamp(54px,7dvh,75px)}
+.tabletop-grid .center-choice .glass{height:14px;width:14px}
+.tabletop-grid .tabletop-market-header h2{font-size:11px}
+.tabletop-grid .tabletop-track-area{padding:5px 7px}
+.tabletop-grid .tabletop-track-area .broken-track-rail{grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}
+.tabletop-grid .tabletop-track-area .broken-track-step{height:clamp(29px,3.7dvh,39px);min-height:29px;padding:2px 0}
+.tabletop-grid .tabletop-track-area .section-heading{padding:1px 2px 3px}
+.tabletop-grid .tabletop-track-area .section-heading h2{font-size:12px}
+.tabletop-grid .tabletop-track-area .glass-track-legend{grid-template-columns:repeat(2,minmax(0,1fr));font-size:8px;gap:1px}
+.tabletop-grid .tabletop-track-area .broken-track-note{display:none}
+.tabletop-grid .tabletop-market-help{min-height:18px;padding:2px 5px 0;font-size:9px}
+.tabletop-players-2 .tabletop-grid>.tabletop-market{grid-column:1/4;grid-row:2}
+.tabletop-players-3 .tabletop-grid>.tabletop-market{grid-column:1/3;grid-row:2}
+/* Narrow screens scroll the table; never crush glass into lines. */
+@media(max-width:1100px),(max-height:740px){
+ .tabletop-surface{--board-long:780px;--board-depth:260px;overflow:auto}
+ .tabletop-grid,.tabletop-players-2 .tabletop-grid,.tabletop-players-3 .tabletop-grid,.tabletop-players-4 .tabletop-grid{width:1320px;min-width:1320px;height:790px;min-height:790px;grid-template-columns:260px minmax(0,1fr) 260px;grid-template-rows:260px 1fr 260px}
+}
+@media(min-width:1101px) and (max-height:840px){
+ .tabletop-surface{--board-long:760px;--board-depth:280px;overflow:auto;scrollbar-color:#709da1 #102b38}
+ .tabletop-grid,.tabletop-players-2 .tabletop-grid,.tabletop-players-3 .tabletop-grid,.tabletop-players-4 .tabletop-grid{height:850px;min-height:850px;grid-template-columns:280px minmax(0,1fr) 280px;grid-template-rows:280px minmax(0,1fr) 280px}
+}
+@media(min-width:1101px) and (max-width:1350px) and (max-height:840px){
+ .tabletop-grid,.tabletop-players-2 .tabletop-grid,.tabletop-players-3 .tabletop-grid,.tabletop-players-4 .tabletop-grid{width:1330px;min-width:1330px}
+}
