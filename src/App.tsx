@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, X, ListChecks } from 'lucide-react'
-import { applyMove, availableSources, BROKEN_TRACK, COLORS, legalMoves, newGame, standings } from './game/engine'
+import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, standings } from './game/engine'
 import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
 import { LiveHistory } from './components/LiveHistory'
@@ -11,9 +11,10 @@ import './match.css'
 import './redesign.css'
 import './center-v9.css'
 import './center-v10.css'
+import './inventory-v12.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
-const COLORS_PL: Record<GlassColor, string> = { rose: 'Róż', citrine: 'Złoto', cyan: 'Turkus', amber: 'Bursztyn', slate: 'Srebro' }
+const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
 const PLAYER_AVATARS = ['✦', '✧', '✳', '❖']
 interface Settings { opponents: number; difficulties: Difficulty[]; palaceSide: PalaceSide }
 const DEFAULT_OPTIONS: Settings = { opponents: 3, difficulties: ['normal', 'normal', 'normal'], palaceSide: 'A' }
@@ -54,6 +55,7 @@ function Market({ game, selection, disabled, onPick }: {
   onPick: (source: Source, color: GlassColor) => void
 }) {
   const center = COLORS.map(color => ({ color, count: game.center.filter(x => x === color).length })).filter(item => item.count > 0)
+  const inventory = glassInventory(game)
   return <section className="sg-market sg-center-card" aria-label="Warsztaty szkła">
     <div className="sg-panel-title"><span>WARSZTATY SZKŁA</span><small>{game.factories.filter(f => f.length).length} aktywnych</small></div>
     <div className="sg-market-circle">
@@ -68,6 +70,28 @@ function Market({ game, selection, disabled, onPick }: {
           </button>) : <span className="sg-center-quiet">✧</span>}</div>
         {!game.firstCenterTaken && <span className="sg-start-tile sg-start-on-market" title="Żeton pierwszego gracza — pierwszy pobór ze środka oznacza +1 stłuczenie">1</span>}
         {!game.firstCenterTaken && <small className="sg-center-penalty">+1 stłuczenie</small>}
+      </div>
+    </div>
+    <div className="sg-inventory" aria-label={`Bilans tafli szkła: ${inventory.total} ze 100`}>
+      <div className="sg-inventory-tower" title={`Szklana Wieża: ${inventory.tower} tafli`}>
+        <svg viewBox="0 0 34 42" role="img" aria-label="Szklana Wieża" fill="none">
+          <path d="M9 4 L25 4 L29 35 L25 39 L9 39 L5 35 Z" fill="#2b7180" fillOpacity=".28" stroke="#9dc6c5" strokeWidth="1.4"/>
+          <path d="M11 8 L23 8 L26 33 L22 36 L12 36 L8 33 Z" fill="#72c4d7" fillOpacity=".13" stroke="#9ad3db" strokeOpacity=".45"/>
+          <path d="M9 14 L24 14 M8 23 L26 23 M10 32 L24 32" stroke="#ddf1e8" strokeOpacity=".35"/>
+          <path d="M13 6 L11 32" stroke="#f3ffff" strokeOpacity=".55" strokeWidth="2"/>
+          <path d="M6 38 L28 38" stroke="#e1b578" strokeWidth="2.2"/>
+        </svg>
+        <span>WIEŻA</span>
+      </div>
+      <div className="sg-inventory-stats">
+        <span title={`Warsztaty: ${inventory.factories}, środek: ${inventory.center}`}><small>Na stole</small><b>{inventory.table}</b></span>
+        <span><small>Witraże</small><b>{inventory.playerBoards}</b></span>
+        <span><small>Woreczek</small><b>{inventory.bag}</b></span>
+        <span className="sg-inventory-highlight"><small>W wieży</small><b>{inventory.tower}</b></span>
+        <span><small>Rundy</small><b>{inventory.roundTrack}</b></span>
+      </div>
+      <div className={`sg-inventory-total${inventory.total !== 100 ? ' sg-inventory-warning' : ''}`} title="Razem: 100 tafli szkła">
+        <strong>{inventory.total}<small> / 100</small></strong><span>SUMA</span>
       </div>
     </div>
     <div className="sg-first-token">{game.firstCenterTaken
