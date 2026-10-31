@@ -7,3 +7,5 @@ coverage/
 
 # Generated Node simulator
 .sim-dist/
+reports/strategy-checkpoint.json
+reports/strategy-checkpoint.json.tmp
