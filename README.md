@@ -32,7 +32,7 @@ W kodzie logika jest oddzielona od interfejsu: `src/game/engine.ts`, `src/game/a
 
 ## Ważne
 
-Projekt fanowski, niezwiązany z autorem ani wydawcą gry. Nie wykorzystuje oficjalnych grafik. Ścieżka muzyczna jest dostarczana osobno przez użytkownika, a jej dalsza dystrybucja wymaga odpowiednich praw.
+Projekt fanowski, niezwiązany z autorem ani wydawcą gry. Nie wykorzystuje oficjalnych grafik. Ścieżka muzyczna została przekazana przez użytkownika jako nagranie z domeny publicznej.
 
 ## Zestawy kwater graczy i bilans 100 tafli (v12)
 
@@ -84,7 +84,6 @@ podczas `npm run build`). W uruchomionej grze:
   po pierwszym kliknięciu lub naciśnięciu klawisza.
 - Jeśli pliku nie ma, przycisk poinformuje `Brak MP3` po próbie odtworzenia.
 
-**Ważne:** plik MP3 nie jest dołączony do publicznego repozytorium i jest
-wpisany do `.gitignore`. Otrzymany w rozmowie plik audio jest uwzględniony
-w prywatnej paczce ZIP dla autora projektu. Przed publicznym udostępnieniem
-nagrania należy sprawdzić, czy pozwala na to licencja.
+**Dostarczenie pliku:** źródłowe nagranie `background.mp3` jest w paczce ZIP z gry.
+Kod odtwarzacza znajduje się na GitHubie. Po sklonowaniu repozytorium bez pliku MP3
+skopiuj nagranie do `public/background.mp3`; plik może być wersjonowany w GitHubie.
