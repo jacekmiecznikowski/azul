@@ -95,7 +95,7 @@ function buildReport(candidate, incumbent, cfg, trainingLog, score, eligible, pr
     seed: cfg.seed, settings: cfg, featureNames: nameList,
     incumbentWeights: incumbent, selectedCandidateWeights: candidate,
     eligible, promoted, promotionBlockedByFlag: !cfg.promote, activeWeights: promoted ? candidate : incumbent,
-    promotionRule: 'head-to-head win > 50% by more than its 95% margin of error, duel margin > 95% CI, no substantial regression elsewhere',
+    promotionRule: 'at least 60 holdout and 100 head-to-head games, not quick; direct win >50% beyond 95% CI, duel margin >95% CI, no serious regression',
     training: { generations: trainingLog.length, candidatesEvaluated: trainingLog.reduce((n,g)=>n+g.trials.length,0),
       gamesPerCandidate: cfg.games * cfg.participants.length * 2, log: trainingLog, bestTrainingFitness: score },
     validation, headToHead: duel, ablations,
@@ -223,7 +223,8 @@ function train(cfg) {
   const main = validation['2'] || validation[String(cfg.participants[0])]
   const noSeriousRegressions = Object.values(validation).every(v =>
     v.deltaMargin >= -Math.max(1.5, v.marginCI95))
-  const eligible = duel.candidate.win > .5 + duel.winCI95 && duel.scoreDelta > .5 &&
+  const eligible = cfg.preset !== 'quick' && cfg.holdout >= 60 && cfg.h2h >= 100 &&
+    duel.candidate.win > .5 + duel.winCI95 && duel.scoreDelta > .5 &&
     main.deltaMargin > main.marginCI95 && noSeriousRegressions
   const promoted = cfg.promote && eligible
   const ablations = {}
