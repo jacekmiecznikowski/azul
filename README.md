@@ -38,7 +38,7 @@ Node.js 22.18.0 jest zgodny z Vite 8 i Vitest 5. Nie próbuj instalować npm 12 
 - **Mniejsze warsztaty** są w centrum stołu. Wyniki, stan tury, tor stłuczeń i przycisk historii znajdują się obok nich, bez zabierania miejsca czterem planszom.
 - Historia partii otwiera się w dużym oknie z filtrami, zamiast zajmować stale widoczną kolumnę; tor stłuczonego szkła pozostaje widoczny.
 - Na desktopie o wysokości co najmniej 710 px gra automatycznie dopasowuje się do okna. Na małych ekranach stół jest przewijany, aby nie upychać ośmiu kwater w kilka pikseli.
-- Przycisk **„Obróć plansze do mnie”** zmienia orientację planszy naprzeciwko i kierunek obrotu plansz bocznych.
+- Przycisk **„Odwróć orientację”** zmienia orientację planszy naprzeciwko i kierunek obrotu plansz bocznych.
 
 ## Co jest zaimplementowane
 
