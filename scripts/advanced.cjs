@@ -95,7 +95,7 @@ function buildReport(candidate, incumbent, cfg, trainingLog, score, promoted, va
     seed: cfg.seed, settings: cfg, featureNames: nameList,
     incumbentWeights: incumbent, selectedCandidateWeights: candidate,
     promoted, activeWeights: promoted ? candidate : incumbent,
-    promotionRule: 'head-to-head win >= 54%, positive score gap, positive duel margin, no substantial regression in other formats',
+    promotionRule: 'head-to-head win > 50% by more than its 95% margin of error, duel margin > 95% CI, no substantial regression elsewhere',
     training: { generations: trainingLog.length, candidatesEvaluated: trainingLog.reduce((n,g)=>n+g.trials.length,0),
       gamesPerCandidate: cfg.games * cfg.participants.length * 2, log: trainingLog, bestTrainingFitness: score },
     validation, headToHead: duel, ablations,
@@ -140,7 +140,7 @@ function train(cfg) {
   const fingerprintCurrent = fingerprint(cfg)
   let checkpoint = {
     fingerprint: fingerprintCurrent, incumbent, rngState: rng.state, generation: 0,
-    pending: null, log: [], best: { weights: incumbent, score: -Infinity },
+    pending: null, log: [], best: { weights: incumbent, score: -1000000000 },
     center: incumbent, stagnant: 0,
   }
   if (cfg.resume) {
@@ -220,8 +220,8 @@ function train(cfg) {
   const main = validation['2'] || validation[String(cfg.participants[0])]
   const noSeriousRegressions = Object.values(validation).every(v =>
     v.deltaMargin >= -Math.max(1.5, v.marginCI95))
-  const promoted = cfg.promote && duel.candidate.win >= .54 && duel.scoreDelta > .5 &&
-    main.deltaMargin > .3 && noSeriousRegressions
+  const promoted = cfg.promote && duel.candidate.win > .5 + duel.winCI95 && duel.scoreDelta > .5 &&
+    main.deltaMargin > main.marginCI95 && noSeriousRegressions
   const ablations = {}
   const features = ['penaltyCost','rightChain','futureLeft','palaceSynergy','jokerUse','roundBonus','resetOpportunity','firstToken']
   if (cfg.ablate) {
@@ -239,7 +239,23 @@ function train(cfg) {
   saveAtomic(summaryPath,markdown(report))
   if (promoted) {
     writeJSON(path.join(root,'reports/previous-trained-weights.json'),baselineData)
+    // Keep the application StrategyLab schema in sync with promoted weights.
+    // The app expects duelVsHard/fourVsHard and full/without ablations.
+    const duelResult = validation['2'] || Object.values(validation)[0]
+    const fourResult = validation['4'] || duelResult
+    const visual = {
+      duelVsHard: { ...duelResult.candidate, winRate:duelResult.candidate.win, avgScore:duelResult.candidate.score, games:duelResult.games },
+      baselineVsHard: { ...duelResult.incumbent, winRate:duelResult.incumbent.win, avgScore:duelResult.incumbent.score, games:duelResult.games },
+      fourVsHard: { ...fourResult.candidate, winRate:fourResult.candidate.win, avgScore:fourResult.candidate.score, games:fourResult.games },
+      fourBaselineVsHard: { ...fourResult.incumbent, winRate:fourResult.incumbent.win, avgScore:fourResult.incumbent.score, games:fourResult.games },
+    }
+    const visualAblations = Object.fromEntries(Object.entries(ablations).map(([k,m])=>[k, {
+      full:{ winRate:m.incumbent.win,games:m.games },
+      without:{ winRate:m.candidate.win,games:m.games },
+    }]))
     writeJSON(incumbentPath,{...baselineData,version:3,algorithm:report.algorithm,weights:candidate,
+      validation:visual,ablation:visualAblations,
+      training:{...baselineData.training,trainingGames:checkpoint.log.reduce((n,g)=>n+g.trials.length*cfg.games*cfg.participants.length*2,0)},
       lastValidation:validation,headToHead:duel,report:'reports/strategy-advanced.json'})
     console.log('PROMOTED: candidate passed independent validation')
   } else {
