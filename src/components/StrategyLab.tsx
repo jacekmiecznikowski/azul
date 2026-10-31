@@ -46,10 +46,10 @@ export function StrategyLab({state,onClose}:{state:GameState;onClose:()=>void}){
       <div className="strategy-stats">
         <div><small>WYGRANE VS TRUDNY · 2 GRACZY</small><strong>{pc(data.duelVsHard.winRate)}</strong><span>{data.duelVsHard.games} testowych partii</span></div>
         <div><small>WERSJA WYJŚCIOWA</small><strong>{pc(data.baselineVsHard.winRate)}</strong><span>te same losowania</span></div>
-        <div><small>ŚREDNI WYNIK · MISTRZ</small><strong>{num(data.duelVsHard.avgScore)}</strong><span>punkty na partię</span></div>
+        <div><small>ŚREDNI WYNIK · BOT TRENINGOWY</small><strong>{num(data.duelVsHard.avgScore)}</strong><span>punkty na partię</span></div>
       </div>
       <h3><ChartNoAxesColumnIncreasing size={18}/> Gra czteroosobowa</h3>
-      <p className="strategy-line">Mistrz: <strong>{pc(data.fourVsHard.winRate)}</strong> zwycięstw; wersja wyjściowa: <strong>{pc(data.fourBaselineVsHard.winRate)}</strong> ({data.fourVsHard.games} gier przeciwko trzem botom „Trudny”).</p>
+      <p className="strategy-line">Bot trenowany: <strong>{pc(data.fourVsHard.winRate)}</strong> zwycięstw; wersja wyjściowa: <strong>{pc(data.fourBaselineVsHard.winRate)}</strong> ({data.fourVsHard.games} gier przeciwko trzem botom „Trudny”).</p>
       <h3><Lightbulb size={18}/> Testy elementów strategii</h3>
       <div className="strategy-lessons">{lessons.map(item=>{
         const test=report.ablation?.[item.key as keyof typeof report.ablation]
