@@ -134,3 +134,30 @@ describe('tor stłuczonego szkła', () => {
     expect(next.history.some(e => e.kind === 'take' && e.firstPlayer)).toBe(true)
   })
 })
+
+describe('żeton pierwszego gracza', () => {
+  it('losuje gracza rozpoczynającego i wyznacza go do pierwszej tury', () => {
+    const starters = new Set<number>()
+    for (let seed = 1; seed <= 50; seed++) {
+      const state = newGame({ opponents: 3, seed })
+      expect(state.currentPlayer).toBe(state.startingPlayer)
+      expect(state.firstCenterTaken).toBe(false)
+      expect(state.nextStartingPlayer).toBeNull()
+      starters.add(state.startingPlayer)
+    }
+    expect(starters.size).toBe(4)
+  })
+  it('przy pierwszym pobraniu ze środka przejmuje żeton i stłuczenie', () => {
+    const state = newGame({ opponents: 3, seed: 218 })
+    const starter = state.currentPlayer
+    state.center = ['rose', 'cyan']
+    const move = legalMoves(state).find(m => m.kind === 'take' && m.source.type === 'center')!
+    expect(move).toBeDefined()
+    const next = applyMove(state, move)
+    expect(next.nextStartingPlayer).toBe(starter)
+    expect(next.firstCenterTaken).toBe(true)
+    expect(next.players[starter].brokenSteps).toBe(1)
+    expect(next.history[0].kind).toBe('take')
+    expect(next.history[0].firstPlayer).toBe(true)
+  })
+})
