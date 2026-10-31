@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, Music2, X, ListChecks } from 'lucide-react'
+import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, Music2, X, ListChecks, BrainCircuit } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, patternFor, standings } from './game/engine'
 import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
 import { LiveHistory } from './components/LiveHistory'
 import { FinalResults } from './components/FinalResults'
+import { StrategyLab } from './components/StrategyLab'
 import { finishOverlayVisibility } from './ui/finishOverlayVisibility'
 import { useGameAudio } from './hooks/useGameAudio'
 import { useAmbientMusic } from './hooks/useAmbientMusic'
@@ -16,6 +17,7 @@ import './center-v10.css'
 import './inventory-v12.css'
 import './ux-v13.css'
 import './polish-v14.css'
+import './strategy-lab.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
@@ -149,7 +151,7 @@ function SetupModal({ settings, onClose, onStart }: {
       {Array.from({length: local.opponents}, (_, i) => <div key={i} className="bot-setting-row">
         <label htmlFor={`bot-level-${i}`}><Bot size={16}/><span>{['Aurora','Iris','Noctis'][i]}</span></label>
         <select id={`bot-level-${i}`} value={local.difficulties[i] ?? 'normal'} onChange={(e) => setLocal(prev => ({...prev, difficulties: prev.difficulties.map((level, idx) => idx === i ? e.target.value as Difficulty : level)}))}>
-          <option value="easy">Łatwy · losowy</option><option value="normal">Normalny · zachłanny</option><option value="hard">Trudny · strategiczny</option><option value="expert">Ekspert · przewiduje przeciwników</option>
+          <option value="easy">Łatwy · losowy</option><option value="normal">Normalny · zachłanny</option><option value="hard">Trudny · strategiczny</option><option value="expert">Ekspert · przewiduje przeciwników</option><option value="master">Mistrz · wytrenowany na symulacjach</option>
         </select>
       </div>)}
       <label className="field-label" htmlFor="palace-side">Punktowanie finałowe</label>
@@ -189,6 +191,7 @@ export default function App() {
   const [showSetup, setShowSetup] = useState(false)
   const [showRules, setShowRules] = useState(false)
   const [showResults, setShowResults] = useState(false)
+  const [showStrategy, setShowStrategy] = useState(false)
   const { enabled: soundEnabled, toggle: toggleSound, play } = useGameAudio()
   const { enabled: musicEnabled, toggle: toggleMusic, unavailable: musicUnavailable } = useAmbientMusic()
   const humanTurn = game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
@@ -200,7 +203,7 @@ export default function App() {
   const canReset = humanTurn && moves.some(m => m.kind === 'reset')
   const current = game.players[game.currentPlayer]
   const best = standings(game)
-  const finishOverlay = finishOverlayVisibility({ phase: game.phase, setupOpen: showSetup, rulesOpen: showRules, resultsOpen: showResults })
+  const finishOverlay = finishOverlayVisibility({ phase: game.phase, setupOpen: showSetup, rulesOpen: showRules || showStrategy, resultsOpen: showResults })
   const status = selection
     ? `Wybrano ${COLORS_PL[selection.color].toLowerCase()}. Wskaż podświetloną kwaterę.`
     : game.phase === 'finished' ? `Koniec gry — wygrywa ${best[0].name}.`
@@ -212,7 +215,7 @@ export default function App() {
   useEffect(() => {
     if (game.phase !== 'playing' || game.players[game.currentPlayer].controller !== 'ai' || finishing) return
     const difficulty = game.players[game.currentPlayer].difficulty ?? 'normal'
-    const base = difficulty === 'easy' ? 1100 : difficulty === 'normal' ? 1500 : difficulty === 'expert' ? 2200 : 1900
+    const base = difficulty === 'easy' ? 1100 : difficulty === 'normal' ? 1500 : difficulty === 'expert' ? 2200 : difficulty === 'master' ? 2250 : 1900
     const delay = base + Math.round(Math.random() * 450)
     const timer = window.setTimeout(() => {
       const move = chooseAIMove(game, difficulty)
@@ -288,7 +291,7 @@ export default function App() {
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span><small>WITRAŻE SINTRY · EDYCJA CYFROWA</small></div>
       <div className="sg-header-round"><span>RUNDA</span><strong>{game.round} <small>/ 6</small></strong><div className="sg-round-colors">{game.roundColors.map((c, i) =>
         <i key={i} title={`Runda ${i + 1}: ${COLORS_PL[c]}`} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : i + 1 < game.round ? ' sg-color-past' : ''}`}/>)}</div></div>
-      <div className="sg-header-actions"><button type="button" className="sg-music-toggle" onClick={toggleMusic} aria-pressed={musicEnabled && !musicUnavailable} title={musicUnavailable ? "Brak pliku public/background.mp3 — skopiuj plik do katalogu public i odśwież stronę" : musicEnabled ? "Wycisz muzykę w tle" : "Włącz muzykę w tle"} aria-label={musicUnavailable ? "Brak pliku muzyki" : musicEnabled ? "Wycisz muzykę" : "Włącz muzykę"}>{musicUnavailable || !musicEnabled ? <VolumeX size={16}/> : <Music2 size={16}/>}<span>{musicUnavailable ? "Brak MP3" : musicEnabled ? "Muzyka" : "Muzyka wył."}</span></button><button type="button" onClick={toggleSound} title={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-label={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-pressed={soundEnabled} className="sg-audio-toggle">{soundEnabled ? <Volume2 size={16}/> : <VolumeX size={16}/>}<span>{soundEnabled ? 'Dźwięk' : 'Cisza'}</span></button><button onClick={() => setShowRules(true)}><BookOpen size={16}/> Zasady</button>
+      <div className="sg-header-actions"><button type="button" className="sg-music-toggle" onClick={toggleMusic} aria-pressed={musicEnabled && !musicUnavailable} title={musicUnavailable ? "Brak pliku public/background.mp3 — skopiuj plik do katalogu public i odśwież stronę" : musicEnabled ? "Wycisz muzykę w tle" : "Włącz muzykę w tle"} aria-label={musicUnavailable ? "Brak pliku muzyki" : musicEnabled ? "Wycisz muzykę" : "Włącz muzykę"}>{musicUnavailable || !musicEnabled ? <VolumeX size={16}/> : <Music2 size={16}/>}<span>{musicUnavailable ? "Brak MP3" : musicEnabled ? "Muzyka" : "Muzyka wył."}</span></button><button type="button" onClick={toggleSound} title={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-label={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-pressed={soundEnabled} className="sg-audio-toggle">{soundEnabled ? <Volume2 size={16}/> : <VolumeX size={16}/>}<span>{soundEnabled ? 'Dźwięk' : 'Cisza'}</span></button><button type="button" onClick={() => setShowStrategy(true)}><BrainCircuit size={16}/> Strategia</button><button onClick={() => setShowRules(true)}><BookOpen size={16}/> Zasady</button>
         <button className="sg-new" onClick={() => setShowSetup(true)}><RotateCcw size={16}/> Nowa gra</button></div>
     </header>
     <main className="sg-stage" aria-label="Wspólny stół Sintra Glass">
@@ -310,6 +313,7 @@ export default function App() {
     {finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
+    {showStrategy && <StrategyLab state={game} onClose={() => setShowStrategy(false)}/>}
     {placementOptions && selection && <div className="modal-backdrop sg-placement-overlay" onMouseDown={() => setPlacementOptions(null)}>
       <div className="modal sg-placement-dialog" role="dialog" aria-modal="true" aria-label="Wybierz pola kwatery" onMouseDown={e => e.stopPropagation()}>
         <button className="close-btn" onClick={() => setPlacementOptions(null)} aria-label="Zamknij"><X size={18}/></button>
