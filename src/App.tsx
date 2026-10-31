@@ -10,15 +10,20 @@ import {
 } from './game/engine'
 import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Player, Source, WindowStrip } from './game/engine'
 import { chooseAIMove } from './game/ai'
+import { BrokenGlassTrack, GameTimeline, OpponentBoards } from './components/MatchPanels'
+import './match.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = {
   rose: 'Róż', citrine: 'Złoto', cyan: 'Turkus', amber: 'Bursztyn', slate: 'Srebro',
 }
 const PLAYER_AVATARS = ['✧', '✦', '❖', '✳']
-const DEFAULT_OPTIONS = { opponents: 2, difficulty: 'normal' as Difficulty, palaceSide: 'A' as PalaceSide }
-
-type Settings = typeof DEFAULT_OPTIONS
+interface Settings {
+  opponents: number
+  difficulties: Difficulty[]
+  palaceSide: PalaceSide
+}
+const DEFAULT_OPTIONS: Settings = { opponents: 2, difficulties: ['normal', 'normal', 'normal'], palaceSide: 'A' }
 interface Selection { source: Source; color: GlassColor }
 function sourceEquals(a: Source, b: Source): boolean {
   return a.type === b.type && (a.type === 'center' || (b.type === 'factory' && a.index === b.index))
@@ -28,7 +33,7 @@ function restore(): GameState | null {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return null
     const game = JSON.parse(raw) as GameState
-    if (game.players?.length >= 2 && game.factories && game.roundColors?.length === 6 && game.round >= 1 && game.round <= 6) return game
+    if (game.players?.length >= 2 && game.factories && game.roundColors?.length === 6 && game.round >= 1 && game.round <= 6) return { ...game, history: Array.isArray(game.history) ? game.history : [] }
   } catch { /* Ignore expired/corrupt browser storage. */ }
   return null
 }
@@ -81,6 +86,11 @@ function WindowCard({ strip, index, glazier, highlighted, active, onClick, isHum
       {glazier === index && <span className="artisan" title="Witrażysta"><Gem size={14} strokeWidth={2.6} /></span>}
       <span className="window-side">{complete ? '✓' : strip.side === 0 ? 'A' : 'B'}</span>
     </div>
+    <div className={`reverse-preview${complete ? ' reverse-finished' : ''}`} title="Ściągawka: kolor pól po drugiej stronie kwatery">
+      <span className="reverse-caption">REWERS</span>
+      <div className="reverse-colors">{(strip.side === 0 ? strip.back : strip.front).map((color, i) =>
+        <span key={i} className={`reverse-dot tile-${color}`} aria-label={color === 'wild' ? 'Joker' : COLORS_PL[color]} />)}</div>
+    </div>
     <div className="pattern-frame">
       {complete ? <div className="pattern-finished"><Sparkles size={20} /><small>UKOŃCZONO</small></div> : pattern.map((slot, slotIndex) =>
         <div key={slotIndex} className={`pattern-cell${strip.panes[slotIndex] ? ' filled' : ''}`}>
@@ -109,12 +119,15 @@ function SetupModal({ settings, onClose, onStart }: {
       <span className="overline">ROZPOCZNIJ PRZYGODĘ</span>
       <h2>Nowa rozgrywka</h2>
       <p>Wybierz przeciwników i zasady punktowania. Każda partia ma nowy układ kwater.</p>
-      <label className="field-label" htmlFor="ai-count">Liczba przeciwników AI</label>
+      <label className="field-label">Liczba przeciwników AI</label>
       <div className="option-row">{[1, 2, 3].map((n) => <button key={n} className={`option-choice${local.opponents === n ? ' chosen' : ''}`} onClick={() => setLocal({ ...local, opponents: n })}>{n}<small>{n === 1 ? 'Pojedynek' : `${n + 1} graczy`}</small></button>)}</div>
-      <label className="field-label" htmlFor="difficulty">Poziom trudności</label>
-      <select id="difficulty" value={local.difficulty} onChange={(e) => setLocal({ ...local, difficulty: e.target.value as Difficulty })}>
-        <option value="easy">Łatwy — bot losowy</option><option value="normal">Normalny — bot zachłanny</option><option value="hard">Trudny — bot strategiczny</option>
-      </select>
+      <div className="per-bot-header"><span className="field-label">Poziom trudności każdego bota</span><small>Możesz mieszać poziomy w jednej partii.</small></div>
+      {Array.from({length: local.opponents}, (_, i) => <div key={i} className="bot-setting-row">
+        <label htmlFor={`bot-level-${i}`}><Bot size={16}/><span>{['Aurora','Iris','Noctis'][i]}</span></label>
+        <select id={`bot-level-${i}`} value={local.difficulties[i] ?? 'normal'} onChange={(e) => setLocal(prev => ({...prev, difficulties: prev.difficulties.map((level, idx) => idx === i ? e.target.value as Difficulty : level)}))}>
+          <option value="easy">Łatwy · losowy</option><option value="normal">Normalny · zachłanny</option><option value="hard">Trudny · strategiczny</option>
+        </select>
+      </div>)}
       <label className="field-label" htmlFor="palace-side">Punktowanie finałowe</label>
       <select id="palace-side" value={local.palaceSide} onChange={(e) => setLocal({ ...local, palaceSide: e.target.value as PalaceSide })}>
         <option value="A">Strona A — ornamenty</option><option value="B">Strona B — dominujący kolor</option>
@@ -140,8 +153,12 @@ function RulesModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function App() {
-  const [game, setGame] = useState<GameState>(() => restore() ?? newGame(DEFAULT_OPTIONS))
-  const [settings, setSettings] = useState<Settings>(DEFAULT_OPTIONS)
+  const [game, setGame] = useState<GameState>(() => restore() ?? newGame({ ...DEFAULT_OPTIONS, botDifficulties: DEFAULT_OPTIONS.difficulties }))
+  const [settings, setSettings] = useState<Settings>(() => ({
+    opponents: game.players.length - 1,
+    difficulties: game.players.slice(1).map((player) => player.difficulty ?? 'normal'),
+    palaceSide: game.palaceSide,
+  }))
   const [selection, setSelection] = useState<Selection | null>(null)
   const [inspect, setInspect] = useState(0)
   const [finishing, setFinishing] = useState<Move[] | null>(null)
@@ -162,11 +179,11 @@ export default function App() {
   useEffect(() => {
     if (game.phase !== 'playing' || game.players[game.currentPlayer].controller !== 'ai' || finishing) return
     const timeout = window.setTimeout(() => {
-      const move = chooseAIMove(game, settings.difficulty)
+      const move = chooseAIMove(game, game.players[game.currentPlayer].difficulty ?? 'normal')
       if (move) setGame((previous) => applyMove(previous, move))
     }, 600)
     return () => window.clearTimeout(timeout)
-  }, [game, settings.difficulty, finishing])
+  }, [game, finishing])
   useEffect(() => { if (!humanTurn) { setSelection(null); setFinishing(null) } }, [humanTurn])
 
   function commitMove(move: Move) {
@@ -196,7 +213,7 @@ export default function App() {
   }
   function startNew(options: Settings) {
     setSettings(options)
-    setGame(newGame(options))
+    setGame(newGame({ ...options, botDifficulties: options.difficulties }))
     setSelection(null)
     setFinishing(null)
     setInspect(0)
@@ -219,7 +236,10 @@ export default function App() {
         <section className="panel turn-panel"><div className="turn-pattern">✧</div><span className="overline">AKTUALNA TURA</span><h2>{game.phase === 'finished' ? 'Koniec rozgrywki!' : current.controller === 'human' ? 'Twój ruch!' : `Ruch gracza ${current.name}`}</h2><p>{game.phase === 'finished' ? `Zwycięzca: ${best[0].name} (${best[0].score} pkt).` : current.controller === 'human' ? 'Wybierz tafle z warsztatu i wskaż kwaterę albo cofnij witrażystę.' : 'Sztuczna inteligencja wybiera najkorzystniejszy wariant.'}</p><div className="turn-actions"><button className="btn btn-reset" disabled={!canReset || !!finishing} onClick={() => commitMove({ kind: 'reset' })}><ArrowLeft size={17}/> Cofnij witrażystę</button></div><div className="turn-bottom">{game.phase === 'finished' ? <><Crown size={15}/> Ranking końcowy</> : <><span className="thinking-dot"/> {current.controller === 'ai' ? 'AI MYŚLI...' : 'OCZEKIWANIE NA RUCH'}</>}</div></section></aside></div>
       <section className="panel board-panel"><div className="board-header"><div><span className="overline">03 / TWOJA PRACOWNIA</span><h2>Pałacowe witraże <span className="panel-title-spark">✧</span></h2><p>Ułóż tafle na pionowych kwaterach, aby ukończyć okna.</p></div><div className="board-controls"><div className="board-player"><span className={`player-avatar avatar-${inspect}`}>{PLAYER_AVATARS[inspect]}</span><span><strong>{selectedPlayer.name}</strong><small>{inspect === 0 ? 'TWOJA PLANSZA' : 'PODGLĄD GRACZA'}</small></span><ChevronDown size={14}/><select value={inspect} onChange={(e) => {setInspect(Number(e.target.value));setSelection(null)}} aria-label="Wybierz planszę do oglądania">{game.players.map((p, i) => <option key={p.id} value={i}>{p.name}</option>)}</select></div><div className="broken-indicator"><span>STŁUCZONE</span><strong>{selectedPlayer.brokenSteps}<small> / 8</small></strong><span className="glass-loss">−{BROKEN_TRACK[selectedPlayer.brokenSteps]} pkt</span></div></div></div>
         <div className="board-scroll"><div className="board-area"><div className="glazier-route"><div className="route-caption"><WandSparkles size={15}/> RUCH WITRAŻYSTY <ArrowRight size={15}/></div></div><div className="window-row">{selectedPlayer.strips.map((strip, index) => <WindowCard key={index} strip={strip} index={index} glazier={selectedPlayer.glazier} highlighted={inspect === 0 && targetIndices.has(index)} active={selection !== null} isHumanTurn={humanTurn} onClick={() => inspect === 0 && chooseTarget(index)}/>)}</div><div className="ornament-row">{[0,1,2,3].map((i) => <span key={i} className="ornament-position"><span className="ornament-symbol">❖</span><span>ORNAMENT {i+1}</span></span>)}</div></div></div><div className="board-footer"><span><Gem size={15}/> Kwatera = 5 tafli</span><span><Sparkles size={15}/> Premia za ukończone okna po prawej</span><span><MoonStar size={15}/> Strona pałacu {game.palaceSide}</span></div></section>
-      <section className="lower-grid"><div className="panel how-panel"><div className="small-icon"><Sparkles size={18}/></div><div><h3>Mały ruch. Wielkie dzieło.</h3><p>Witrażysta przesuwa się w prawo. Możesz go cofnąć kosztem jednej tury. Planuj kilka ruchów naprzód.</p><button onClick={() => setShowRules(true)}>Poznaj zasady <ArrowRight size={15}/></button></div></div><div className="panel history-panel"><div className="history-head"><h3>Ostatnie wydarzenia</h3><span>HISTORIA PARTII</span></div><div className="history-list">{game.log.slice(0, 3).map((event, i) => <div key={`${i}-${event}`}><span className="history-dot"/>{event}</div>)}</div></div></section>
+      <OpponentBoards state={game} inspect={inspect} onInspect={(index) => {setInspect(index);setSelection(null)}} />
+      <BrokenGlassTrack players={game.players} />
+      <GameTimeline state={game} />
+      <section className="lower-grid"><div className="panel how-panel"><div className="small-icon"><Sparkles size={18}/></div><div><h3>Mały ruch. Wielkie dzieło.</h3><p>Witrażysta przesuwa się w prawo. Możesz go cofnąć kosztem jednej tury. Planuj kilka ruchów naprzód.</p><button onClick={() => setShowRules(true)}>Poznaj zasady <ArrowRight size={15}/></button></div></div><div className="panel how-panel"><div className="small-icon"><Shield size={18}/></div><div><h3>Kontroluj kary w każdej turze.</h3><p>Powyżej znajdziesz tor stłuczonego szkła wszystkich graczy i pełny dziennik ruchów z rozbiciem punktów.</p><button onClick={() => document.querySelector('.glass-track-panel')?.scrollIntoView({behavior: 'smooth'})}>Zobacz tor kar <ArrowRight size={15}/></button></div></div></section>
       <footer className="site-footer"><span><Gem size={16}/> SINTRA GLASS <small>© 2026 · FAN PROJECT</small></span><span>Nieoficjalna cyfrowa adaptacja mechaniki „Azul: Witraże Sintry”. Bez oryginalnych grafik i znaków wydawcy.</span></footer>
     </main>
     {game.phase === 'finished' && <div className="result-float"><Crown size={18}/><span>Partia zakończona — wygrywa <strong>{best[0].name}</strong>!</span><button onClick={() => setShowSetup(true)}>Zagraj ponownie <ArrowRight size={15}/></button></div>}
