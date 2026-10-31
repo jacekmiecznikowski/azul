@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Activity, ArrowUpRight, Bot, Check, ChevronDown, ChevronUp, Clock3, Gem, History, ShieldAlert, Users } from 'lucide-react'
+import { Activity, ArrowUpRight, ArrowLeft, Bot, Check, ChevronDown, ChevronUp, Clock3, Gem, History, ShieldAlert, Users } from 'lucide-react'
 import { BROKEN_TRACK, patternFor, WINDOW_POINTS } from '../game/engine'
 import { WindowCard } from './WindowBoard'
 import type { GameEvent, GameState, GlassColor, Player, SlotColor, WindowStrip } from '../game/engine'
@@ -25,21 +25,30 @@ function StripMini({ strip, index, glazier }: { strip: WindowStrip; index: numbe
   </div>
 }
 
-/** A compact, always-visible board arranged around the shared drafting market. */
-export function TableSeat({ player, index, location, isCurrent, onInspect }: {
-  player: Player; index: number; location: 'north' | 'east' | 'west'; isCurrent: boolean; onInspect: () => void
+/** Exactly the same window board and dimensions for human and AI players. */
+export function TableSeat({ player, index, location, isCurrent, onInspect, isHuman = false,
+  isHumanTurn = false, highlightedTargets, activeSelection = false, onTarget, canReset = false, onReset }: {
+  player: Player; index: number; location: 'north' | 'south' | 'east' | 'west'
+  isCurrent: boolean; onInspect: () => void; isHuman?: boolean
+  isHumanTurn?: boolean; highlightedTargets?: ReadonlySet<number>
+  activeSelection?: boolean; onTarget?: (index: number) => void
+  canReset?: boolean; onReset?: () => void
 }) {
   const completed = player.strips.filter(strip => strip.side === 2).length
-  return <section className={`tabletop-seat tabletop-seat-${location}${isCurrent ? ' tabletop-seat-current' : ''}`} aria-label={`Witraże gracza ${player.name}, ${player.score} punktów`}>
+  return <section className={`tabletop-seat tabletop-seat-${location}${isCurrent ? ' tabletop-seat-current' : ''}${isHuman ? ' tabletop-seat-human' : ''}`} aria-label={`Witraże gracza ${player.name}, ${player.score} punktów`}>
     <div className="tabletop-seat-header">
       <span className={`player-avatar avatar-${index}`}>{AVATARS[index]}</span>
-      <span className="tabletop-seat-name"><strong>{player.name}</strong><small>{isCurrent ? 'TERAZ GRA' : `AI · ${DIFFICULTY[player.difficulty ?? 'normal']}`}</small></span>
+      <span className="tabletop-seat-name"><strong>{isHuman ? 'Twoje witraże' : player.name}</strong><small>{isCurrent ? 'TERAZ GRA' : isHuman ? 'TWOJA PLANSZA' : `AI · ${DIFFICULTY[player.difficulty ?? 'normal']}`}</small></span>
       <span className="tabletop-seat-meta"><Gem size={12}/>{completed}/8 <ShieldAlert size={12}/>{player.brokenSteps}/8</span>
       <span className="tabletop-seat-score">{player.score}<small> pkt</small></span>
+      {isHuman && <button type="button" className="tabletop-seat-reset" disabled={!canReset} onClick={onReset} title="Cofnij witrażystę zamiast pobierać szkło"><ArrowLeft size={13}/> Cofnij witrażystę</button>}
       <button type="button" className="tabletop-seat-zoom" onClick={onInspect} aria-label={`Powiększ witraże gracza ${player.name}`} title="Powiększ planszę"><ArrowUpRight size={16}/></button>
     </div>
     <div className="tabletop-seat-windows window-row" aria-label={`Osiem pełnych kwater gracza ${player.name}`}>
-      {player.strips.map((strip, i) => <WindowCard key={i} strip={strip} index={i} glazier={player.glazier} highlighted={false} active={false} isHumanTurn={false} onClick={() => undefined}/>)}
+      {player.strips.map((strip, i) => <WindowCard key={i} strip={strip} index={i}
+        glazier={player.glazier} highlighted={isHuman && !!highlightedTargets?.has(i)}
+        active={isHuman && activeSelection} isHumanTurn={isHuman && isHumanTurn}
+        onClick={() => { if (isHuman) onTarget?.(i) }} />)}
     </div>
   </section>
 }
