@@ -87,3 +87,9 @@ Pierwotna gra planszowa: **Azul: Stained Glass of Sintra / Witraże Sintry**, au
 Wzory przechowujemy jako osiem sparowanych, dwustronnych pasków w `PATTERN_STRIPS` w `src/game/engine.ts` — każdy gracz losuje kolejność i początkową stronę, poza paskiem z dwoma jokerami (ten zaczyna jokerami w dół). **Rozkłady kolorów zostały zrekonstruowane z publicznych fotografii fizycznej gry, ale nie są zweryfikowaną reprodukcją wszystkich 16 wzorów i ich parowania.** Instrukcja nie zawiera pełnej tabeli 32 stron fizycznych pasków. Żeby osiągnąć zgodność 1:1, potrzebne będą zdjęcia obu stron kompletu 8 pasków; wtedy wystarczy podmienić definicje, bez zmian w silniku gry.
 
 Źródła: [instrukcja gry (PDF)](https://gusandco.net/wp-content/uploads/2018/12/EN-Azul-Sintra-Rules.pdf), [fotografia planszy](https://pimg.1px.tw/punchboardgame/1555934372-2551694762.jpg), [komponenty w BGG](https://boardgamegeek.com/boardgame/256226/azul-stained-glass-sintra).
+
+## Widoki stołu v6
+
+Domyślny układ **Duże plansze** wyświetla pełne kwatery wszystkich graczy w dwóch rzędach po dwie plansze, przedzielonych paskiem warsztatów, wyników i toru stłuczeń. W odróżnieniu od wcześniejszego wymuszonego dopasowania nie zmniejsza szkiełek do mikroskopijnych rozmiarów. Przy typowej rozdzielczości laptopa trzeba **przewinąć środkowy obszar stołu**, aby zobaczyć drugi rząd; w prawym górnym rogu są skróty **Plansze AI** i **Moje witraże**. Wybranie tafli automatycznie przewija do własnych kwater.
+
+Przełącznik **Stół fizyczny** przywraca cztery plansze wokół warsztatów z obrotem górnej i bocznych, przeznaczony do oglądania całego stołu naraz. Oba układy wykorzystują te same komponenty i stan rozgrywki, bez restartu partii. Nie jest fizycznie możliwe zmieszczenie czterech pełnowymiarowych, obróconych plansz na ekranie 1440 × 900 bez znaczącego pomniejszenia albo przewijania.
