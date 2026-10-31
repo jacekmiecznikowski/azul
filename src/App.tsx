@@ -5,6 +5,7 @@ import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from
 import { chooseAIMove } from './game/ai'
 import { LiveHistory } from './components/LiveHistory'
 import { FinalResults } from './components/FinalResults'
+import { finishOverlayVisibility } from './ui/finishOverlayVisibility'
 import { useGameAudio } from './hooks/useGameAudio'
 import { GameBoard, GlassPiece } from './components/GameBoard'
 import './match.css'
@@ -196,6 +197,7 @@ export default function App() {
   const canReset = humanTurn && moves.some(m => m.kind === 'reset')
   const current = game.players[game.currentPlayer]
   const best = standings(game)
+  const finishOverlay = finishOverlayVisibility({ phase: game.phase, setupOpen: showSetup, rulesOpen: showRules, resultsOpen: showResults })
   const status = selection
     ? `Wybrano ${COLORS_PL[selection.color].toLowerCase()}. Wskaż podświetloną kwaterę.`
     : game.phase === 'finished' ? `Koniec gry — wygrywa ${best[0].name}.`
@@ -301,8 +303,8 @@ export default function App() {
         {seat(0, 'south')}
       </div>
     </main>
-    {game.phase === 'finished' && !showResults && !showSetup && !showRules && <div className="sg-finish"><Trophy size={17}/> Koniec partii <button onClick={() => setShowResults(true)}><ListChecks size={14}/> Zobacz podliczenie</button><button onClick={() => setShowSetup(true)}>Nowa partia <ArrowRight size={14}/></button></div>}
-    {showResults && game.phase === 'finished' && !showSetup && !showRules && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
+    {finishOverlay.banner && <div className="sg-finish"><Trophy size={17}/> Koniec partii <button onClick={() => setShowResults(true)}><ListChecks size={14}/> Zobacz podliczenie</button><button onClick={() => setShowSetup(true)}>Nowa partia <ArrowRight size={14}/></button></div>}
+    {finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
     {placementOptions && selection && <div className="modal-backdrop sg-placement-overlay" onMouseDown={() => setPlacementOptions(null)}>
