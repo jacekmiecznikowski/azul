@@ -3,7 +3,7 @@
 .tabletop-players-2 .tabletop-grid,
 .tabletop-players-3 .tabletop-grid,
 .tabletop-players-4 .tabletop-grid {
-  --seat-length: min(calc(100dvh - 118px), calc((100vw - 35px) * .625), 1100px);
+  --seat-length: min(calc(100dvh - 118px), calc((100vw - 35px) * .61), 1100px);
   --seat-depth: calc(var(--seat-length) * .31);
   display:grid;
   grid-template-columns:var(--seat-depth) minmax(0,1fr) var(--seat-depth);
