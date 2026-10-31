@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ArrowRight, BookOpen, Bot, Check, Crown, Gem, History,
   Info, Layers3, RotateCcw, Settings2, Trophy, RefreshCw,
@@ -14,8 +14,7 @@ import { BrokenGlassTrack, GameTimeline, TableSeat } from './components/MatchPan
 import { Glass, WindowCard } from './components/WindowBoard'
 import './match.css'
 import './tabletop.css'
-import './balanced-table.css'
-import './full-boards.css'
+import './physical-table.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = {
@@ -127,8 +126,6 @@ export default function App() {
   const [showRules, setShowRules] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [physicalOrientation, setPhysicalOrientation] = useState(true)
-  const [boardLayout, setBoardLayout] = useState<'large' | 'physical'>('large')
-  const tableRef = useRef<HTMLElement>(null)
   const humanTurn = game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
   const moves = useMemo(() => legalMoves(game), [game])
   const sourceOptions = useMemo(() => availableSources(game), [game])
@@ -166,10 +163,7 @@ export default function App() {
     const discard = options.find((m) => m.kind === 'take' && m.windowIndex === null)
     if (discard) { setSelection({ source, color }); return }
     setSelection({ source, color })
-    if (boardLayout === 'large') requestAnimationFrame(() => {
-      const el = tableRef.current
-      if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
-    })
+
   }
   function chooseTarget(index: number | null) {
     const candidates = selectionMoves.filter((move) => move.kind === 'take' && move.windowIndex === index)
@@ -199,13 +193,10 @@ export default function App() {
     <main className="tabletop-container" id="top">
       <div className="tabletop-topline" role="status" aria-label="Stan gry">
         <div className="tabletop-title"><strong>SINTRA · WSPÓLNY STÓŁ</strong><span className="tabletop-title-hint">Witraże wszystkich graczy w czasie rzeczywistym</span></div>
-        <div className="tabletop-board-jump" aria-label="Szybka nawigacja po planszach">
-          {boardLayout === 'large' && <><button type="button" onClick={() => tableRef.current?.scrollTo({top:0,behavior:'smooth'})}>Plansze AI ↑</button><button type="button" onClick={() => {const el=tableRef.current;if(el)el.scrollTo({top:el.scrollHeight,behavior:'smooth'})}}>Moje witraże ↓</button></>}
-        </div>
         <div className="tabletop-round-counter"><span>RUNDA</span><strong>{game.round}<small>/6</small></strong><div className="tabletop-round-pips">{game.roundColors.map((c,i) => <span key={i} className={`tile-${c}${i + 1 === game.round ? ' current' : ''}`} title={`Runda ${i + 1}: ${COLORS_PL[c]}`}/>)}</div></div>
       </div>
       <div className="tabletop-layout">
-        <section ref={tableRef} className={`tabletop-surface tabletop-players-${game.players.length}${boardLayout === 'large' ? ' large-board-layout' : ''}${physicalOrientation ? ' physical-orientation' : ' readable-orientation'}`} aria-label="Wspólny stół z planszami graczy i warsztatami">
+        <section className={`tabletop-surface tabletop-players-${game.players.length}${physicalOrientation ? ' physical-orientation' : ' readable-orientation'}`} aria-label="Wspólny stół z planszami graczy i warsztatami">
           <div className="tabletop-grid">
             {game.players[3] && <div className="tabletop-seat-slot tabletop-seat-slot-west">
               <TableSeat player={game.players[3]} index={3} location="west" isCurrent={game.currentPlayer === 3 && game.phase === 'playing'} onInspect={() => {setInspect(3);setInspectedBoard(3);setSelection(null)}} />
@@ -234,13 +225,9 @@ export default function App() {
                 <button className="tabletop-hud-action" type="button" onClick={() => setShowHistory(true)}>
                   <History size={16}/><span>Historia rozgrywki</span><b>{game.history?.length ?? 0}</b>
                 </button>
-                <div className="tabletop-layout-picker" role="group" aria-label="Układ plansz">
-                  <button type="button" className={boardLayout === 'large' ? 'is-selected' : ''} aria-pressed={boardLayout === 'large'} onClick={() => setBoardLayout('large')} title="Cztery pełne plansze i większe tafle">Duże plansze</button>
-                  <button type="button" className={boardLayout === 'physical' ? 'is-selected' : ''} aria-pressed={boardLayout === 'physical'} onClick={() => setBoardLayout('physical')} title="Obrócone plansze wokół warsztatów">Stół fizyczny</button>
-                </div>
-                {boardLayout === 'physical' && <button className="tabletop-hud-action tabletop-orient-action" type="button" aria-pressed={physicalOrientation} onClick={() => setPhysicalOrientation(v => !v)}>
-                  <RefreshCw size={15}/><span>{physicalOrientation ? 'Obróć plansze do siebie' : 'Odwróć plansze jak przy stole'}</span>
-                </button>}
+                <button className="tabletop-hud-action tabletop-orient-action" type="button" aria-pressed={physicalOrientation} onClick={() => setPhysicalOrientation(v => !v)}>
+                  <RefreshCw size={15}/><span>{physicalOrientation ? 'Obróć plansze do siebie' : 'Ustaw jak przy prawdziwym stole'}</span>
+                </button>
               </div>
 
               <div className="tabletop-market-core">
