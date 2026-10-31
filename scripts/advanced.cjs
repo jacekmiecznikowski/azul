@@ -89,12 +89,12 @@ function evaluation(candidate, incumbent, cfg, generation, candidateNumber) {
     m.deltaWinRate * (m.players === 2 ? 20 : 13), 0) / matches.length
   return { fitness: rounded(fitness), byPlayers, candidateNumber }
 }
-function buildReport(candidate, incumbent, cfg, trainingLog, score, promoted, validation, duel, ablations) {
+function buildReport(candidate, incumbent, cfg, trainingLog, score, eligible, promoted, validation, duel, ablations) {
   return {
     version: 3, algorithm: 'resumable paired-seed evolutionary strategy search',
     seed: cfg.seed, settings: cfg, featureNames: nameList,
     incumbentWeights: incumbent, selectedCandidateWeights: candidate,
-    promoted, activeWeights: promoted ? candidate : incumbent,
+    eligible, promoted, promotionBlockedByFlag: !cfg.promote, activeWeights: promoted ? candidate : incumbent,
     promotionRule: 'head-to-head win > 50% by more than its 95% margin of error, duel margin > 95% CI, no substantial regression elsewhere',
     training: { generations: trainingLog.length, candidatesEvaluated: trainingLog.reduce((n,g)=>n+g.trials.length,0),
       gamesPerCandidate: cfg.games * cfg.participants.length * 2, log: trainingLog, bestTrainingFitness: score },
@@ -108,7 +108,8 @@ function markdown(r) {
   s.push('Wyniki pochodzą z **prawdziwych rozgrywek na silniku gry**. Nowe nasiona losowe nie były używane podczas strojenia parametrów.','')
   s.push('- Liczba ocenionych kandydatów: **' + r.training.candidatesEvaluated + '**')
   s.push('- Wykorzystany profil: **' + r.settings.preset + '**; seed: **' + r.seed + '**')
-  s.push('- Automatyczne zaakceptowanie nowych wag: **' + (r.promoted ? 'TAK' : 'NIE — pozostawiono dotychczasowego bota') + '**','')
+  s.push('- Wynik niezależnej walidacji: **' + (r.eligible ? 'KANDYDAT SPEŁNIA KRYTERIA' : 'BRAK POTWIERDZONEJ PRZEWAGI') + '**')
+  s.push('- Automatyczne zaakceptowanie nowych wag: **' + (r.promoted ? 'TAK' : r.promotionBlockedByFlag ? 'WYŁĄCZONE (--no-promote)' : 'NIE — pozostawiono dotychczasowego bota') + '**','')
   s.push('## Walidacja na nieznanych partiach','')
   s.push('| Graczy | Gry na wariant | Wygrane kandydata | Wygrane obecnego bota | Różnica punktowa (95% CI) |')
   s.push('|---:|---:|---:|---:|---:|')
@@ -122,7 +123,7 @@ function markdown(r) {
   s.push('| Element | Zmiana przewagi punktowej po wyłączeniu | 95% CI | Gry |','|---|---:|---:|---:|')
   for (const [key,m] of Object.entries(r.ablations))
     s.push('| '+key+' | '+(m.deltaMargin>=0?'+':'')+m.deltaMargin.toFixed(2)+' | ±'+m.marginCI95.toFixed(2)+' | '+m.games+' |')
-  if (!Object.keys(r.ablations).length) s.push('Testy ablacją wyłączone w tym profilu (opcja --ablate).')
+  if (!Object.keys(r.ablations).length) s.push('Testy ablacyjne wyłączone w tym profilu (opcja --ablate).')
   s.push('','## Jak interpretować wnioski','',
     '1. **Sprawdzaj wartość punktową ukończenia kwatery**, także z oknami już przeszklonymi na prawo.',
     '2. **Licz koszt stłuczeń** w punktach na torze, nie tylko liczbę stłuczonych tafli.',
@@ -143,6 +144,8 @@ function train(cfg) {
     pending: null, log: [], best: { weights: incumbent, score: -1000000000 },
     center: incumbent, stagnant: 0,
   }
+  if (!cfg.resume && fs.existsSync(checkpointPath))
+    throw Error('Unfinished training checkpoint exists. Use --resume or move reports/strategy-checkpoint.json to a backup name.')
   if (cfg.resume) {
     checkpoint = JSON.parse(fs.readFileSync(checkpointPath,'utf8'))
     if (checkpoint.fingerprint !== fingerprintCurrent) throw Error('Checkpoint parameters mismatch: use same flags as original run')
@@ -220,8 +223,9 @@ function train(cfg) {
   const main = validation['2'] || validation[String(cfg.participants[0])]
   const noSeriousRegressions = Object.values(validation).every(v =>
     v.deltaMargin >= -Math.max(1.5, v.marginCI95))
-  const promoted = cfg.promote && duel.candidate.win > .5 + duel.winCI95 && duel.scoreDelta > .5 &&
+  const eligible = duel.candidate.win > .5 + duel.winCI95 && duel.scoreDelta > .5 &&
     main.deltaMargin > main.marginCI95 && noSeriousRegressions
+  const promoted = cfg.promote && eligible
   const ablations = {}
   const features = ['penaltyCost','rightChain','futureLeft','palaceSynergy','jokerUse','roundBonus','resetOpportunity','firstToken']
   if (cfg.ablate) {
@@ -234,7 +238,7 @@ function train(cfg) {
       console.log('Ablation',key, 'delta margin',ablations[key].deltaMargin)
     }
   }
-  const report=buildReport(candidate,incumbent,cfg,checkpoint.log,checkpoint.best.score,promoted,validation,duel,ablations)
+  const report=buildReport(candidate,incumbent,cfg,checkpoint.log,checkpoint.best.score,eligible,promoted,validation,duel,ablations)
   writeJSON(reportPath,report)
   saveAtomic(summaryPath,markdown(report))
   if (promoted) {
