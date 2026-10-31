@@ -24,6 +24,22 @@ function StripMini({ strip, index, glazier }: { strip: WindowStrip; index: numbe
   </div>
 }
 
+/** A compact, always-visible board arranged around the shared drafting market. */
+export function TableSeat({ player, index, location, isCurrent, onInspect }: {
+  player: Player; index: number; location: 'north' | 'east' | 'west'; isCurrent: boolean; onInspect: () => void
+}) {
+  const completed = player.strips.filter(strip => strip.side === 2).length
+  return <button type="button" className={`tabletop-seat tabletop-seat-${location}${isCurrent ? ' tabletop-seat-current' : ''}`} onClick={onInspect} aria-label={`Powiększ planszę gracza ${player.name}, wynik ${player.score} punktów`}>
+    <div className="tabletop-seat-header">
+      <span className={`player-avatar avatar-${index}`}>{AVATARS[index]}</span>
+      <span className="tabletop-seat-name"><strong>{player.name}</strong><small>{isCurrent ? 'TERAZ GRA' : `AI · ${DIFFICULTY[player.difficulty ?? 'normal']}`}</small></span>
+      <span className="tabletop-seat-score">{player.score}<small> pkt</small></span>
+    </div>
+    <div className="rival-window-board tabletop-seat-windows" aria-hidden="true">{player.strips.map((strip, i) => <StripMini key={i} strip={strip} index={i} glazier={player.glazier} />)}</div>
+    <div className="tabletop-seat-footer"><span><Gem size={12}/> {completed}/8 okien</span><span><ShieldAlert size={12}/> {player.brokenSteps}/8</span><span className="tabletop-seat-zoom">Powiększ <ArrowUpRight size={12}/></span></div>
+  </button>
+}
+
 export function OpponentBoards({ state, inspect, onInspect }: { state: GameState; inspect: number; onInspect: (index: number) => void }) {
   return <section className="panel rivals-panel" aria-label="Plansze wszystkich uczestników">
     <div className="section-heading">
