@@ -301,8 +301,8 @@ export default function App() {
         {seat(0, 'south')}
       </div>
     </main>
-    {game.phase === 'finished' && !showResults && <div className="sg-finish"><Trophy size={17}/> Koniec partii <button onClick={() => setShowResults(true)}><ListChecks size={14}/> Zobacz podliczenie</button><button onClick={() => setShowSetup(true)}>Nowa partia <ArrowRight size={14}/></button></div>}
-    {showResults && game.phase === 'finished' && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
+    {game.phase === 'finished' && !showResults && !showSetup && !showRules && <div className="sg-finish"><Trophy size={17}/> Koniec partii <button onClick={() => setShowResults(true)}><ListChecks size={14}/> Zobacz podliczenie</button><button onClick={() => setShowSetup(true)}>Nowa partia <ArrowRight size={14}/></button></div>}
+    {showResults && game.phase === 'finished' && !showSetup && !showRules && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
     {placementOptions && selection && <div className="modal-backdrop sg-placement-overlay" onMouseDown={() => setPlacementOptions(null)}>
