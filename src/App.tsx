@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, X, ListChecks } from 'lucide-react'
+import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, Music2, X, ListChecks } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, patternFor, standings } from './game/engine'
 import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
@@ -7,6 +7,7 @@ import { LiveHistory } from './components/LiveHistory'
 import { FinalResults } from './components/FinalResults'
 import { finishOverlayVisibility } from './ui/finishOverlayVisibility'
 import { useGameAudio } from './hooks/useGameAudio'
+import { useAmbientMusic } from './hooks/useAmbientMusic'
 import { GameBoard, GlassPiece } from './components/GameBoard'
 import './match.css'
 import './redesign.css'
@@ -14,6 +15,7 @@ import './center-v9.css'
 import './center-v10.css'
 import './inventory-v12.css'
 import './ux-v13.css'
+import './polish-v14.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
@@ -188,6 +190,7 @@ export default function App() {
   const [showRules, setShowRules] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const { enabled: soundEnabled, toggle: toggleSound, play } = useGameAudio()
+  const { enabled: musicEnabled, toggle: toggleMusic } = useAmbientMusic()
   const humanTurn = game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
   const moves = useMemo(() => legalMoves(game), [game])
   const sourceOptions = useMemo(() => availableSources(game), [game])
@@ -285,7 +288,7 @@ export default function App() {
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span><small>WITRAŻE SINTRY · EDYCJA CYFROWA</small></div>
       <div className="sg-header-round"><span>RUNDA</span><strong>{game.round} <small>/ 6</small></strong><div className="sg-round-colors">{game.roundColors.map((c, i) =>
         <i key={i} title={`Runda ${i + 1}: ${COLORS_PL[c]}`} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : i + 1 < game.round ? ' sg-color-past' : ''}`}/>)}</div></div>
-      <div className="sg-header-actions"><button type="button" onClick={toggleSound} title={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-label={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-pressed={soundEnabled} className="sg-audio-toggle">{soundEnabled ? <Volume2 size={16}/> : <VolumeX size={16}/>}<span>{soundEnabled ? 'Dźwięk' : 'Cisza'}</span></button><button onClick={() => setShowRules(true)}><BookOpen size={16}/> Zasady</button>
+      <div className="sg-header-actions"><button type="button" className="sg-music-toggle" onClick={toggleMusic} aria-pressed={musicEnabled} title={musicEnabled ? "Wycisz muzykę ambientową" : "Włącz muzykę ambientową"} aria-label={musicEnabled ? "Wycisz muzykę" : "Włącz muzykę"}>{musicEnabled ? <Music2 size={16}/> : <VolumeX size={16}/>}<span>{musicEnabled ? "Muzyka" : "Muzyka wył."}</span></button><button type="button" onClick={toggleSound} title={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-label={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-pressed={soundEnabled} className="sg-audio-toggle">{soundEnabled ? <Volume2 size={16}/> : <VolumeX size={16}/>}<span>{soundEnabled ? 'Dźwięk' : 'Cisza'}</span></button><button onClick={() => setShowRules(true)}><BookOpen size={16}/> Zasady</button>
         <button className="sg-new" onClick={() => setShowSetup(true)}><RotateCcw size={16}/> Nowa gra</button></div>
     </header>
     <main className="sg-stage" aria-label="Wspólny stół Sintra Glass">
