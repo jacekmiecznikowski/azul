@@ -32,7 +32,7 @@ W kodzie logika jest oddzielona od interfejsu: `src/game/engine.ts`, `src/game/a
 
 ## Ważne
 
-Projekt fanowski, niezwiązany z autorem ani wydawcą gry. Nie wykorzystuje oficjalnych grafik ani dźwięków.
+Projekt fanowski, niezwiązany z autorem ani wydawcą gry. Nie wykorzystuje oficjalnych grafik. Ścieżka muzyczna jest dostarczana osobno przez użytkownika, a jej dalsza dystrybucja wymaga odpowiednich praw.
 
 ## Zestawy kwater graczy i bilans 100 tafli (v12)
 
@@ -68,6 +68,23 @@ Aby użyć nowych kwater, wybierz **Nowa gra** — wcześniejsze zapisane partie
 
 - Pola **joker** mają teraz fioletowe szkło i wyraźnie odróżniają się od białych tafli, również w podglądzie drugiej strony kwatery.
 - Żeton pierwszego gracza ma ciemny, czytelny numer „1” na jasnym kaflu z kontrastową ramką.
-- W górnym pasku są **dwa niezależne przełączniki**: **Muzyka** (spokojna, autorska muzyka ambientowa generowana w przeglądarce) oraz **Dźwięk** (krótkie efekty akcji).
+- W górnym pasku są **dwa niezależne przełączniki**: **Muzyka** (odtwarzanie lokalnego pliku MP3 dostarczonego przez użytkownika) oraz **Dźwięk** (krótkie efekty akcji).
 - Muzyka jest domyślnie włączona, ale ze względu na zasady automatycznego odtwarzania przeglądarek zaczyna grać po pierwszym kliknięciu lub naciśnięciu klawisza. Każdy przełącznik pamięta ustawienie w `localStorage`.
-- Do muzyki nie są używane żadne zewnętrzne pliki, połączenie internetowe ani materiały chronione prawem autorskim.
+- Odtwarzanie muzyki odbywa się offline, z lokalnego pliku `public/background.mp3`.
+
+## Muzyka z pliku background.mp3 (v15)
+
+Gra odtwarza w pętli przekazany utwór MP3 zamiast poprzedniej generowanej melodii.
+Umieść **własną kopię** nagrania w `public/background.mp3` (Vite kopiuje ten plik
+podczas `npm run build`). W uruchomionej grze:
+- `Muzyka` włącza/wycisza zapętlony utwór; początkowa głośność to 20%.
+- `Dźwięk` niezależnie steruje efektami gry.
+- Oba ustawienia są zapamiętywane w przeglądarce.
+- Ze względu na ograniczenia automatycznego odtwarzania muzyka uruchamia się
+  po pierwszym kliknięciu lub naciśnięciu klawisza.
+- Jeśli pliku nie ma, przycisk poinformuje `Brak MP3` po próbie odtworzenia.
+
+**Ważne:** plik MP3 nie jest dołączony do publicznego repozytorium i jest
+wpisany do `.gitignore`. Otrzymany w rozmowie plik audio jest uwzględniony
+w prywatnej paczce ZIP dla autora projektu. Przed publicznym udostępnieniem
+nagrania należy sprawdzić, czy pozwala na to licencja.
