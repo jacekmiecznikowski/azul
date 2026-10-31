@@ -222,7 +222,7 @@ export default function App() {
                   <History size={16}/><span>Historia rozgrywki</span><b>{game.history?.length ?? 0}</b>
                 </button>
                 <button className="tabletop-hud-action tabletop-orient-action" type="button" aria-pressed={physicalOrientation} onClick={() => setPhysicalOrientation(v => !v)}>
-                  <RefreshCw size={15}/><span>{physicalOrientation ? 'Obróć plansze do mnie' : 'Układ jak przy stole'}</span>
+                  <RefreshCw size={15}/><span>{physicalOrientation ? 'Odwróć orientację' : 'Układ jak przy stole'}</span>
                 </button>
               </div>
 
