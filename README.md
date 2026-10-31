@@ -167,7 +167,7 @@ npm.cmd run train:ai -- --generations 8 --population 12 --games 20 --holdout 120
 Obsługiwane opcje: `--preset quick|balanced|deep`, `--generations`,
 `--population`, `--games` (na format i kandydata), `--holdout` (liczba gier na
 format w finalnym teście), `--h2h` (bezpośrednie pojedynki z obecnym botem),
-`--ablate`, `--participants 2,3,4`, `--rival hard|expert`, `--seed`,
+`--ablate`, `--participants 2,3,4`, `--rival hard|expert|incumbent|mixed`, `--seed`,
 `--patience`, `--budget-minutes`, `--no-promote`, `--resume`.
 
 Bezpieczne przerwanie: naciśnij **Ctrl+C raz**, poczekaj na komunikat o
@@ -191,3 +191,18 @@ nadpisać pliki wyników.
 
 Eksperymentalne ablacje pokazują **korelacje** przy wyłączaniu cech modelu,
 a nie dowód uniwersalnej strategii dla każdej partii.
+
+### Trening w chmurze przez GitHub Actions
+
+Nie musisz trzymać włączonego komputera podczas eksperymentów. Otwórz
+`Actions → Strategia AI — trening → Run workflow`, wybierz profil, przeciwnika
+i seed. Po zakończeniu w sekcji **Artifacts** znajdziesz raport
+`strategy-advanced.md`, dane `strategy-advanced.json` i stan wag bota.
+Jeżeli limit czasu minie, paczka zawiera checkpoint do ewentualnego wznowienia
+lokalnie. Workflow **nie publikuje automatycznie** nowych wag w repozytorium.
+
+Wariant `mixed` losuje deterministycznie przeciwników spośród Trudnego,
+Eksperta i bieżącego modelu; jest wolniejszy, ale sprawdza uogólnianie na
+różne style gry. W raportach wartości `±` oznaczają przybliżony przedział
+ufności 95% z par powtarzalnych rozgrywek, a nie gwarantowany margines
+błędu dowolnej przyszłej partii.
