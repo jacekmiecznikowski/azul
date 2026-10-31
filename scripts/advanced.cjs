@@ -23,7 +23,7 @@ function argsFromCLI(argv) {
     rival: 'hard', resume: false, promote: true, budgetMinutes: 0 }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
-    if (a === '--help') { console.log('Usage: npm run train:ai -- [--preset quick|balanced|deep] [--generations N] [--population N] [--games N] [--holdout N] [--h2h N] [--ablate N] [--patience N] [--seed N] [--participants 2,3,4] [--rival hard|expert] [--budget-minutes N] [--resume] [--no-promote]'); process.exit(0) }
+    if (a === '--help') { console.log('Usage: npm run train:ai -- [--preset quick|balanced|deep] [--generations N] [--population N] [--games N] [--holdout N] [--h2h N] [--ablate N] [--patience N] [--seed N] [--participants 2,3,4] [--rival hard|expert|incumbent|mixed] [--budget-minutes N] [--resume] [--no-promote]'); process.exit(0) }
     if (a === '--resume') { opts.resume = true; continue }
     if (a === '--no-promote') { opts.promote = false; continue }
     if (!a.startsWith('--')) throw Error('Unexpected argument: ' + a)
@@ -46,7 +46,7 @@ function argsFromCLI(argv) {
   if (!Number.isFinite(cfg.budgetMinutes) || cfg.budgetMinutes < 0) throw Error('Invalid budget')
   if (!cfg.participants.length || cfg.participants.some(p => ![2,3,4].includes(p)) ||
       new Set(cfg.participants).size !== cfg.participants.length) throw Error('participants must be unique values from 2,3,4')
-  if (!['hard','expert'].includes(cfg.rival)) throw Error('rival must be hard or expert')
+  if (!['hard','expert','incumbent','mixed'].includes(cfg.rival)) throw Error('rival must be hard, expert, incumbent or mixed')
   return cfg
 }
 function randomSource(seed) {
