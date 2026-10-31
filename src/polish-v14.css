@@ -1,0 +1,71 @@
+/* Sintra Glass v14 — vivid jokers, legible first-player token and ambient music control. */
+/* Joker is a special PURPLE field, never another shade of white glass. */
+.sg .sg-glass-wild {
+  --shine: #9955e6;
+  border-color: #e0b8ff;
+  background: linear-gradient(140deg, #d2a9ff 0%, #9c56df 36%, #6630a6 72%, #341764 100%);
+  box-shadow: inset 0 0 0 2px #f4dbff70, inset -3px -4px 7px #32114f, 0 0 12px #a45af54d;
+}
+.sg .sg-glass-wild.sg-glass-guide {
+  opacity: 0.96;
+  filter: none;
+  background: linear-gradient(140deg, #c69bf4, #8a49c8 58%, #4f2781);
+}
+.sg .sg-glass-wild .sg-glass-inner {
+  inset: 26%;
+  border: 2px solid #f6e3ff;
+  background: linear-gradient(140deg, #e9c9ff88, #7435b362);
+  box-shadow: 0 0 7px #e9b1ffad;
+}
+.sg .sg-color-dot-wild {
+  --piece: #a05be5;
+  border-color: #ecd4ff;
+  box-shadow: 0 0 5px #a865e7a6;
+}
+.sg .sg-placement-slot .sg-glass-wild {outline: 1px solid #f4c5ff;outline-offset:1px;}
+/* Legacy previews still use .tile-wild. */
+.sg .tile-wild {background: linear-gradient(145deg, #c9a0ff, #762fb5 70%);border-color:#ead4ff;}
+
+/* The market's own > span color previously overrode the number on this tile. */
+.sg .sg-start-tile,
+.sg .sg-center-pile > .sg-start-tile.sg-start-on-market {
+  box-sizing: border-box;
+  display: inline-grid;
+  place-items: center;
+  background: linear-gradient(145deg, #f7fcfa, #b9e2ed);
+  color: #102c3d;
+  -webkit-text-fill-color: #102c3d;
+  text-shadow: none;
+  font-family: Georgia, serif;
+  font-weight: 900;
+  line-height: 1;
+  border: 2px solid #185a77;
+  outline: 2px solid #efcf84;
+  outline-offset: 0;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px #fff, 0 3px 8px #071821b3;
+}
+.sg .sg-center-pile > .sg-start-on-market {
+  width: 29px;
+  height: 29px;
+  font-size: 18px;
+}
+.sg .sg-start-on-board {
+  width: 19px;
+  height: 19px;
+  font-size: 13px;
+}
+.sg .sg-header-actions .sg-music-toggle {
+  gap: 6px;
+  border-color: #716e8f;
+  color: #cbd8ec;
+}
+.sg .sg-header-actions .sg-music-toggle[aria-pressed="true"] {
+  border-color: #a4b7a3;
+  color: #d7e8d7;
+  background: #1b3940;
+}
+@media (max-width: 1300px) {
+  .sg .sg-header-actions .sg-music-toggle span { display: none; }
+  .sg .sg-header-actions .sg-music-toggle { min-width: 32px; padding: 0 8px; justify-content:center; }
+}
