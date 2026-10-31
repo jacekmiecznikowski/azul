@@ -4,3 +4,5 @@ coverage/
 .env*
 *.tsbuildinfo
 .DS_Store
+# User-provided music asset: keep out of the public repository unless licensed.
+public/background.mp3
