@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import {
   applyMove, availableSources, BROKEN_TRACK, COLORS, legalMoves,
-  newGame, patternFor, standings, WINDOW_POINTS,
+  newGame, standings, WINDOW_POINTS,
 } from './game/engine'
 import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Player, Source, WindowStrip } from './game/engine'
 import { chooseAIMove } from './game/ai'
@@ -97,15 +97,6 @@ function WindowCard({ strip, index, glazier, highlighted, active, onClick, isHum
     </div>
     <span className="window-points"><Sparkles size={12} /> {WINDOW_POINTS[index]}</span>
   </button>
-}
-function MiniBoard({ player }: { player: Player }) {
-  return <div className="mini-board">{player.strips.map((strip, i) =>
-    <div className="mini-strip" key={i}>
-      {strip.side === 2 ? <div className="mini-done" /> : patternFor(strip).map((color, j) =>
-        <span key={j} className={`mini-glass ${strip.panes[j] ? `mini-${strip.panes[j]}` : 'mini-empty'}`} />)}
-      <div className="mini-bottom">{[strip.upper, strip.lower].map((c, k) => <span key={k} className={`mini-glass ${c ? `mini-${c}` : 'mini-empty'}`} />)}</div>
-    </div>)}
-  </div>
 }
 function SetupModal({ settings, onClose, onStart }: {
   settings: Settings; onClose: () => void; onStart: (settings: Settings) => void
