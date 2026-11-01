@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-type Cue = 'pick' | 'place' | 'score' | 'round'
+type Cue = 'pick' | 'place' | 'score' | 'round' | 'gameOver'
+const GAME_OVER_URL = `${import.meta.env.BASE_URL}game-over.wav`
+const GAME_OVER_VOLUME = 0.52
 const KEY = 'sintra-glass-sounds-v1'
 const melodies: Record<Cue, [number, number, number][]> = {
   pick: [[540, 0, .08]],
@@ -15,8 +17,27 @@ export function useGameAudio() {
     try { return localStorage.getItem(KEY) !== 'false' } catch { return true }
   })
   const contextRef = useRef<AudioContext | null>(null)
+  const finishRef = useRef<HTMLAudioElement | null>(null)
+  const finishedAudio = useCallback(() => {
+    if (finishRef.current) return finishRef.current
+    const wav = new window.Audio(GAME_OVER_URL)
+    wav.preload = 'auto'
+    wav.loop = false
+    wav.volume = GAME_OVER_VOLUME
+    finishRef.current = wav
+    return wav
+  }, [])
   const play = useCallback((cue: Cue, force = false) => {
     if (!enabled && !force) return
+    if (cue === 'gameOver') {
+      try {
+        const wav = finishedAudio()
+        wav.pause()
+        wav.currentTime = 0
+        void wav.play().catch(() => { /* Browsers may require a prior user gesture. */ })
+      } catch { /* Unsupported audio or unavailable local WAV. */ }
+      return
+    }
     try {
       const AudioCtor = window.AudioContext
       if (!AudioCtor) return
@@ -37,12 +58,29 @@ export function useGameAudio() {
         osc.stop(ctx.currentTime + offset + duration + .01)
       }
     } catch { /* Browser may block audio until the first user gesture. */ }
-  }, [enabled])
+  }, [enabled, finishedAudio])
   const toggle = useCallback(() => setEnabled(current => {
     const next = !current
     try { localStorage.setItem(KEY, String(next)) } catch { /* Private mode */ }
     return next
   }), [])
-  useEffect(() => () => { if (contextRef.current) void contextRef.current.close().catch(() => {}) }, [])
+  useEffect(() => {
+    if (!enabled) {
+      finishRef.current?.pause()
+      return
+    }
+    // Keep the short local sample ready so the final cue starts promptly.
+    try { finishedAudio().load() } catch { /* Browser audio unavailable. */ }
+  }, [enabled, finishedAudio])
+  useEffect(() => () => {
+    const wav = finishRef.current
+    finishRef.current = null
+    if (wav) {
+      wav.pause()
+      wav.removeAttribute('src')
+      wav.load()
+    }
+    if (contextRef.current) void contextRef.current.close().catch(() => {})
+  }, [])
   return { enabled, toggle, play }
 }
