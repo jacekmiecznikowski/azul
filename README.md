@@ -400,3 +400,19 @@ dostosowany do ekranów mobilnych.
 
 Testy: `src/components/FinishCelebration.test.tsx` oraz
 `src/ui/finishOverlayVisibility.test.ts`.
+
+## Fanfara końca gry (v22)
+
+Gdy ostatni legalny ruch kończy partię, gra odtwarza **`public/game-over.wav`**
+przekazany przez autora projektu. Towarzyszy pojawieniu się ekranu zwycięzcy;
+zastępuje zwykły sygnał punktowania tej tury i jest odtwarzany tylko raz.
+
+- Plik WAV ma wstępne ładowanie oraz ustawioną głośność 52%.
+- Przełącznik **Menu → Efekty dźwiękowe** również steruje fanfarą.
+- **Menu → Muzyka w tle** działa niezależnie.
+- Wejście do szczegółowego podliczenia, jego zamknięcie i odświeżenie
+  zapisanego zakończonego meczu **nie powtarzają** dźwięku.
+- Działa zarówno po końcowym ruchu człowieka, jak i bota; nie ma wpływu
+  na szybkie symulacje AI ani offline-owy trening.
+
+Testy wyzwalania sygnału: `src/ui/moveAudioCue.test.ts`.
