@@ -140,7 +140,7 @@ function TurnSummary({ game }: { game: GameState }) {
   const current = game.players[game.currentPlayer]
   return <section className="sg-turn sg-center-card" aria-label="Tura i wyniki">
     <div className="sg-panel-title"><span>PRZY STOLE</span><span className="sg-live-dot"/></div>
-    <div className="sg-turn-player"><span className={`sg-player-icon sg-player-icon-${game.currentPlayer}`}>{PLAYER_AVATARS[game.currentPlayer]}</span>
+    <div className="sg-turn-player"><span className={`sg-player-icon sg-palace-icon-${current.palaceColor ?? 'red'}`}>{PLAYER_AVATARS[game.currentPlayer]}</span>
       <div><strong>{game.phase === 'finished' ? 'Koniec rozgrywki' : current.controller === 'human' ? (current.name === 'Ty' ? 'Twój ruch' : `Tura: ${current.name}`) : `Gra ${current.name}`}</strong>
       <small>{game.phase === 'finished' ? 'Zobacz końcowe wyniki' : current.controller === 'human' ? 'Wybierz tafle i kwaterę' : 'Przeciwnik rozważa ruch…'}</small></div>
       {current.controller === 'ai' && game.phase === 'playing' && <span className="sg-thinking" aria-label="AI myśli"><i/><i/><i/></span>}
