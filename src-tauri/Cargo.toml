@@ -1,0 +1,21 @@
+[package]
+name = "sintra-glass"
+version = "1.0.0"
+description = "Sintra Glass - locally playable digital stained-glass board game"
+authors = ["Sintra Glass"]
+edition = "2021"
+rust-version = "1.77.2"
+build = "build.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
