@@ -464,3 +464,52 @@ witraży. Obracanie stołu w trybie hot-seat nie zmienia tej barwy.
 
 Testy regresyjne: `src/palace-color-v24.test.tsx` oraz
 `src/components/presentation-v18.test.tsx`.
+
+
+## Minimalny portable EXE na Windows (Tauri)
+
+Gra nadal działa normalnie jako strona Vite przez `npm.cmd run dev`. Dodatkowo
+ma **lekki plik wykonywalny Windows x64 bez instalatora** — oparty na Tauri 2
+i systemowym Edge WebView2 (bez dołączonego silnika Electron/Chromium).
+
+### Najprościej: gotowy EXE z GitHub Actions (bez instalacji Rusta)
+
+1. Otwórz repozytorium na GitHubie → **Actions**.
+2. Wybierz **Portable Windows EXE (Tauri)** → **Run workflow** → uruchom na `main`.
+3. Po zakończeniu zadania pobierz artefakt **SintraGlass-Portable-Win64**.
+4. Rozpakuj `SintraGlass-Portable-Win64.zip` i uruchom **SintraGlass.exe**.
+
+[Workflow budujący portable EXE](https://github.com/jacekmiecznikowski/azul/actions/workflows/portable-windows.yml)
+
+W workflow aplikacja jest budowana w trybie release (`opt-level = "z"`,
+LTO, usunięcie symboli debugowania), bez tworzenia instalatora. Gra i jej
+zasoby (w tym muzyka i `game-over.wav`) są osadzone w EXE. Komputer docelowy
+nie potrzebuje Node.js, Rusta, serwera Vite ani dostępu do internetu.
+
+**Wymagania komputera docelowego:** Windows 10/11 64-bit oraz
+**Microsoft Edge WebView2 Runtime**. Windows 11 zazwyczaj ma WebView2
+wbudowany; na starszych komputerach z Windows 10 może być potrzebna
+jednorazowa instalacja WebView2. EXE nie zawiera własnej kopii runtime,
+bo zwiększyłoby to rozmiar o ponad 100 MB. Plik nie jest podpisany
+certyfikatem, więc system Windows może pokazać ostrzeżenie SmartScreen.
+Gra zapisuje stan na komputerze, na którym jest uruchomiona — skopiowanie
+samego EXE nie przenosi zapisanej rozgrywki.
+
+### Lokalny build na Windows (opcjonalny)
+
+Wymagane: Node.js 22+, Rust z celem `x86_64-pc-windows-msvc`,
+Visual Studio C++ Build Tools i WebView2 SDK/runtime. Następnie:
+
+```powershell
+npm.cmd install
+npm.cmd run portable:build
+```
+
+Plik wynikowy znajduje się w `src-tauri/target/release/sintra-glass.exe`.
+Polecenie samo tworzy małą ikonę `.ico`, kompiluje React/Vite, a następnie
+buduje EXE bez instalatora. Jednorazowa kompilacja Rusta może potrwać
+znacznie dłużej niż zwykłe `npm run build`.
+
+**Ważne:** Tryb portable to jeden EXE, ale nie oznacza niezależności od
+systemowych bibliotek Windows. Gdy wymagany jest rozruch na całkiem
+czystym komputerze bez WebView2, pakiet będzie wyraźnie większy.
