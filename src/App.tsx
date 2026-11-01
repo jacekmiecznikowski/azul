@@ -16,7 +16,6 @@ import { useAmbientMusic } from './hooks/useAmbientMusic'
 import { GameBoard, GlassPiece } from './components/GameBoard'
 import { ManualPlacementDialog } from './components/ManualPlacementDialog'
 import { GameMenu } from './components/GameMenu'
-import { TableAmbient } from './components/TableAmbient'
 import './match.css'
 import './redesign.css'
 import './center-v9.css'
@@ -388,7 +387,6 @@ export default function App() {
     </header>
     <main className="sg-stage" aria-label="Wspólny stół Sintra Glass">
       <div className="sg-felt">
-        <TableAmbient enabled={effectsEnabled && !reducedMotion}/>
         {tableSeats.filter(seatInfo => seatInfo.place !== 'south').map(seatInfo => seat(seatInfo.playerIndex, seatInfo.place))}
         <div className="sg-center">
           <div className="sg-side-left"><TurnSummary game={game}/><PenaltyTrack game={game}/></div>
