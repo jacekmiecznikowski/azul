@@ -6,6 +6,11 @@ on:
   push:
     paths:
       - '.github/workflows/portable-windows.yml'
+      - 'src/styles.css'
+      - 'public/*.ttf'
+      - 'src-tauri/**'
+      - 'scripts/verify-portable-assets.cjs'
+      - 'package.json'
 
 permissions:
   contents: read
