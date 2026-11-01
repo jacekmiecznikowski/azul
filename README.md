@@ -540,3 +540,32 @@ Google Fonts. Weryfikacja działa także w GitHub Actions i po lokalnym
 EXE nadal potrzebuje systemowego WebView2, które na komputerze bez niego
 może wymagać jednorazowego doinstalowania. Po zapewnieniu runtime sama gra
 nie wymaga sieci.
+
+## Android — aktualny kod gry, wersja mobilna (v25)
+
+Android jest budowany z najnowszej gałęzi `main`, a **nie z dawnej v7**.
+Capacitor 8 pakuje do APK cały lokalny frontend (również muzykę `background.mp3`,
+`game-over.wav`, fonty i mechanikę AI). Gra działa offline.
+Na telefonach w orientacji poziomej interfejs przełącza się na osobny,
+czytelny układ: pełna plansza wybranego gracza, warsztaty obok,
+przełączanie między graczami oraz panele wyników i historii.
+Duży, czteroosobowy stół desktopowy pozostaje bez zmian.
+
+**Zbudowanie przez GitHub:** Actions → **Android APK (current main, mobile layout)**
+→ uruchom workflow lub pobierz ostatnią udaną kompilację → artefakt
+`SintraGlass-Android-Main-Mobile` → `app-debug.apk`.
+
+**Na Windows (z Android SDK i Java 21):**
+```powershell
+npm.cmd install
+npm.cmd run build
+npx.cmd cap add android
+node scripts/configure-android-landscape.mjs
+npx.cmd cap sync android
+cd android
+.\gradlew.bat assembleDebug
+```
+
+APK debug jest przeznaczony do testów, a nie do publikacji w Google Play.
+Przy aktualizacji webowej wersji gry w istniejącym katalogu Android można wykonać
+`npm run android:sync`, a następnie `gradlew assembleDebug`.
