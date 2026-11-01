@@ -5,6 +5,12 @@ import type { GlassColor, Player, SlotColor, WindowStrip } from '../game/engine'
 const colors: Record<GlassColor, string> = {
   rose: 'czerwony', citrine: 'żółty', cyan: 'niebieski', amber: 'pomarańczowy', slate: 'biały',
 }
+const ORNAMENT_PAIRS = [[0, 1], [2, 3], [4, 5], [6, 7]] as const
+
+/** In Palace A, 2 / 3 / 4 completed sides in a pair score 3 / 6 / 10 points. */
+export function ornamentBonus(completedSides: number): number {
+  return completedSides >= 4 ? 10 : completedSides === 3 ? 6 : completedSides === 2 ? 3 : 0
+}
 
 export function GlassPiece({ color, placed = true, small = false }: {
   color: SlotColor; placed?: boolean; small?: boolean
@@ -44,12 +50,62 @@ function Window({ strip, index, glazier, target, selected, isHumanTurn, onTarget
   </button>
 }
 
+/** A common architectural crown binds two playable strips into one ornament. */
+function OrnamentPair({ player, pairIndex, glazier, targets, selected, isHumanTurn, onTarget, palaceSide }: {
+  player: Player
+  pairIndex: number
+  glazier: number
+  targets?: ReadonlySet<number>
+  selected: boolean
+  isHumanTurn: boolean
+  onTarget?: (index: number) => void
+  palaceSide: 'A' | 'B'
+}) {
+  const [leftIndex, rightIndex] = ORNAMENT_PAIRS[pairIndex]
+  const left = player.strips[leftIndex]
+  const right = player.strips[rightIndex]
+  const sides = left.side + right.side
+  const completed = sides === 4
+  const bonus = ornamentBonus(sides)
+  const title = `Ornament ${pairIndex + 1}: kwatery ${leftIndex + 1} i ${rightIndex + 1}. ${sides} z 4 stron ukończonych.` +
+    (palaceSide === 'A' ? ` Premia pałacu A: ${bonus} pkt na koniec gry.` : ' Na stronie B premia zależy od dominującego koloru szkła.')
+
+  return <div className={`sg-ornament-pair${completed ? ' sg-ornament-complete' : ''}`}
+    data-sg-ornament={pairIndex} data-ornament-progress={sides} title={title}
+    role="group" aria-label={title}>
+    <span className="sg-ornament-crown" aria-hidden="true">
+      <svg viewBox="0 0 132 32" preserveAspectRatio="xMidYMid meet">
+        <path className="sg-ornament-outline" d="M3 28 Q10 9 27 12 Q40 14 51 24 Q59 13 66 5 Q73 13 81 24 Q92 14 105 12 Q122 9 129 28"/>
+        <path className={`sg-ornament-wing${left.side > 0 ? ' sg-ornament-wing-lit' : ''}${left.side === 2 ? ' sg-ornament-wing-full' : ''}`}
+          d="M6 26 Q15 14 27 17 Q39 18 54 28 M24 17 Q30 7 41 10 Q49 13 54 21"/>
+        <path className={`sg-ornament-wing${right.side > 0 ? ' sg-ornament-wing-lit' : ''}${right.side === 2 ? ' sg-ornament-wing-full' : ''}`}
+          d="M126 26 Q117 14 105 17 Q93 18 78 28 M108 17 Q102 7 91 10 Q83 13 78 21"/>
+        <path className={`sg-ornament-gem${completed ? ' sg-ornament-gem-lit' : ''}`}
+          d="M66 8 L75 19 L66 29 L57 19 Z"/>
+        <path className="sg-ornament-gem-line" d="M66 11 L66 26 M59 19 L73 19"/>
+        {[0, 1, 2, 3].map((i) =>
+          <path key={i} className={`sg-ornament-petal${i < left.side && i < 2 || i >= 2 && i - 2 < right.side ? ' sg-ornament-petal-lit' : ''}`}
+            d={i === 0 ? 'M14 21 L19 16 L24 21 L19 26 Z'
+              : i === 1 ? 'M36 18 L41 13 L46 18 L41 23 Z'
+              : i === 2 ? 'M86 18 L91 13 L96 18 L91 23 Z'
+              : 'M108 21 L113 16 L118 21 L113 26 Z'}/>)}
+      </svg>
+    </span>
+    <Window strip={left} index={leftIndex} glazier={glazier} target={!!targets?.has(leftIndex)}
+      selected={selected} isHumanTurn={isHumanTurn} onTarget={onTarget}/>
+    <Window strip={right} index={rightIndex} glazier={glazier} target={!!targets?.has(rightIndex)}
+      selected={selected} isHumanTurn={isHumanTurn} onTarget={onTarget}/>
+  </div>
+}
+
 const avatars = ['✦', '✧', '✳', '❖']
 export function GameBoard({ player, index, isCurrent, isHuman = false, isHumanTurn = false,
-  targets, selected = false, onTarget, canReset = false, onReset, isStartingPlayer = false, hasFirstToken = false }: {
+  targets, selected = false, onTarget, canReset = false, onReset, isStartingPlayer = false, hasFirstToken = false,
+  palaceSide = 'A' }: {
   player: Player; index: number; isCurrent: boolean; isHuman?: boolean; isHumanTurn?: boolean
   targets?: ReadonlySet<number>; selected?: boolean; onTarget?: (index: number) => void
   canReset?: boolean; onReset?: () => void; isStartingPlayer?: boolean; hasFirstToken?: boolean
+  palaceSide?: 'A' | 'B'
 }) {
   const completed = player.strips.filter(s => s.side === 2).length
   return <section data-sg-board={index} className={`sg-board sg-player-${index} sg-palace-${player.palaceColor ?? 'red'}${isCurrent ? ' sg-board-current' : ''}${isHuman ? ' sg-board-human' : ''}`}
@@ -65,9 +121,10 @@ export function GameBoard({ player, index, isCurrent, isHuman = false, isHumanTu
       {isHuman && <button type="button" className="sg-reset" onClick={onReset} disabled={!canReset}><RotateCcw size={13}/> Cofnij witrażystę</button>}
     </div>
     <div className="sg-board-windows">
-      {player.strips.map((strip, i) => <Window key={i} strip={strip} index={i}
-        glazier={player.glazier} target={!!targets?.has(i)} selected={selected}
-        isHumanTurn={isHuman && isHumanTurn} onTarget={onTarget}/>)}
+      {ORNAMENT_PAIRS.map((_, pairIndex) => <OrnamentPair key={pairIndex}
+        pairIndex={pairIndex} player={player} glazier={player.glazier}
+        targets={targets} selected={selected} isHumanTurn={isHuman && isHumanTurn}
+        onTarget={onTarget} palaceSide={palaceSide}/>)}
     </div>
     <div className="sg-board-engraving"><span>✥</span><span>SINTRA · PRACOWNIA WITRAŻY</span><span>✥</span></div>
   </section>
