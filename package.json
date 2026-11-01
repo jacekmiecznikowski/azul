@@ -14,7 +14,7 @@
     "train:legacy": "node scripts/compileTraining.cjs && node scripts/train.cjs && node scripts/refine.cjs",
     "train:deep": "node scripts/compileTraining.cjs && node scripts/advanced.cjs --preset deep",
     "train:resume": "node scripts/compileTraining.cjs && node scripts/advanced.cjs --resume",
-    "train:smoke": "node scripts/compileTraining.cjs && node scripts/advanced.cjs --preset quick --generations 1 --population 2 --games 2 --holdout 3 --h2h 4 --no-promote"
+    "train:smoke": "node scripts/compileTraining.cjs && node scripts/advanced.cjs --preset quick --generations 1 --population 2 --games 2 --holdout 3 --h2h 4 --no-promote --seed 7654321"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.0",
