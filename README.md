@@ -595,3 +595,18 @@ Przy aktualizacji webowej wersji gry w istniejącym katalogu Android można wyko
 - Układ mobilnego stołu nie otrzymuje już ogromnego marginesu lewej krawędzi od notch/cutout; wymagana weryfikacja położenia aparatu na konkretnym urządzeniu.
 - Ukryty licznik 100/100, szklana wieża i powtórzona informacja o stłuczeniach pod tytułem witraży (tylko w mobilnym układzie), a środek stołu może wykorzystać dodatkową wysokość.
 - Wersja desktopowa bez zmian. Publiczny prerelease Android: `android-v28-preview`.
+
+
+## v29 — wspólne menu główne i trzy platformy
+
+Wersje **Vite (przeglądarka)**, **Windows EXE (Tauri)** oraz **Android APK (Capacitor)**
+korzystają z tego samego React/TypeScript i tych samych ustawień. Po uruchomieniu
+pokazywane jest menu główne: Nowa gra, Kontynuuj (jeśli istnieje zapisana gra),
+Ustawienia dźwięku i efektów, O twórcy oraz zasady. Partia nie jest automatycznie
+rozgrywana w tle podczas pobytu w menu. Powrót do menu nie usuwa zapisu.
+
+Stół desktopowy skalowany jest jako całość w zależności od szerokości i wysokości
+CSS viewportu (w tym przy zoomie przeglądarki) — proporcje witraży są zachowane.
+Przy małym oknie (szerokość ≤1180 CSS px lub wysokość ≤640 CSS px)
+automatycznie wyświetlany jest sprawdzony układ kompaktowy także na PC.
+Wszystkie testy i buildy trzech wersji trzeba sprawdzać po zmianach wspólnego UI.

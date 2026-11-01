@@ -6,7 +6,8 @@ on:
   push:
     paths:
       - '.github/workflows/portable-windows.yml'
-      - 'src/styles.css'
+      - 'src/**'
+      - 'index.html'
       - 'public/*.ttf'
       - 'src-tauri/**'
       - 'scripts/verify-portable-assets.cjs'

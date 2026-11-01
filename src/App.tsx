@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, BookOpen, Check, Gem, Info, RotateCcw, Settings2, X } from 'lucide-react'
+import { ArrowRight, BookOpen, Check, Gem, House, Info, RotateCcw, Settings2, X } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, standings } from './game/engine'
 import type { Controller, Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
@@ -16,6 +16,8 @@ import { useAmbientMusic } from './hooks/useAmbientMusic'
 import { GameBoard, GlassPiece } from './components/GameBoard'
 import { ManualPlacementDialog } from './components/ManualPlacementDialog'
 import { GameMenu } from './components/GameMenu'
+import { HomeScreen } from './components/HomeScreen'
+import { desktopTableMetrics } from './ui/responsiveTable'
 import './match.css'
 import './redesign.css'
 import './center-v9.css'
@@ -31,6 +33,7 @@ import './finish-v21.css'
 import './hotseat-v23.css'
 import './polish-v24.css'
 import './android-mobile-v25.css'
+import './home-v29.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
@@ -254,6 +257,9 @@ export default function App() {
   const [selection, setSelection] = useState<Selection | null>(null)
   const [finishing, setFinishing] = useState<Move[] | null>(null)
   const [placementOptions, setPlacementOptions] = useState<Move[] | null>(null)
+  const [screen, setScreen] = useState<'home' | 'game'>('home')
+  const [hasSave, setHasSave] = useState(() => restore() !== null)
+  const [viewport, setViewport] = useState(() => typeof window === 'undefined' ? { width: 1600, height: 900 } : { width: window.innerWidth, height: window.innerHeight })
   const [showSetup, setShowSetup] = useState(false)
   const [showRules, setShowRules] = useState(false)
   const [showResults, setShowResults] = useState(false)
@@ -265,7 +271,8 @@ export default function App() {
   const { enabled: soundEnabled, toggle: toggleSound, play } = useGameAudio()
   const { enabled: musicEnabled, toggle: toggleMusic, unavailable: musicUnavailable } = useAmbientMusic()
   const { enabled: effectsEnabled, toggle: toggleEffects, emit: emitEffects, clear: clearEffects, bursts: visualBursts, reducedMotion } = useVisualEffects()
-  const humanTurn = game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
+  const humanTurn = screen === 'game' && game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
+  const desktopTable = useMemo(() => desktopTableMetrics(viewport.width, viewport.height), [viewport.width, viewport.height])
   const viewerIndex = viewingPlayerIndex(game.currentPlayer, lastHumanIndex, game.players.map(p => p.controller))
   const tableSeats = useMemo(() => seatsForViewer(viewerIndex, game.players.length), [viewerIndex, game.players.length])
   const mobileBoardIndex = mobileBoard !== null && mobileBoard < game.players.length ? mobileBoard : viewerIndex
@@ -284,14 +291,22 @@ export default function App() {
     : humanTurn ? `${current.name === 'Ty' ? 'Twój ruch' : `Ruch gracza ${current.name}`}: wybierz tafle z warsztatu lub środka stołu.`
     : `${current.name} wybiera ruch…`
 
-  useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(game)) }, [game])
+  useEffect(() => {
+    const onResize = () => setViewport({ width: window.innerWidth, height: window.innerHeight })
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+  useEffect(() => {
+    if (screen !== 'game') return
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(game)) } catch { /* private storage */ }
+  }, [game, screen])
   useEffect(() => {
     if (game.phase === 'playing' && game.players[game.currentPlayer]?.controller === 'human') {
       setLastHumanIndex(game.currentPlayer)
     }
   }, [game.currentPlayer, game.phase, game.players])
   useEffect(() => {
-    if (game.phase !== 'playing' || game.players[game.currentPlayer].controller !== 'ai' || finishing) return
+    if (screen !== 'game' || game.phase !== 'playing' || game.players[game.currentPlayer].controller !== 'ai' || finishing) return
     const difficulty = game.players[game.currentPlayer].difficulty ?? 'normal'
     const base = difficulty === 'easy' ? 1100 : difficulty === 'normal' ? 1500 : difficulty === 'expert' ? 2200 : difficulty === 'master' ? 2250 : 1900
     const delay = base + Math.round(Math.random() * 450)
@@ -305,7 +320,7 @@ export default function App() {
       }
     }, delay)
     return () => window.clearTimeout(timer)
-  }, [game, finishing, play, emitEffects])
+  }, [game, screen, finishing, play, emitEffects])
   useEffect(() => { if (!humanTurn) { setSelection(null); setFinishing(null); setPlacementOptions(null) } }, [humanTurn])
 
   function commit(move: Move) {
@@ -356,6 +371,8 @@ export default function App() {
       playerNames: options.names,
     }))
     setLastHumanIndex(0)
+    setScreen('game')
+    setHasSave(true)
     setMobileBoard(null)
     setMobilePanel(null)
     play('round')
@@ -377,7 +394,7 @@ export default function App() {
     </div>
   }
 
-  return <div className="sg">
+  return <div className={`sg${screen === "home" ? " sg-in-home" : ""}`}>
     <header className="sg-header">
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span><small>WITRAŻE SINTRY · EDYCJA CYFROWA</small></div>
       <div className="sg-header-round"><span>RUNDA</span><strong>{game.round} <small>/ 6</small></strong><div className="sg-round-colors">{game.roundColors.map((c, i) =>
@@ -394,13 +411,14 @@ export default function App() {
           musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}
           soundEnabled={soundEnabled} toggleSound={toggleSound}
           openStrategy={() => setShowStrategy(true)} openRules={() => setShowRules(true)}/>
+        <button type="button" className="sg-home-return" onClick={() => { clearEffects(); setScreen('home'); setSelection(null); setFinishing(null); setPlacementOptions(null); setMobilePanel(null) }} aria-label="Menu główne" title="Menu główne"><House size={16}/><span>Główne</span></button>
         <button type="button" className="sg-new" onClick={() => setShowSetup(true)}>
           <RotateCcw size={16}/> Nowa gra
         </button>
       </div>
     </header>
     <main className="sg-stage" aria-label="Wspólny stół Sintra Glass">
-      <div className="sg-felt">
+      <div className="sg-felt" style={{ zoom: desktopTable.scale, width: desktopTable.width, minWidth: desktopTable.width, height: desktopTable.height, '--sg-long': `${desktopTable.boardLong}px` } as React.CSSProperties}>
         {tableSeats.filter(seatInfo => seatInfo.place !== 'south').map(seatInfo => seat(seatInfo.playerIndex, seatInfo.place))}
         <div className="sg-center">
           <div className="sg-side-left"><TurnSummary game={game}/><PenaltyTrack game={game}/></div>
@@ -480,9 +498,17 @@ export default function App() {
         </div>
       </div>}
     </div>
-    <GlassVisualEffects bursts={visualBursts}/>
-    {finishOverlay.banner && <FinishCelebration state={game} onResults={() => setShowResults(true)} onNewGame={() => setShowSetup(true)}/>}
-    {finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
+    {screen === 'home' && <HomeScreen
+      hasSave={hasSave}
+      onContinue={() => { setScreen('game'); setShowSetup(false) }}
+      onNewGame={() => setShowSetup(true)}
+      onRules={() => setShowRules(true)}
+      effectsEnabled={effectsEnabled} reducedMotion={reducedMotion} toggleEffects={toggleEffects}
+      musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}
+      soundEnabled={soundEnabled} toggleSound={toggleSound}/>} 
+    {screen === 'game' && <GlassVisualEffects bursts={visualBursts}/>}
+    {screen === 'game' && finishOverlay.banner && <FinishCelebration state={game} onResults={() => setShowResults(true)} onNewGame={() => setShowSetup(true)}/>}
+    {screen === 'game' && finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
     {showStrategy && <StrategyLab state={game} onClose={() => setShowStrategy(false)}/>}
