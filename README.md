@@ -357,3 +357,28 @@ Nie jest potrzebna nowa biblioteka ani dodatkowe zależności:
 dla tej jednej dekoracji Canvas 2D jest prostszy niż pełny silnik
 WebGL/PixiJS. Efekty ruchów (układanie szkła, rozbicia, punktacja)
 działają nadal tak jak wcześniej.
+
+## Cztery połączone ornamenty nad parami kwater (v20)
+
+Na każdej planszy osiem pasów szkła jest zgrupowanych w cztery wyraźnie
+połączone pary: **01–02, 03–04, 05–06, 07–08**. Każda para ma wspólną
+ozdobną ramę, subtelny łuk i rozetę SVG łączącą obie kwatery. Roślinny motyw
+ma cztery niewielkie segmenty — po dwa na każdą stronę pary:
+
+- 0/4: przygaszona, nieukończona dekoracja;
+- 1–3/4: podświetlone segmenty odpowiadają zakończonym stronom;
+- 4/4: ornament staje się złoty, obramowanie pary delikatnie jaśnieje.
+
+Wynik jest zawsze oparty na rzeczywistych `strip.side` silnika. **Strona pałacu A**
+nagradza 2, 3 lub 4 ukończone części odpowiednio premiami **3, 6, 10 pkt**
+przy końcu gry; podpowiedź ornamentu pokazuje właściwą liczbę punktów.
+Na stronie B dekoracja nadal spaja parę, ale opis nie przypisuje jej
+premii A — tam finałowa punktacja zależy od dominującego koloru.
+
+Wszystkie **osiem kwater pozostaje klikalnych** i ma swoje oryginalne indeksy;
+wybór jokerów, wizualizacja dokładnego układania szkieł i animacje punktów
+nadal korzystają z tych samych identyfikatorów. Żaden nowy efekt nie
+wpływa na AI, reguły gry ani wydajność symulacji. Rozeta nie wykonuje
+ciągłych animacji, a przejścia są usunięte przy ograniczeniu ruchu.
+
+Testy: `src/components/ornaments-v20.test.tsx`.
