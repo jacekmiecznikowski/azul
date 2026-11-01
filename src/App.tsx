@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, Music2, X, ListChecks } from 'lucide-react'
+import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, X, ListChecks } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, standings } from './game/engine'
 import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
@@ -300,20 +300,9 @@ export default function App() {
       <div className="sg-header-round"><span>RUNDA</span><strong>{game.round} <small>/ 6</small></strong><div className="sg-round-colors">{game.roundColors.map((c, i) =>
         <i key={i} title={`Runda ${i + 1}: ${COLORS_PL[c]}`} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : i + 1 < game.round ? ' sg-color-past' : ''}`}/>)}</div></div>
       <div className="sg-header-actions">
-        <button type="button" className="sg-music-toggle" onClick={toggleMusic}
-          aria-pressed={musicEnabled && !musicUnavailable}
-          title={musicUnavailable ? 'Brak pliku public/background.mp3' : musicEnabled ? 'Wycisz muzykę w tle' : 'Włącz muzykę w tle'}
-          aria-label={musicUnavailable ? 'Brak pliku muzyki' : musicEnabled ? 'Wycisz muzykę' : 'Włącz muzykę'}>
-          {musicUnavailable || !musicEnabled ? <VolumeX size={16}/> : <Music2 size={16}/>}
-          <span>{musicUnavailable ? 'Brak MP3' : musicEnabled ? 'Muzyka' : 'Muzyka wył.'}</span>
-        </button>
-        <button type="button" onClick={toggleSound} title={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'}
-          aria-label={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'}
-          aria-pressed={soundEnabled} className="sg-audio-toggle">
-          {soundEnabled ? <Volume2 size={16}/> : <VolumeX size={16}/>}
-          <span>{soundEnabled ? 'Dźwięk' : 'Cisza'}</span>
-        </button>
         <GameMenu effectsEnabled={effectsEnabled} reducedMotion={reducedMotion} toggleEffects={toggleEffects}
+          musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}
+          soundEnabled={soundEnabled} toggleSound={toggleSound}
           openStrategy={() => setShowStrategy(true)} openRules={() => setShowRules(true)}/>
         <button type="button" className="sg-new" onClick={() => setShowSetup(true)}>
           <RotateCcw size={16}/> Nowa gra
