@@ -3,7 +3,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { newGame } from '../game/engine'
 import { GameBoard } from './GameBoard'
-import { DUST_COUNT, createDustMotes, TableAmbient } from './TableAmbient'
+import { GlassVisualEffects } from './GlassVisualEffects'
 import { GameMenu } from './GameMenu'
 
 describe('completed window presentation', () => {
@@ -26,26 +26,25 @@ describe('completed window presentation', () => {
   })
 })
 
-describe('tabletop visual ambience', () => {
-  it('renders one lightweight canvas instead of CSS particles or light-wave elements', () => {
-    const markup = renderToStaticMarkup(createElement(TableAmbient, { enabled: true }))
-    expect(markup).toContain('<canvas')
-    expect(markup).toContain('data-renderer="canvas-2d"')
-    expect(markup).toContain('aria-hidden="true"')
-    expect(markup).not.toContain('sg-table-mote')
-    expect(markup).not.toContain('sg-table-caustic')
-    expect(markup).not.toContain('sg-table-light')
-    expect(renderToStaticMarkup(createElement(TableAmbient, { enabled: false }))).toBe('')
+describe('gameplay-only visual effects', () => {
+  it('renders particles only while a glass-placement event is active', () => {
+    const empty = renderToStaticMarkup(createElement(GlassVisualEffects, { bursts: [] }))
+    expect(empty).toBe('')
+    const placed = renderToStaticMarkup(createElement(GlassVisualEffects, {
+      bursts: [{ id: 1, kind: 'glass', x: 100, y: 120, color: '#6ac5df' }],
+    }))
+    expect(placed).toContain('sg-vfx-layer')
+    expect(placed).toContain('sg-vfx-spark')
+    expect(placed).not.toContain('<canvas')
   })
 
-  it('caps ambient to a modest number of deterministically distributed motes', () => {
-    expect(DUST_COUNT).toBeLessThanOrEqual(30)
-    const first = createDustMotes()
-    expect(first).toHaveLength(DUST_COUNT)
-    expect(createDustMotes()).toEqual(first)
-    expect(first.every(mote => mote.x > 0 && mote.x < 1 && mote.y > 0 && mote.y < 1)).toBe(true)
-    expect(first.every(mote => mote.size < 1.6)).toBe(true)
-    expect(first.filter(mote => mote.glint).length).toBeLessThanOrEqual(4)
+  it('still displays floating scoring feedback for real moves', () => {
+    const markup = renderToStaticMarkup(createElement(GlassVisualEffects, {
+      bursts: [{ id: 2, kind: 'score', x: 200, y: 140,
+        color: '#f6df98', label: '+8 pkt', positive: true }],
+    }))
+    expect(markup).toContain('+8 pkt')
+    expect(markup).toContain('sg-vfx-positive')
   })
 })
 
