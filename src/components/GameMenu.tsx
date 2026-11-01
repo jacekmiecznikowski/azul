@@ -62,7 +62,7 @@ export function GameMenu({
       <button type="button" className="sg-menu-item sg-menu-effects" onClick={toggleEffects}
         disabled={reducedMotion} aria-pressed={effectsEnabled && !reducedMotion}>
         <Sparkles size={17}/>
-        <span><b>Efekty wizualne</b><small>{reducedMotion ? 'Ograniczone przez ustawienia systemowe' : 'Drobinki, światło i animacje ruchów'}</small></span>
+        <span><b>Efekty wizualne</b><small>{reducedMotion ? 'Ograniczone przez ustawienia systemowe' : 'Błyski szkła, odpryski i punkty'}</small></span>
         <i className="sg-menu-switch" aria-hidden="true"/>
       </button>
       <div className="sg-menu-divider"/>
