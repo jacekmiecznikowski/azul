@@ -569,3 +569,12 @@ cd android
 APK debug jest przeznaczony do testów, a nie do publikacji w Google Play.
 Przy aktualizacji webowej wersji gry w istniejącym katalogu Android można wykonać
 `npm run android:sync`, a następnie `gradlew assembleDebug`.
+
+
+### Mobilne dopracowanie v26 (ekran w poziomie)
+
+- Czytelniejsza belka aplikacji: uproszczona informacja o rundzie bez nakładających się znaczników.
+- Konfiguracja nowej gry w dwóch kolumnach i mniejszej wysokości (dla bardzo małych ekranów nadal może być przewijana).
+- Przy każdym graczu widoczna liczba stłuczeń; pod warsztatami zawsze widoczny 9-polowy tor kar.
+- Muzyka na ekranach dotykowych jest przyciszona (0,12 zamiast 0,20), efekty akcji są podgłośnione (0,095 zamiast 0,035), a fanfara końca gry ma głośność 0,78. Desktop zachowuje dotychczasowe poziomy.
+- W APK Android ukryty jest górny pasek statusu systemu, przy zachowaniu dolnej belki gestów i obszaru aparatu. Weryfikacja na konkretnych urządzeniach jest nadal konieczna.

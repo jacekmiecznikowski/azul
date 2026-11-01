@@ -9,3 +9,25 @@ const changed = text.includes('android:screenOrientation=')
 if (!changed.includes('android:screenOrientation="landscape"')) throw new Error('Cannot set landscape mode')
 await writeFile(manifestPath, changed, 'utf8')
 console.log('Sintra Glass: Android landscape orientation set')
+
+/* Use all available Android landscape height instead of reserving a status bar.
+   Preserve the system gesture-navigation bar and the camera-cutout safe area. */
+const activityPath = new URL('../android/app/src/main/java/pl/sintraglass/game/MainActivity.java', import.meta.url)
+const activity = await readFile(activityPath, 'utf8')
+if (!activity.includes('public class MainActivity extends BridgeActivity {')) {
+  throw new Error('Unexpected Capacitor MainActivity structure; verify fullscreen integration')
+}
+const immersiveActivity = activity.replace(
+  'public class MainActivity extends BridgeActivity {',
+  `public class MainActivity extends BridgeActivity {
+    @Override
+    protected void onCreate(android.os.Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      getWindow().setFlags(
+        android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN
+      );
+    }`,
+)
+await writeFile(activityPath, immersiveActivity, 'utf8')
+console.log('Sintra Glass: Android fullscreen viewport enabled')

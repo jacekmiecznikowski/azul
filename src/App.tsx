@@ -413,6 +413,7 @@ export default function App() {
           onClick={() => setMobileBoard(i)}>
           <span className="sg-mobile-player-name">{p.name}</span>
           <strong>{p.score} pkt</strong>
+          <small className="sg-mobile-broken">Szkło: {p.brokenSteps}/8</small>
           {game.currentPlayer === i && game.phase === 'playing' && <i className="sg-mobile-now" aria-label="Aktualna tura"/>}
         </button>)}
         <button type="button" className="sg-mobile-panel-button" onClick={() => setMobilePanel('score')}>Wyniki</button>
@@ -436,6 +437,18 @@ export default function App() {
         </div>
         <div className="sg-mobile-market">
           <Market game={game} selection={selection} disabled={!humanTurn || !!finishing} onPick={chooseSource}/>
+          <div className="sg-mobile-penalty-strip" role="group" aria-label="Tor stłuczonego szkła — naciśnij, aby otworzyć szczegóły">
+            <span className="sg-mobile-penalty-label">TOR SZKŁA</span>
+            {BROKEN_TRACK.map((points, i) => <button type="button" key={i} title={`Pole ${i}/8 · kara −${points} pkt`}
+              aria-label={`Tor szkła, pole ${i}, kara ${points} punktów`}
+              onClick={() => setMobilePanel('score')}
+              className={`sg-mobile-penalty-step${i === 8 ? ' sg-mobile-penalty-final' : ''}`}>
+              <strong>{i === 0 ? '0' : `−${points}`}</strong>
+              <span className="sg-mobile-penalty-pawns">
+                {game.players.map(p => p.brokenSteps === i ? <i key={p.id} className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`}/> : null)}
+              </span>
+            </button>)}
+          </div>
           <div className="sg-mobile-status" aria-live="polite">
             <span>{selection ? `Wskaż kwaterę — ${COLORS_PL[selection.color].toLowerCase()}` : humanTurn ? `Ruch: ${current.name}` : `${current.name} wybiera ruch…`}</span>
             {selection && <button type="button" onClick={() => setSelection(null)}>Anuluj</button>}
