@@ -382,3 +382,21 @@ wpływa na AI, reguły gry ani wydajność symulacji. Rozeta nie wykonuje
 ciągłych animacji, a przejścia są usunięte przy ograniczeniu ruchu.
 
 Testy: `src/components/ornaments-v20.test.tsx`.
+
+## Ekran zakończenia partii (v21)
+
+Po ostatnim ruchu nie otwiera się już automatycznie szczegółowa tabela wyników.
+Zamiast tego na środku stołu pojawia się **nieduży, ozdobny ekran zakończenia**
+z medalem, nazwą zwycięzcy (lub zwycięzców przy remisie) oraz wynikiem
+końcowym. Wygląd zachowuje paletę morskiej zieleni i złota i jest
+dostosowany do ekranów mobilnych.
+
+- **Zobacz podliczenie** — dopiero po kliknięciu otwiera szczegółowy raport.
+- **Nowa partia** — pokazuje ustawienia nowej gry, ukrywając ekran zakończenia.
+- Zamknięcie podliczenia wraca do ekranu zakończenia, nie uruchamia
+  samoczynnie drugiego okna.
+- Wykrywanie zwycięzcy uwzględnia standardowy warunek rozstrzygania remisu.
+- Efekty wejścia są wyłączone przy systemowym ograniczeniu animacji.
+
+Testy: `src/components/FinishCelebration.test.tsx` oraz
+`src/ui/finishOverlayVisibility.test.ts`.
