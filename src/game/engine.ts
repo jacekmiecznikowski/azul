@@ -94,6 +94,9 @@ export interface NewGameOptions {
   opponents: number
   difficulty?: Difficulty
   botDifficulties?: Difficulty[]
+  /** Optional local hot-seat players; defaults to human seat 0 and AI opponents. */
+  playerControllers?: Controller[]
+  playerNames?: string[]
   palaceSide?: PalaceSide
   seed?: number
 }
@@ -233,14 +236,19 @@ export function newGame(options: NewGameOptions): GameState {
   const distinctColors = shuffle(state, [...COLORS])
   for (const color of distinctColors) state.bag.splice(state.bag.indexOf(color), 1)
   state.roundColors = [state.bag.pop()!, ...distinctColors]
-  const labels = ['Ty', 'Aurora', 'Iris', 'Noctis']
+  const aiLabels = ['Ty', 'Aurora', 'Iris', 'Noctis']
   const palaceColors = shuffle(state, [...PALACE_COLORS])
-  state.players = Array.from({ length: count }, (_, i) => ({
-    id: `player-${i}`, name: labels[i], controller: i === 0 ? 'human' : 'ai',
-    difficulty: i === 0 ? undefined : (options.botDifficulties?.[i - 1] ?? options.difficulty ?? 'normal'), score: 0,
+  state.players = Array.from({ length: count }, (_, i) => {
+    const controller: Controller = i === 0 || options.playerControllers?.[i] === 'human' ? 'human' : 'ai'
+    const providedName = options.playerNames?.[i]?.trim().slice(0, 28)
+    const name = controller === 'human' ? providedName || (i === 0 ? 'Ty' : `Gracz ${i + 1}`) : aiLabels[i]
+    return {
+    id: `player-${i}`, name, controller,
+    difficulty: controller === 'human' ? undefined : (options.botDifficulties?.[i - 1] ?? options.difficulty ?? 'normal'), score: 0,
     glazier: 0, brokenSteps: 0, glassLost: 0, palaceColor: palaceColors[i],
     strips: makeStrips(state, palaceColors[i]),
-  }))
+  }
+  })
   // In the physical game the first player is chosen before the first round.
   // With no real-world "last window washer", draw the starter deterministically from the seed.
   state.startingPlayer = Math.floor(nextRandom(state) * count)
