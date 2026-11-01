@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, X, ListChecks } from 'lucide-react'
+import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, X } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, standings } from './game/engine'
 import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
 import { LiveHistory } from './components/LiveHistory'
 import { FinalResults } from './components/FinalResults'
+import { FinishCelebration } from './components/FinishCelebration'
 import { StrategyLab } from './components/StrategyLab'
 import { finishOverlayVisibility } from './ui/finishOverlayVisibility'
 import { useGameAudio } from './hooks/useGameAudio'
@@ -25,6 +26,7 @@ import './strategy-lab.css'
 import './glass-effects-v16.css'
 import './polish-v17.css'
 import './ornaments-v20.css'
+import './finish-v21.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
@@ -219,7 +221,6 @@ export default function App() {
     : `${current.name} wybiera ruch…`
 
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(game)) }, [game])
-  useEffect(() => { if (game.phase === 'finished') setShowResults(true) }, [game.phase])
   useEffect(() => {
     if (game.phase !== 'playing' || game.players[game.currentPlayer].controller !== 'ai' || finishing) return
     const difficulty = game.players[game.currentPlayer].difficulty ?? 'normal'
@@ -328,7 +329,7 @@ export default function App() {
       </div>
     </main>
     <GlassVisualEffects bursts={visualBursts}/>
-    {finishOverlay.banner && <div className="sg-finish"><Trophy size={17}/> Koniec partii <button onClick={() => setShowResults(true)}><ListChecks size={14}/> Zobacz podliczenie</button><button onClick={() => setShowSetup(true)}>Nowa partia <ArrowRight size={14}/></button></div>}
+    {finishOverlay.banner && <FinishCelebration state={game} onResults={() => setShowResults(true)} onNewGame={() => setShowSetup(true)}/>}
     {finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
