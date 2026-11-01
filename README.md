@@ -206,3 +206,29 @@ Eksperta i bieżącego modelu; jest wolniejszy, ale sprawdza uogólnianie na
 różne style gry. W raportach wartości `±` oznaczają przybliżony przedział
 ufności 95% z par powtarzalnych rozgrywek, a nie gwarantowany margines
 błędu dowolnej przyszłej partii.
+
+
+### Dlaczego „NOT PROMOTED” i co zrobić przy powtarzaniu treningu?
+
+Nie jest to błąd. Trener **nie wdraża** kandydata, jeżeli przewaga nad
+bieżącym botem jest niepewna lub pojawiło się ryzyko pogorszenia wyników
+w innej liczbie graczy.
+
+W starszych wersjach każde uruchomienie bez `--seed` powtarzało to samo
+losowanie `20261101`. **Od tej aktualizacji każda nowa sesja automatycznie
+otrzymuje inne, jawnie wypisywane ziarno losowe.** Powtarzalny eksperyment
+uruchomisz przez `npm run train:ai -- --seed 123456`. Wznowienie z
+`--resume` zawsze odzyskuje ziarno z checkpointu.
+
+Po walidacji konsola pokazuje `Promotion checks:` oraz wyniki PASS/FAIL
+dla każdego wymogu. Ten sam zestaw warunków jest w
+`reports/strategy-advanced.md` (sekcja *Dlaczego model został zaakceptowany
+lub odrzucony?*) oraz w JSON. Raport każdej zakończonej sesji zapisywany jest
+również w `reports/runs/strategy-<seed>.md` i `.json`, aby łatwo porównać
+kolejne próby. Miejsce przy stole i strona pałacu są rozkładane niezależnie.
+
+Nie zmieniaj `src/game/trained-weights.json` ręcznie tylko po to, aby wymusić
+promocję: trening może znaleźć słabszego bota, a to jest użyteczna informacja.
+Jeżeli kilka niezależnych sesji kończy się odrzuceniem, warto w kolejnym
+eksperymencie zwiększyć próbę albo zmienić przestrzeń cech i sposób planowania
+ruchów zamiast jedynie powtarzać ten sam zestaw wag.
