@@ -444,3 +444,23 @@ i właściciel nie zmieniają się.
   z 1–3 botami.
 
 Testy regresyjne: `src/game/hotseat.test.ts` i `src/ui/tableSeating.test.ts`.
+
+## Wydajność i kolory graczy (v24)
+
+Zrezygnowaliśmy z **ciągłych efektów na filcowym stole**. Usunięty został
+komponent `TableAmbient`, jego Canvas 2D oraz związane z nim animacje.
+Dzięki temu w czasie bezczynności stół nie ma już własnej pętli rysowania.
+Pozostały **wyłącznie krótkie efekty związane z przebiegiem gry**:
+błysk przy dołożeniu tafli, odpryski szkła, ozdobny błysk ukończenia
+kwatery i unoszący się napis z liczbą punktów. Ustawienie
+**Menu → Efekty wizualne** steruje teraz tylko tymi zdarzeniami.
+
+Poprawiono także kolory uczestników. Wcześniej awatar panelu
+**„PRZY STOLE”** miał kolor przypisany na stałe do numeru miejsca
+(np. gracz 1 był czerwony), chociaż silnik losował faktyczny kolor pałacu.
+Teraz awatar w panelu tury i znaczniki historii ruchów są kolorowane
+na podstawie `player.palaceColor`, tak samo jak nazwa koloru i ramka
+witraży. Obracanie stołu w trybie hot-seat nie zmienia tej barwy.
+
+Testy regresyjne: `src/palace-color-v24.test.tsx` oraz
+`src/components/presentation-v18.test.tsx`.
