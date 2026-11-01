@@ -15,6 +15,8 @@ permissions:
 
 jobs:
   build-apk:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -55,3 +57,19 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
+      - name: Publish public prerelease APK (no GitHub login required)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/fix/android-main-mobile-v25'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk SintraGlass-Android-v27.apk
+          if gh release view android-v27-preview --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload android-v27-preview SintraGlass-Android-v27.apk --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create android-v27-preview SintraGlass-Android-v27.apk \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "Sintra Glass Android v27 — test" \
+              --notes "Publiczny APK debug do testow na telefonie (bez logowania i bez rozpakowywania)." \
+              --prerelease
+          fi
