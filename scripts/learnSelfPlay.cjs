@@ -192,7 +192,7 @@ function run(options){
   console.log(saved?'WZNOWIENIE':'NOWY TRENING','seed',data.seed,'start',data.games,'bez opóźnień UI')
   try{
     while(data.games<target){
-      learnBatch(data,rng,Math.min(BATCH,target-data.games))
+      learnBatch(data,rng,Math.min(BATCH_SIZE,target-data.games))
       if(options.smoke?data.games>=target:data.games%TEST_INTERVAL===0)testChampion(data,rng,options.smoke)
       if(data.games%SAVE_INTERVAL===0||data.games===target||stopRequested||fs.existsSync(STOP)){
         data.rngSeed=rng.state
