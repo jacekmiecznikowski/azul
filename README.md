@@ -102,3 +102,40 @@ W wersji testowej ekran gry znów przedstawia stół planszowy: Aurora naprzeciw
 Usunięto układ 2×2 i zbędny przełącznik wielkości plansz. W niższych rozdzielczościach przewijana jest powierzchnia stołu, ponieważ zachowanie czytelnych szkieł jest ważniejsze niż sztuczne zmniejszanie wszystkiego.
 
 **Weryfikacja:** widok sprawdzony statycznie w Chromium na makiecie 1440×900 i 1920×1080; nie jest to jeszcze test całej aplikacji React. Przed scaleniem uruchom `npm run build`, `npm test` i sprawdź interakcje w przeglądarce.
+
+## Android — APK instalacyjny
+
+Ta gałąź zawiera konfigurację **Capacitor 8**. Gra jest opakowana jako aplikacja Android z zasobami WWW wbudowanymi w APK — do rozgrywki offline nie jest potrzebny serwer.
+
+### APK bez instalacji Android Studio
+
+Otwórz zakładkę **Actions** w GitHubie, wybierz workflow **Android APK (debug)**, a po zakończonej kompilacji pobierz artefakt `sintra-glass-android-debug` z sekcji **Artifacts**. W pliku ZIP znajduje się `app-debug.apk`, podpisany testowym kluczem Androida.
+
+To jest **APK debug do instalacji i testowania**, a nie podpisany produkcyjny pakiet do Google Play. APK pozostaje dostępny jako artefakt GitHub Actions przez 30 dni.
+
+### Lokalny build na Windows (PowerShell)
+
+Wymaga Node.js zgodnego z Capacitor 8 (zalecany najnowszy Node.js 22 LTS lub nowszy), Java 21 i Android SDK/Android Studio:
+
+```powershell
+npm.cmd install
+npm.cmd run build
+npx.cmd cap add android
+node scripts/configure-android-landscape.mjs
+npx.cmd cap sync android
+cd android
+.\gradlew.bat assembleDebug
+```
+
+Plik wynikowy: `android/app/build/outputs/apk/debug/app-debug.apk`.
+
+Po późniejszych zmianach w kodzie WWW (jeśli katalog `android` już istnieje):
+
+```powershell
+npm.cmd run android:sync
+cd android
+.\gradlew.bat assembleDebug
+```
+
+Gra jest wymuszana w orientacji poziomej. Pamiętaj, że aktualne UI projektowano głównie dla desktopu: na telefonie czytelność dużych czterech plansz wymaga oddzielnego dopracowania, szczególnie na małych ekranach.
+
