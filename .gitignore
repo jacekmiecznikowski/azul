@@ -12,3 +12,8 @@ reports/strategy-checkpoint.json.tmp
 
 # Automatically saved long-running self-play sessions
 reports/selfplay/
+
+# Windows Tauri portable build output and generated icon
+src-tauri/target/
+src-tauri/icons/
+portable/
