@@ -3,7 +3,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { newGame } from '../game/engine'
 import { GameBoard } from './GameBoard'
-import { TableAmbient } from './TableAmbient'
+import { DUST_COUNT, createDustMotes, TableAmbient } from './TableAmbient'
 import { GameMenu } from './GameMenu'
 
 describe('completed window presentation', () => {
@@ -27,13 +27,25 @@ describe('completed window presentation', () => {
 })
 
 describe('tabletop visual ambience', () => {
-  it('has many glowing particles and is an entirely decorative, pointer-transparent layer', () => {
+  it('renders one lightweight canvas instead of CSS particles or light-wave elements', () => {
     const markup = renderToStaticMarkup(createElement(TableAmbient, { enabled: true }))
-    expect(markup.match(/sg-table-mote-/g)?.length).toBe(78)
-    expect(markup).toContain('sg-table-caustic-a')
-    expect(markup).toContain('sg-table-caustic-b')
+    expect(markup).toContain('<canvas')
+    expect(markup).toContain('data-renderer="canvas-2d"')
     expect(markup).toContain('aria-hidden="true"')
+    expect(markup).not.toContain('sg-table-mote')
+    expect(markup).not.toContain('sg-table-caustic')
+    expect(markup).not.toContain('sg-table-light')
     expect(renderToStaticMarkup(createElement(TableAmbient, { enabled: false }))).toBe('')
+  })
+
+  it('caps ambient to a modest number of deterministically distributed motes', () => {
+    expect(DUST_COUNT).toBeLessThanOrEqual(30)
+    const first = createDustMotes()
+    expect(first).toHaveLength(DUST_COUNT)
+    expect(createDustMotes()).toEqual(first)
+    expect(first.every(mote => mote.x > 0 && mote.x < 1 && mote.y > 0 && mote.y < 1)).toBe(true)
+    expect(first.every(mote => mote.size < 1.6)).toBe(true)
+    expect(first.filter(mote => mote.glint).length).toBeLessThanOrEqual(4)
   })
 })
 
