@@ -30,6 +30,7 @@ import './ornaments-v20.css'
 import './finish-v21.css'
 import './hotseat-v23.css'
 import './polish-v24.css'
+import './android-mobile-v25.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
@@ -257,6 +258,8 @@ export default function App() {
   const [showRules, setShowRules] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [showStrategy, setShowStrategy] = useState(false)
+  const [mobileBoard, setMobileBoard] = useState<number | null>(null)
+  const [mobilePanel, setMobilePanel] = useState<'score' | 'history' | null>(null)
   const [lastHumanIndex, setLastHumanIndex] = useState(() =>
     game.players[game.currentPlayer]?.controller === 'human' ? game.currentPlayer : 0)
   const { enabled: soundEnabled, toggle: toggleSound, play } = useGameAudio()
@@ -265,6 +268,7 @@ export default function App() {
   const humanTurn = game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
   const viewerIndex = viewingPlayerIndex(game.currentPlayer, lastHumanIndex, game.players.map(p => p.controller))
   const tableSeats = useMemo(() => seatsForViewer(viewerIndex, game.players.length), [viewerIndex, game.players.length])
+  const mobileBoardIndex = mobileBoard !== null && mobileBoard < game.players.length ? mobileBoard : viewerIndex
   const moves = useMemo(() => legalMoves(game), [game])
   const sourceOptions = useMemo(() => availableSources(game), [game])
   const selectionMoves = useMemo(() => selection ? moves.filter(m => m.kind === 'take' &&
@@ -352,6 +356,8 @@ export default function App() {
       playerNames: options.names,
     }))
     setLastHumanIndex(0)
+    setMobileBoard(null)
+    setMobilePanel(null)
     play('round')
     setSelection(null); setFinishing(null); setPlacementOptions(null); setShowSetup(false); setShowResults(false)
   }
@@ -399,6 +405,61 @@ export default function App() {
         {tableSeats.filter(seatInfo => seatInfo.place === 'south').map(seatInfo => seat(seatInfo.playerIndex, seatInfo.place))}
       </div>
     </main>
+    <div className="sg-mobile-layout" aria-label="Mobilny stół Sintra Glass">
+      <nav className="sg-mobile-players" aria-label="Wybierz planszę gracza">
+        {game.players.map((p,i) => <button type="button" key={p.id}
+          className={`sg-mobile-player sg-palace-${p.palaceColor ?? 'red'}${mobileBoardIndex === i ? ' sg-mobile-player-selected' : ''}`}
+          aria-pressed={mobileBoardIndex === i}
+          onClick={() => setMobileBoard(i)}>
+          <span className="sg-mobile-player-name">{p.name}</span>
+          <strong>{p.score} pkt</strong>
+          {game.currentPlayer === i && game.phase === 'playing' && <i className="sg-mobile-now" aria-label="Aktualna tura"/>}
+        </button>)}
+        <button type="button" className="sg-mobile-panel-button" onClick={() => setMobilePanel('score')}>Wyniki</button>
+        <button type="button" className="sg-mobile-panel-button" onClick={() => setMobilePanel('history')}>Historia</button>
+      </nav>
+      <div className="sg-mobile-game">
+        <div className="sg-mobile-board">
+          {game.players[mobileBoardIndex] && <GameBoard
+            player={game.players[mobileBoardIndex]} index={mobileBoardIndex}
+            isCurrent={game.currentPlayer === mobileBoardIndex && game.phase === 'playing'}
+            isHuman={game.players[mobileBoardIndex].controller === 'human'}
+            isHumanTurn={humanTurn && game.currentPlayer === mobileBoardIndex}
+            selected={!!selection && humanTurn && game.currentPlayer === mobileBoardIndex}
+            targets={humanTurn && game.currentPlayer === mobileBoardIndex ? targets : undefined}
+            onTarget={humanTurn && game.currentPlayer === mobileBoardIndex ? chooseTarget : undefined}
+            canReset={canReset && !finishing && game.currentPlayer === mobileBoardIndex}
+            onReset={() => commit({kind:'reset'})}
+            isStartingPlayer={game.startingPlayer === mobileBoardIndex}
+            palaceSide={game.palaceSide}
+            hasFirstToken={game.firstCenterTaken && game.nextStartingPlayer === mobileBoardIndex}/>}
+        </div>
+        <div className="sg-mobile-market">
+          <Market game={game} selection={selection} disabled={!humanTurn || !!finishing} onPick={chooseSource}/>
+          <div className="sg-mobile-status" aria-live="polite">
+            <span>{selection ? `Wskaż kwaterę — ${COLORS_PL[selection.color].toLowerCase()}` : humanTurn ? `Ruch: ${current.name}` : `${current.name} wybiera ruch…`}</span>
+            {selection && <button type="button" onClick={() => setSelection(null)}>Anuluj</button>}
+            {selection && selectionMoves.some(m => m.kind === 'take' && m.windowIndex === null) &&
+              <button type="button" onClick={() => chooseTarget(null)}>Stłucz</button>}
+            {humanTurn && mobileBoardIndex !== game.currentPlayer &&
+              <button type="button" onClick={() => setMobileBoard(game.currentPlayer)}>Moja tura</button>}
+          </div>
+        </div>
+      </div>
+      {mobilePanel && <div className="sg-mobile-overlay" onMouseDown={() => setMobilePanel(null)}>
+        <div className="sg-mobile-overlay-dialog" role="dialog" aria-modal="true"
+          aria-label={mobilePanel === 'score' ? 'Wyniki i tor szkła' : 'Historia rozgrywki'}
+          onMouseDown={e => e.stopPropagation()}>
+          <div className="sg-mobile-overlay-heading"><strong>{mobilePanel === 'score' ? 'Wyniki i stłuczone szkło' : 'Historia ruchów'}</strong>
+            <button type="button" onClick={() => setMobilePanel(null)}>Zamknij ×</button></div>
+          {mobilePanel === 'score'
+            ? <div className="sg-mobile-stats"><TurnSummary game={game}/><PenaltyTrack game={game}/></div>
+            : <LiveHistory state={game} status={status}
+                onCancel={selection ? () => setSelection(null) : undefined}
+                onDiscard={selection && selectionMoves.some(m => m.kind === 'take' && m.windowIndex === null) ? () => chooseTarget(null) : undefined}/>}
+        </div>
+      </div>}
+    </div>
     <GlassVisualEffects bursts={visualBursts}/>
     {finishOverlay.banner && <FinishCelebration state={game} onResults={() => setShowResults(true)} onNewGame={() => setShowSetup(true)}/>}
     {finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}

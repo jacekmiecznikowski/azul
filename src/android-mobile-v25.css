@@ -1,0 +1,106 @@
+/* Android v25: the full four-board tabletop remains untouched on desktop.
+   Android landscape presents one complete game board and its shared market. */
+.sg-mobile-layout{display:none}
+@media (max-width: 1100px) and (pointer: coarse) {
+  .sg{min-height:0;height:100dvh;overflow:hidden}
+  .sg-header{height:40px;min-height:40px;padding:0 9px;gap:6px;grid-template-columns:minmax(0,1fr) auto auto}
+  .sg-brand{font-size:12px;letter-spacing:1px;gap:5px}
+  .sg-brand-symbol{width:25px;height:25px}
+  .sg-brand small{display:none}
+  .sg-header-round{display:flex;gap:5px}
+  .sg-header-round>span{font-size:8px;letter-spacing:0}
+  .sg-header-round strong{font-size:15px}
+  .sg-header-round strong small{font-size:9px}
+  .sg-round-colors{gap:4px;padding-left:3px}
+  .sg-round-colors .sg-color-dot{width:6px;height:6px}
+  .sg-header-actions{gap:4px}
+  .sg-header-actions button{height:28px;padding:0 7px;font-size:10px}
+  .sg-header-actions .sg-menu-trigger>span,.sg-header-actions .sg-menu-trigger>svg:last-child{display:none}
+  .sg-stage{display:none}
+  .sg-mobile-layout{display:flex;flex-direction:column;height:calc(100dvh - 40px);padding:4px 6px 5px;gap:4px;min-height:0;overflow:hidden;background:radial-gradient(ellipse at center,#1c4d4a,#0c2a34)}
+  .sg-mobile-players{display:flex;flex:0 0 32px;gap:4px;min-height:0}
+  .sg-mobile-player{position:relative;display:flex;align-items:center;justify-content:space-between;gap:4px;flex:1 1 0;min-width:0;padding:0 7px;border:1px solid #65968d77;border-radius:6px;background:#163742;color:#d5e5e5;font-size:10px}
+  .sg-mobile-player.sg-mobile-player-selected{border-color:#e9ce8a;background:#355b58;box-shadow:inset 0 0 0 1px #e8d28a44}
+  .sg-mobile-player-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sg-mobile-player strong{font-size:10px;white-space:nowrap;color:#f1daaa}
+  .sg-mobile-now{position:absolute;top:1px;right:2px;width:5px;height:5px;background:#9df3a3;border-radius:50%}
+  .sg-mobile-panel-button{flex:0 0 auto;padding:0 9px;border:1px solid #7c9b98;border-radius:6px;background:#18313e;color:#e1e6d8;font-size:10px}
+  .sg-mobile-game{display:grid;grid-template-columns:minmax(0,1fr) minmax(225px,32%);gap:5px;flex:1 1 auto;min-height:0}
+  .sg-mobile-board{min-width:0;min-height:0}
+  .sg-mobile-board .sg-board{padding:3px 4px 2px;border-width:1px}
+  .sg-mobile-board .sg-board-top{height:22px;min-height:22px;gap:4px;padding-bottom:2px}
+  .sg-mobile-board .sg-board-name{font-size:12px}
+  .sg-mobile-board .sg-board-label,.sg-mobile-board .sg-palace-label{display:none}
+  .sg-mobile-board .sg-board-stat{font-size:9px}
+  .sg-mobile-board .sg-board-stat small{font-size:8px}
+  .sg-mobile-board .sg-board-score{font-size:13px}
+  .sg-mobile-board .sg-reset{padding:2px 4px;font-size:9px!important;gap:2px}
+  .sg-mobile-board .sg-board-windows{gap:3px}
+  .sg-mobile-board .sg-ornament-pair{padding:12px 1px 1px;gap:1px;border-radius:6px}
+  .sg-mobile-board .sg-ornament-crown{height:16px;top:-3px}
+  .sg-mobile-board .sg-window{grid-template-rows:13px 12px minmax(0,1fr) 17px;padding:1px;border-radius:7px 7px 4px 4px}
+  .sg-mobile-board .sg-window-head{font-size:7px;padding:0 2px}
+  .sg-mobile-board .sg-window-head>span:last-child{min-width:10px;line-height:10px}
+  .sg-mobile-board .sg-window-glazier{height:11px}
+  .sg-mobile-board .sg-window-reverse{margin:0 1px 1px;gap:2px}
+  .sg-mobile-board .sg-window-reverse .sg-color-dot{width:4px;height:4px}
+  .sg-mobile-board .sg-window-lancet{gap:1px;padding:2px 1px 1px;border-width:1px;border-radius:10px 10px 3px 3px}
+  .sg-mobile-board .sg-pane{border-radius:2px}
+  .sg-mobile-board .sg-glass{width:min(93cqi,93cqb,32px);border-radius:3px}
+  .sg-mobile-board .sg-window-foot{min-height:16px;padding:0 1px;margin-top:1px}
+  .sg-mobile-board .sg-window-foot>b{font-size:9px}
+  .sg-mobile-board .sg-window-foot>b small{display:none}
+  .sg-mobile-board .sg-window-kept>span{width:11px;height:11px}
+  .sg-mobile-board .sg-window-kept .sg-glass-small{width:8px;height:8px}
+  .sg-mobile-board .sg-board-engraving{display:none}
+  .sg-mobile-market{position:relative;display:flex;flex-direction:column;min-width:0;min-height:0;gap:3px}
+  .sg-mobile-market .sg-market{flex:1 1 auto;min-height:0;position:relative;container-type:size;padding:19px 5px 40px;justify-content:center;align-items:center;overflow:hidden}
+  .sg-mobile-market .sg-panel-title{position:absolute;top:0;left:0;right:0;height:18px;min-height:18px}
+  .sg-mobile-market .sg-panel-title>span:first-child{font-size:8px}
+  .sg-mobile-market .sg-panel-title small{font-size:8px}
+  .sg-mobile-market .sg-market-circle{container-type:size;width:min(100cqi - 14px,100cqb - 30px,240px);height:auto;max-width:none;max-height:none;min-height:0;aspect-ratio:1;flex:0 0 auto;margin:auto}
+  .sg-mobile-market .sg-factory{width:clamp(31px,19cqi,49px);height:clamp(31px,19cqi,49px)}
+  .sg-mobile-market .sg-factory-grid{width:84%;height:84%;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:2px}
+  .sg-mobile-market .sg-market-token .sg-glass{width:100%;height:100%}
+  .sg-mobile-market .sg-factory-num{font-size:8px;top:-9px}
+  .sg-mobile-market .sg-center-pile{width:clamp(60px,33cqi,82px);height:clamp(60px,33cqi,82px)}
+  .sg-mobile-market .sg-center-pile>span{font-size:8px}
+  .sg-mobile-market .sg-center-tokens{max-width:82%}
+  .sg-mobile-market .sg-center-choice .sg-glass{width:11px;height:11px}
+  .sg-mobile-market .sg-inventory{position:absolute;left:3px;right:3px;bottom:18px;height:21px;min-height:21px;padding:1px 3px;overflow:hidden}
+  .sg-mobile-market .sg-inventory-tower,.sg-mobile-market .sg-inventory-stats>span:not(.sg-inventory-highlight){display:none}
+  .sg-mobile-market .sg-inventory-stats{display:flex;align-items:center;justify-content:center}
+  .sg-mobile-market .sg-inventory-stats small,.sg-mobile-market .sg-inventory-total>span{display:none}
+  .sg-mobile-market .sg-inventory-total strong{font-size:10px}
+  .sg-mobile-market .sg-first-token{position:absolute;bottom:0;left:0;right:0;min-height:17px;height:17px;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 3px}
+  .sg-mobile-status{flex:0 0 23px;display:flex;align-items:center;gap:3px;padding:0 5px;font-size:9px;border-radius:5px;background:#122b37;overflow:hidden}
+  .sg-mobile-status span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sg-mobile-status button{border:1px solid #7baba0;border-radius:4px;background:#285760;color:#fff;padding:2px 4px;white-space:nowrap}
+  .sg-mobile-overlay{position:fixed;inset:0;z-index:70;background:#04131edb;display:grid;place-items:center;padding:5px}
+  .sg-mobile-overlay-dialog{display:flex;flex-direction:column;width:min(850px,98vw);height:min(420px,94dvh);min-height:0;padding:8px;border:1px solid #d1b782;border-radius:12px;background:#102b36}
+  .sg-mobile-overlay-heading{display:flex;justify-content:space-between;align-items:center;flex:0 0 27px}
+  .sg-mobile-overlay-heading button{padding:4px 8px;border:1px solid #87aaa6;background:#254752;color:#fff;border-radius:5px}
+  .sg-mobile-stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;min-height:0;flex:1}
+  .sg-mobile-stats>.sg-turn,.sg-mobile-stats>.sg-track{min-height:0;height:100%;overflow:auto}
+  .sg-mobile-overlay-dialog>.sg-history{flex:1;min-height:0}
+  .sg .sg-game-menu .sg-menu-popup{position:fixed;right:7px;top:41px;max-height:calc(100dvh - 45px);overflow:auto;z-index:100}
+  .sg .sg-menu-popup .sg-menu-item{min-height:39px;padding:4px 9px}
+  .sg .sg-menu-popup{gap:1px;padding:6px}
+  .modal-backdrop{z-index:80}
+  .modal{max-height:96dvh;overflow:auto}
+}
+@media (max-width: 1100px) and (pointer: coarse) and (max-height: 360px){
+  .sg-mobile-layout{padding:2px 4px;gap:2px}
+  .sg-mobile-players{flex-basis:27px}
+  .sg-mobile-game{grid-template-columns:minmax(0,1fr) minmax(220px,35%)}
+  .sg-mobile-board .sg-board-top{height:19px;min-height:19px}
+  .sg-mobile-board .sg-ornament-pair{padding-top:10px}
+  .sg-mobile-market .sg-market{padding-bottom:29px}
+  .sg-mobile-market .sg-inventory{display:none}
+}
+@media (max-width: 1100px) and (pointer: coarse) and (orientation: portrait){
+  .sg-mobile-layout{overflow:auto}
+  .sg-mobile-game{min-height:500px;grid-template-columns:minmax(0,1fr)}
+  .sg-mobile-board{min-height:310px}
+  .sg-mobile-market{min-height:225px}
+}
