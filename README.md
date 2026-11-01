@@ -513,3 +513,30 @@ znacznie dłużej niż zwykłe `npm run build`.
 **Ważne:** Tryb portable to jeden EXE, ale nie oznacza niezależności od
 systemowych bibliotek Windows. Gdy wymagany jest rozruch na całkiem
 czystym komputerze bez WebView2, pakiet będzie wyraźnie większy.
+
+
+## Lokalne fonty w EXE — bez połączenia z Google Fonts
+
+Cztery pliki dostarczone do repozytorium znajdują się bezpośrednio w
+`public/`:
+
+- `DMSans-VariableFont_opsz,wght.ttf`
+- `DMSans-Italic-VariableFont_opsz,wght.ttf`
+- `PlayfairDisplay-VariableFont_wght.ttf`
+- `PlayfairDisplay-Italic-VariableFont_wght.ttf`
+
+`src/styles.css` używa dla nich lokalnych deklaracji `@font-face`
+zamiast Google Fonts. Vite kopiuje je do `dist/`, a Tauri pakuje
+wszystkie cztery do przenośnej aplikacji wraz z grafiką i dźwiękami.
+W efekcie **pełny interfejs, włącznie z krojami DM Sans i Playfair Display,
+działa bez internetu**.
+
+Po `npm.cmd run build` można sprawdzić lokalne zasoby poleceniem
+`npm.cmd run portable:verify`. Kontrola sprawdza kompletność plików
+czcionek w `dist/`, ich referencje w wynikowym CSS oraz brak adresów
+Google Fonts. Weryfikacja działa także w GitHub Actions i po lokalnym
+`npm.cmd run portable:build`.
+
+EXE nadal potrzebuje systemowego WebView2, które na komputerze bez niego
+może wymagać jednorazowego doinstalowania. Po zapewnieniu runtime sama gra
+nie wymaga sieci.
