@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, Music2, X, ListChecks, BrainCircuit, Sparkles } from 'lucide-react'
-import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, patternFor, standings } from './game/engine'
+import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, Music2, X, ListChecks } from 'lucide-react'
+import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, standings } from './game/engine'
 import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
 import { LiveHistory } from './components/LiveHistory'
@@ -11,6 +11,9 @@ import { useGameAudio } from './hooks/useGameAudio'
 import { GlassVisualEffects, useVisualEffects } from './components/GlassVisualEffects'
 import { useAmbientMusic } from './hooks/useAmbientMusic'
 import { GameBoard, GlassPiece } from './components/GameBoard'
+import { ManualPlacementDialog } from './components/ManualPlacementDialog'
+import { GameMenu } from './components/GameMenu'
+import { TableAmbient } from './components/TableAmbient'
 import './match.css'
 import './redesign.css'
 import './center-v9.css'
@@ -20,6 +23,7 @@ import './ux-v13.css'
 import './polish-v14.css'
 import './strategy-lab.css'
 import './glass-effects-v16.css'
+import './polish-v17.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
@@ -265,12 +269,10 @@ export default function App() {
       chooseFinalGlass(candidates)
     }
   }
-  function choosePlacement(selectedMove: Move) {
-    if (selectedMove.kind !== 'take') return
-    const options = (placementOptions ?? []).filter(m => m.kind === 'take' &&
-      m.slots?.join(',') === selectedMove.slots?.join(','))
+  function confirmManualPlacement(candidates: Extract<Move, { kind: 'take' }>[]) {
+    if (!candidates.length) return
     setPlacementOptions(null)
-    chooseFinalGlass(options)
+    chooseFinalGlass(candidates)
   }
   function startNew(options: Settings) {
     clearEffects()
@@ -297,11 +299,30 @@ export default function App() {
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span><small>WITRAŻE SINTRY · EDYCJA CYFROWA</small></div>
       <div className="sg-header-round"><span>RUNDA</span><strong>{game.round} <small>/ 6</small></strong><div className="sg-round-colors">{game.roundColors.map((c, i) =>
         <i key={i} title={`Runda ${i + 1}: ${COLORS_PL[c]}`} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : i + 1 < game.round ? ' sg-color-past' : ''}`}/>)}</div></div>
-      <div className="sg-header-actions"><button type="button" className="sg-fx-toggle" onClick={toggleEffects} disabled={reducedMotion} aria-pressed={effectsEnabled && !reducedMotion} aria-label={reducedMotion ? 'Animacje ograniczone przez system' : effectsEnabled ? 'Wyłącz efekty wizualne' : 'Włącz efekty wizualne'} title={reducedMotion ? 'System ma włączone ograniczanie animacji' : effectsEnabled ? 'Wyłącz rozbłyski, odłamki i animacje punktów' : 'Włącz efekty wizualne'}><Sparkles size={16}/><span>{reducedMotion ? 'Bez animacji' : effectsEnabled ? 'Efekty' : 'Efekty wył.'}</span></button><button type="button" className="sg-music-toggle" onClick={toggleMusic} aria-pressed={musicEnabled && !musicUnavailable} title={musicUnavailable ? "Brak pliku public/background.mp3 — skopiuj plik do katalogu public i odśwież stronę" : musicEnabled ? "Wycisz muzykę w tle" : "Włącz muzykę w tle"} aria-label={musicUnavailable ? "Brak pliku muzyki" : musicEnabled ? "Wycisz muzykę" : "Włącz muzykę"}>{musicUnavailable || !musicEnabled ? <VolumeX size={16}/> : <Music2 size={16}/>}<span>{musicUnavailable ? "Brak MP3" : musicEnabled ? "Muzyka" : "Muzyka wył."}</span></button><button type="button" onClick={toggleSound} title={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-label={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-pressed={soundEnabled} className="sg-audio-toggle">{soundEnabled ? <Volume2 size={16}/> : <VolumeX size={16}/>}<span>{soundEnabled ? 'Dźwięk' : 'Cisza'}</span></button><button type="button" onClick={() => setShowStrategy(true)}><BrainCircuit size={16}/> Strategia</button><button onClick={() => setShowRules(true)}><BookOpen size={16}/> Zasady</button>
-        <button className="sg-new" onClick={() => setShowSetup(true)}><RotateCcw size={16}/> Nowa gra</button></div>
+      <div className="sg-header-actions">
+        <button type="button" className="sg-music-toggle" onClick={toggleMusic}
+          aria-pressed={musicEnabled && !musicUnavailable}
+          title={musicUnavailable ? 'Brak pliku public/background.mp3' : musicEnabled ? 'Wycisz muzykę w tle' : 'Włącz muzykę w tle'}
+          aria-label={musicUnavailable ? 'Brak pliku muzyki' : musicEnabled ? 'Wycisz muzykę' : 'Włącz muzykę'}>
+          {musicUnavailable || !musicEnabled ? <VolumeX size={16}/> : <Music2 size={16}/>}
+          <span>{musicUnavailable ? 'Brak MP3' : musicEnabled ? 'Muzyka' : 'Muzyka wył.'}</span>
+        </button>
+        <button type="button" onClick={toggleSound} title={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'}
+          aria-label={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'}
+          aria-pressed={soundEnabled} className="sg-audio-toggle">
+          {soundEnabled ? <Volume2 size={16}/> : <VolumeX size={16}/>}
+          <span>{soundEnabled ? 'Dźwięk' : 'Cisza'}</span>
+        </button>
+        <GameMenu effectsEnabled={effectsEnabled} reducedMotion={reducedMotion} toggleEffects={toggleEffects}
+          openStrategy={() => setShowStrategy(true)} openRules={() => setShowRules(true)}/>
+        <button type="button" className="sg-new" onClick={() => setShowSetup(true)}>
+          <RotateCcw size={16}/> Nowa gra
+        </button>
+      </div>
     </header>
     <main className="sg-stage" aria-label="Wspólny stół Sintra Glass">
       <div className="sg-felt">
+        <TableAmbient enabled={effectsEnabled && !reducedMotion}/>
         {seat(1, 'north')}
         {seat(3, 'west')}
         {seat(2, 'east')}
@@ -321,26 +342,12 @@ export default function App() {
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
     {showStrategy && <StrategyLab state={game} onClose={() => setShowStrategy(false)}/>}
-    {placementOptions && selection && <div className="modal-backdrop sg-placement-overlay" onMouseDown={() => setPlacementOptions(null)}>
-      <div className="modal sg-placement-dialog" role="dialog" aria-modal="true" aria-label="Wybierz pola kwatery" onMouseDown={e => e.stopPropagation()}>
-        <button className="close-btn" onClick={() => setPlacementOptions(null)} aria-label="Zamknij"><X size={18}/></button>
-        <h2>Wybierz pola na tafle</h2>
-        <p>Joker przyjmuje każdy kolor. Wybierz, czy zająć joker, czy zachować go na później.</p>
-        <div className="sg-placement-list">{[...new Map(placementOptions.filter((m): m is Extract<Move,{kind:'take'}> => m.kind === 'take')
-          .map(m => [m.slots?.join(',') ?? '', m] as const)).values()].map((m, i) => {
-            const strip = game.players[game.currentPlayer].strips[m.windowIndex!]
-            const pattern = patternFor(strip)
-            return <button type="button" key={m.slots?.join(',') ?? i} onClick={() => choosePlacement(m)}>
-              <span className="sg-placement-number">Wariant {i + 1}</span>
-              <span className="sg-placement-slots">{pattern.map((slot, j) => <span key={j} className={`sg-placement-slot${m.slots?.includes(j) ? ' sg-placement-active' : ''}`}>
-                <GlassPiece color={m.slots?.includes(j) ? m.color : strip.panes[j] ?? slot} placed={!!strip.panes[j] || !!m.slots?.includes(j)} small/>
-                <small>{slot === 'wild' ? '★' : String(j + 1)}</small>
-              </span>)}</span>
-              <small>{m.slots?.some(j => pattern[j] === 'wild') ? 'Z użyciem jokera' : 'Bez zajmowania jokera'}</small>
-            </button>
-          })}</div>
-      </div>
-    </div>}
+    {placementOptions && selection && placementOptions[0].kind === 'take' && placementOptions[0].windowIndex !== null &&
+      <ManualPlacementDialog key={`${game.turn}-${placementOptions[0].windowIndex}-${selection.color}`}
+        strip={game.players[game.currentPlayer].strips[placementOptions[0].windowIndex]}
+        candidates={placementOptions.filter((move): move is Extract<Move, { kind: 'take' }> => move.kind === 'take')}
+        picked={sourceOptions.find(option => option.color === selection.color && sourceEquals(option.source, selection.source))?.count ?? 0}
+        onClose={() => setPlacementOptions(null)} onConfirm={confirmManualPlacement}/>}
     {finishing && <div className="modal-backdrop" onMouseDown={() => setFinishing(null)}><div className="modal keep-modal" role="dialog" aria-modal="true" aria-label="Wybierz taflę do zachowania" onMouseDown={e => e.stopPropagation()}><button className="close-btn" onClick={() => setFinishing(null)} aria-label="Zamknij"><X size={18}/></button><div className="modal-icon"><Gem size={24}/></div><h2>Wybierz taflę do okna</h2><p>Jedna tafla zostanie w pałacowym witrażu.</p><div className="keep-options">{finishing.filter(m => m.kind === 'take' && m.keepColor).map(m => m.kind === 'take' && m.keepColor ? <button key={m.keepColor} onClick={() => commit(m)}><GlassPiece color={m.keepColor}/><span>{COLORS_PL[m.keepColor]}</span></button> : null)}</div></div></div>}
   </div>
 }
