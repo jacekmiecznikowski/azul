@@ -456,9 +456,9 @@ function endGame(state: GameState): void {
   state.log.unshift('Koniec gry! Naliczono punkty finałowe.')
   addHistory(state, { playerIndex: null, kind: 'final', description: 'Koniec szóstej rundy — rozliczono pozostałe tafle, stłuczone szkło i premie pałacu.' })
 }
-/** Clockwise seating around the table: north → east → south → west.
- * Player indices are stable (human=0 south, Aurora=1 north, Iris=2 east,
- * Noctis=3 west), and absent seats are skipped in 2/3-player games.
+/** Clockwise order of *player indices*, independent of who is a human or a bot.
+ * Historical seat ordering is preserved so existing saves and AI simulations
+ * remain identical; the hot-seat UI rotates that order around the viewer.
  */
 export function nextClockwisePlayer(playerIndex: number, playerCount: number): number {
   const seats = [1, 2, 0, 3].filter(index => index < playerCount)
