@@ -99,6 +99,10 @@
     flex:none;
     margin:0;
     max-width:none;
+    /* Override old viewport-derived min-height: on 2K/4K displays it
+       otherwise expands the logical 1000px canvas before applying zoom. */
+    min-height:0;
+    min-width:0;
     box-sizing:border-box;
   }
 }
