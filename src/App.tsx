@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, Music2, X, ListChecks, BrainCircuit } from 'lucide-react'
+import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, Trophy, Volume2, VolumeX, Music2, X, ListChecks, BrainCircuit, Sparkles } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, patternFor, standings } from './game/engine'
 import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
@@ -8,6 +8,7 @@ import { FinalResults } from './components/FinalResults'
 import { StrategyLab } from './components/StrategyLab'
 import { finishOverlayVisibility } from './ui/finishOverlayVisibility'
 import { useGameAudio } from './hooks/useGameAudio'
+import { GlassVisualEffects, useVisualEffects } from './components/GlassVisualEffects'
 import { useAmbientMusic } from './hooks/useAmbientMusic'
 import { GameBoard, GlassPiece } from './components/GameBoard'
 import './match.css'
@@ -18,6 +19,7 @@ import './inventory-v12.css'
 import './ux-v13.css'
 import './polish-v14.css'
 import './strategy-lab.css'
+import './glass-effects-v16.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
@@ -194,6 +196,7 @@ export default function App() {
   const [showStrategy, setShowStrategy] = useState(false)
   const { enabled: soundEnabled, toggle: toggleSound, play } = useGameAudio()
   const { enabled: musicEnabled, toggle: toggleMusic, unavailable: musicUnavailable } = useAmbientMusic()
+  const { enabled: effectsEnabled, toggle: toggleEffects, emit: emitEffects, clear: clearEffects, bursts: visualBursts, reducedMotion } = useVisualEffects()
   const humanTurn = game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
   const moves = useMemo(() => legalMoves(game), [game])
   const sourceOptions = useMemo(() => availableSources(game), [game])
@@ -221,16 +224,18 @@ export default function App() {
       const move = chooseAIMove(game, difficulty)
       if (move) {
         const next = applyMove(game, move)
+        emitEffects(game, next, move)
         setGame(next)
         play(next.round !== game.round ? 'round' : next.players[game.currentPlayer].score > game.players[game.currentPlayer].score ? 'score' : 'place')
       }
     }, delay)
     return () => window.clearTimeout(timer)
-  }, [game, finishing, play])
+  }, [game, finishing, play, emitEffects])
   useEffect(() => { if (!humanTurn) { setSelection(null); setFinishing(null); setPlacementOptions(null) } }, [humanTurn])
 
   function commit(move: Move) {
     const next = applyMove(game, move)
+    emitEffects(game, next, move)
     setGame(next)
     play(next.round !== game.round ? 'round' : next.players[game.currentPlayer].score > game.players[game.currentPlayer].score ? 'score' : 'place')
     setSelection(null)
@@ -268,6 +273,7 @@ export default function App() {
     chooseFinalGlass(options)
   }
   function startNew(options: Settings) {
+    clearEffects()
     setSettings(options)
     setGame(newGame({ ...options, botDifficulties: options.difficulties }))
     play('round')
@@ -291,7 +297,7 @@ export default function App() {
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span><small>WITRAŻE SINTRY · EDYCJA CYFROWA</small></div>
       <div className="sg-header-round"><span>RUNDA</span><strong>{game.round} <small>/ 6</small></strong><div className="sg-round-colors">{game.roundColors.map((c, i) =>
         <i key={i} title={`Runda ${i + 1}: ${COLORS_PL[c]}`} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : i + 1 < game.round ? ' sg-color-past' : ''}`}/>)}</div></div>
-      <div className="sg-header-actions"><button type="button" className="sg-music-toggle" onClick={toggleMusic} aria-pressed={musicEnabled && !musicUnavailable} title={musicUnavailable ? "Brak pliku public/background.mp3 — skopiuj plik do katalogu public i odśwież stronę" : musicEnabled ? "Wycisz muzykę w tle" : "Włącz muzykę w tle"} aria-label={musicUnavailable ? "Brak pliku muzyki" : musicEnabled ? "Wycisz muzykę" : "Włącz muzykę"}>{musicUnavailable || !musicEnabled ? <VolumeX size={16}/> : <Music2 size={16}/>}<span>{musicUnavailable ? "Brak MP3" : musicEnabled ? "Muzyka" : "Muzyka wył."}</span></button><button type="button" onClick={toggleSound} title={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-label={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-pressed={soundEnabled} className="sg-audio-toggle">{soundEnabled ? <Volume2 size={16}/> : <VolumeX size={16}/>}<span>{soundEnabled ? 'Dźwięk' : 'Cisza'}</span></button><button type="button" onClick={() => setShowStrategy(true)}><BrainCircuit size={16}/> Strategia</button><button onClick={() => setShowRules(true)}><BookOpen size={16}/> Zasady</button>
+      <div className="sg-header-actions"><button type="button" className="sg-fx-toggle" onClick={toggleEffects} disabled={reducedMotion} aria-pressed={effectsEnabled && !reducedMotion} aria-label={reducedMotion ? 'Animacje ograniczone przez system' : effectsEnabled ? 'Wyłącz efekty wizualne' : 'Włącz efekty wizualne'} title={reducedMotion ? 'System ma włączone ograniczanie animacji' : effectsEnabled ? 'Wyłącz rozbłyski, odłamki i animacje punktów' : 'Włącz efekty wizualne'}><Sparkles size={16}/><span>{reducedMotion ? 'Bez animacji' : effectsEnabled ? 'Efekty' : 'Efekty wył.'}</span></button><button type="button" className="sg-music-toggle" onClick={toggleMusic} aria-pressed={musicEnabled && !musicUnavailable} title={musicUnavailable ? "Brak pliku public/background.mp3 — skopiuj plik do katalogu public i odśwież stronę" : musicEnabled ? "Wycisz muzykę w tle" : "Włącz muzykę w tle"} aria-label={musicUnavailable ? "Brak pliku muzyki" : musicEnabled ? "Wycisz muzykę" : "Włącz muzykę"}>{musicUnavailable || !musicEnabled ? <VolumeX size={16}/> : <Music2 size={16}/>}<span>{musicUnavailable ? "Brak MP3" : musicEnabled ? "Muzyka" : "Muzyka wył."}</span></button><button type="button" onClick={toggleSound} title={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-label={soundEnabled ? 'Wyłącz dźwięki' : 'Włącz dźwięki'} aria-pressed={soundEnabled} className="sg-audio-toggle">{soundEnabled ? <Volume2 size={16}/> : <VolumeX size={16}/>}<span>{soundEnabled ? 'Dźwięk' : 'Cisza'}</span></button><button type="button" onClick={() => setShowStrategy(true)}><BrainCircuit size={16}/> Strategia</button><button onClick={() => setShowRules(true)}><BookOpen size={16}/> Zasady</button>
         <button className="sg-new" onClick={() => setShowSetup(true)}><RotateCcw size={16}/> Nowa gra</button></div>
     </header>
     <main className="sg-stage" aria-label="Wspólny stół Sintra Glass">
@@ -309,6 +315,7 @@ export default function App() {
         {seat(0, 'south')}
       </div>
     </main>
+    <GlassVisualEffects bursts={visualBursts}/>
     {finishOverlay.banner && <div className="sg-finish"><Trophy size={17}/> Koniec partii <button onClick={() => setShowResults(true)}><ListChecks size={14}/> Zobacz podliczenie</button><button onClick={() => setShowSetup(true)}>Nowa partia <ArrowRight size={14}/></button></div>}
     {finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
