@@ -302,3 +302,15 @@ zmniejsza zakłócenia innych programów, ale nie eliminuje zużycia CPU.
 
 Obecny trening `train:ai` nadal istnieje jako narzędzie **porównawcze**;
 do nauki w tle od teraz używaj `learn:background`.
+
+## Efekty wizualne przy ruchach (v16)
+
+- **Ułożenie tafli**: w konkretnym polu witrażu pojawia się krótki rozbłysk dopasowany do koloru szkła i kilka drobnych świetlistych cząstek.
+- **Ukończenie strony kwatery**: złocisto-kolorowa poświata, promienie i rozbłysk nad ukończoną kwaterą.
+- **Stłuczenie szkła**: odłamki szkła przy liczniku stłuczeń gracza i etykieta `−N szkła`; dotyczy też kary za żeton pierwszego gracza.
+- **Zmiana punktów**: `+N pkt` / `−N pkt` nad wynikiem właściwego gracza. Przy końcowym podliczeniu uwzględnia też zmiany wyników pozostałych graczy.
+- **Przełącznik „Efekty”** w nagłówku działa niezależnie od muzyki i dźwięków, a jego ustawienie jest pamiętane lokalnie.
+- Efekty uruchamiają się tylko od prawdziwych ruchów (również botów), znikają po maksymalnie 1,5 sekundy, nie uruchamiają ciągłych pętli i nie wpływają na symulacje self-play.
+- Użytkownicy z systemowym ustawieniem `prefers-reduced-motion: reduce` nie zobaczą animacji; przełącznik informuje o tym ograniczeniu.
+
+Weryfikacja reguł wywoływania efektów: `src/ui/moveVisualEvents.test.ts`.
