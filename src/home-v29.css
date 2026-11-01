@@ -87,7 +87,7 @@
 
 /* v30: the physical table is fitted as ONE entire 1700 × 1000 canvas.
    Never let the left/right rotated player boards overflow the viewport. */
-@media (min-width:1361px) and (min-height:781px) {
+@media (min-width:1101px) and (min-height:621px) {
   .sg .sg-responsive-stage {
     display:flex;
     align-items:flex-start;
@@ -108,6 +108,113 @@
 }
 /* Browsers and resizable Windows EXE switch to the complete-board compact
    view when the height/width cannot preserve four readable physical seats. */
-@media (max-width:1360px), (max-height:780px) {
+@media (max-width:1100px), (max-height:620px) {
   .sg .sg-responsive-stage{display:none!important}
+}
+
+/* v31 — desktop table refinement, isolated from the compact board. */
+@media (min-width:1101px) and (min-height:621px) {
+  /* Slightly slimmer four full-size player boards free a little extra height
+     for the shared tabletop, including its actual move history. */
+  .sg {--sg-deep:calc(var(--sg-long) * .322);}
+  .sg .sg-center {
+    grid-template-columns:minmax(205px,.80fr) minmax(300px,1.45fr) minmax(265px,1.23fr);
+    gap:7px;
+  }
+  .sg .sg-center .sg-market {
+    padding:26px 6px 53px;
+  }
+  .sg .sg-center .sg-market-circle {
+    width:min(calc(100cqi - 14px), calc(100cqb - 6px), 410px);
+    height:auto;aspect-ratio:1;max-height:none;max-width:none;
+    min-width:0;min-height:0;flex:0 0 auto;
+  }
+  .sg .sg-center .sg-factory {
+    width:clamp(41px,16cqi,69px);
+    height:clamp(41px,16cqi,69px);
+  }
+  .sg .sg-center .sg-center-pile {
+    width:clamp(68px,27cqi,116px);
+    height:clamp(68px,27cqi,116px);
+  }
+  /* The glass inventory is a secondary desktop indicator; it must not
+     obscure the factories or consume too much of the centre panel. */
+  .sg .sg-center .sg-inventory {
+    min-height:29px;height:29px;bottom:22px;
+    padding:1px 5px;
+  }
+  .sg .sg-center .sg-inventory-tower svg{height:23px;width:18px;}
+  .sg .sg-center .sg-inventory-total strong{font-size:13px;}
+  .sg .sg-center .sg-market > .sg-first-token {
+    height:20px;min-height:20px;
+  }
+}
+/* First-player marker in market title, never over selectable glass. */
+.sg .sg-market-title-meta{
+  display:flex;align-items:center;justify-content:flex-end;
+  gap:8px;min-width:0;white-space:nowrap;
+}
+.sg .sg-market-title-meta small{font-size:10px;color:#a4cac4;}
+.sg .sg-market-first-badge{
+  position:static;transform:none;
+  display:grid;place-items:center;
+  width:19px;height:19px;min-width:19px;min-height:19px;
+  font:900 12px Georgia,serif;border-radius:4px;
+  box-shadow:0 1px 4px #0008;
+}
+/* Keep only the product logo: the extended descriptive label distracted
+   from six-round bonuses and game actions in the header. */
+.sg .sg-brand{min-width:0;}
+/* v31 home screen does not scroll. On short displays it collapses the
+   decorative stained glass and tightens buttons without hiding actions. */
+.sg.sg-in-home .sg-home-screen{
+  overflow:hidden;
+  height:100dvh;
+  padding-block:clamp(5px,2dvh,24px);
+}
+.sg.sg-in-home .sg-home-shell{
+  margin:0 auto;
+  min-height:0;max-height:100%;
+}
+.sg.sg-in-home .sg-home-art{
+  min-height:0;max-height:70dvh;
+}
+.sg.sg-in-home .sg-home-arch{
+  max-height:min(460px,68dvh);
+}
+.sg.sg-in-home .sg-home-footer{flex:none;}
+@media (max-height:600px) {
+  .sg.sg-in-home .sg-home-art{display:none;}
+  .sg.sg-in-home .sg-home-shell{
+    display:flex;align-items:center;justify-content:center;
+    width:min(100%,510px);min-width:0;max-width:100%;
+    margin:0 auto;
+  }
+  .sg.sg-in-home .sg-home-copy{
+    align-items:center;text-align:center;
+    gap:clamp(3px,1dvh,8px);
+    width:100%;min-width:0;
+  }
+  .sg.sg-in-home .sg-home-copy h1{
+    font-size:clamp(25px,7dvh,48px);line-height:1;
+  }
+  .sg.sg-in-home .sg-home-overline{font-size:9px;}
+  .sg.sg-in-home .sg-home-subtitle{font-size:11px;}
+  .sg.sg-in-home .sg-home-buttons{
+    width:min(100%,410px);gap:clamp(3px,1dvh,6px);
+    margin-top:0;
+  }
+  .sg.sg-in-home .sg-home-action{
+    min-height:clamp(28px,8dvh,38px);
+    padding:4px 10px;font-size:11px;
+  }
+  .sg.sg-in-home .sg-home-secondary .sg-home-action{
+    min-height:clamp(28px,7dvh,34px);
+  }
+  .sg.sg-in-home .sg-home-footer{display:none;}
+}
+@media (max-height:370px){
+  .sg.sg-in-home .sg-home-overline{display:none;}
+  .sg.sg-in-home .sg-home-subtitle{display:none;}
+  .sg.sg-in-home .sg-home-guide{padding:0;}
 }

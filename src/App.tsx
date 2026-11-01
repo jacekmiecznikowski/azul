@@ -85,7 +85,7 @@ function Market({ game, selection, disabled, onPick }: {
   const center = COLORS.map(color => ({ color, count: game.center.filter(x => x === color).length })).filter(item => item.count > 0)
   const inventory = glassInventory(game)
   return <section className="sg-market sg-center-card" aria-label="Warsztaty szkła">
-    <div className="sg-panel-title"><span>WARSZTATY SZKŁA</span><small>{game.factories.filter(f => f.length).length} aktywnych</small></div>
+    <div className="sg-panel-title"><span>WARSZTATY SZKŁA</span><span className="sg-market-title-meta"><small>{game.factories.filter(f => f.length).length} aktywnych</small>{!game.firstCenterTaken && <span className="sg-start-tile sg-market-first-badge" aria-label="Żeton pierwszego gracza jest na środku stołu" title="Żeton pierwszego gracza jest na środku stołu">1</span>}</span></div>
     <div className="sg-market-circle">
       <div className="sg-market-ring"/>
       {game.factories.map((tiles, i) => <Factory key={i} tiles={tiles} index={i} count={game.factories.length} selected={selection} disabled={disabled} onPick={onPick}/>)}
@@ -96,7 +96,6 @@ function Market({ game, selection, disabled, onPick }: {
             className={`sg-center-choice${selection?.source.type === 'center' && selection.color === color ? ' sg-token-selected' : ''}`}>
             <GlassPiece color={color} small/><b>{count}</b>
           </button>) : <span className="sg-center-quiet">✧</span>}</div>
-        {!game.firstCenterTaken && <span className="sg-start-tile sg-start-on-market" title="Żeton pierwszego gracza — pierwszy pobór ze środka oznacza +1 stłuczenie">1</span>}
         {!game.firstCenterTaken && <small className="sg-center-penalty">+1 stłuczenie</small>}
       </div>
     </div>
@@ -396,7 +395,7 @@ export default function App() {
 
   return <div className={`sg${screen === "home" ? " sg-in-home" : ""}`}>
     <header className="sg-header">
-      <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span><small>WITRAŻE SINTRY · EDYCJA CYFROWA</small></div>
+      <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span></div>
       <div className="sg-header-round"><span>RUNDA</span><strong>{game.round} <small>/ 6</small></strong><div className="sg-round-colors">{game.roundColors.map((c, i) =>
         <i key={i} title={`Runda ${i + 1}: ${COLORS_PL[c]}`} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : i + 1 < game.round ? ' sg-color-past' : ''}`}/>)}</div><div className="sg-round-mobile-colors" role="group" aria-label="Kolory punktowane w rundach od 1 do 6">
           {game.roundColors.map((c, i) =>

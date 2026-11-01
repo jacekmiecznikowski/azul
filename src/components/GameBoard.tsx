@@ -126,6 +126,5 @@ export function GameBoard({ player, index, isCurrent, isHuman = false, isHumanTu
         targets={targets} selected={selected} isHumanTurn={isHuman && isHumanTurn}
         onTarget={onTarget} palaceSide={palaceSide}/>)}
     </div>
-    <div className="sg-board-engraving"><span>✥</span><span>SINTRA · PRACOWNIA WITRAŻY</span><span>✥</span></div>
   </section>
 }

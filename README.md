@@ -623,3 +623,13 @@ z identycznymi planszami (900 px długości) i skalą obliczaną z obu wymiarów
 Przy typowym laptopie 1650×930 CSS px plansza powinna zmieścić się w całości.
 Szerokość do 1360px lub wysokość do 780px włącza kompletny widok kompaktowy
 na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian.
+
+
+### v31 — poprawki UI po testach na laptopie i Androidzie
+
+- **Ekran główny** (nie modal nowej rozgrywki) nie przewija się pionowo. Na bardzo krótkich ekranach ukrywa dekoracyjny witraż i zmniejsza odstępy, zachowując wszystkie akcje.
+- Tryb mobilny w Vite i EXE dopiero przy szerokości ≤1100 CSS px lub wysokości ≤620 CSS px. Android z niskim viewportem nadal automatycznie korzysta z niego.
+- W desktopowym stole plansze są nieco płytsze, przez co środkowy rząd z historią jest wyższy; warsztaty wykorzystują więcej przestrzeni, a wskaźnik zapasu zajmuje mniej miejsca.
+- Żeton pierwszego gracza przeniesiony do nagłówka warsztatów, daleko od klikalnych tafli.
+- Usunięte zbędne dekoracyjne podpisy „SINTRA · PRACOWNIA WITRAŻY” pod planszami i „WITRAŻE SINTRY · EDYCJA CYFROWA” z górnej belki gry.
+- Wszystkie platformy korzystają z tego samego kodu React: Vite, Windows EXE, Android APK.
