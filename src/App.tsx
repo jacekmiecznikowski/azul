@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowRight, BookOpen, Bot, Check, Gem, Info, RotateCcw, Settings2, X } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, standings } from './game/engine'
-import type { Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
+import type { Controller, Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
 import { LiveHistory } from './components/LiveHistory'
 import { FinalResults } from './components/FinalResults'
@@ -9,6 +9,7 @@ import { FinishCelebration } from './components/FinishCelebration'
 import { StrategyLab } from './components/StrategyLab'
 import { finishOverlayVisibility } from './ui/finishOverlayVisibility'
 import { moveAudioCue } from './ui/moveAudioCue'
+import { seatsForViewer, viewingPlayerIndex } from './ui/tableSeating'
 import { useGameAudio } from './hooks/useGameAudio'
 import { GlassVisualEffects, useVisualEffects } from './components/GlassVisualEffects'
 import { useAmbientMusic } from './hooks/useAmbientMusic'
@@ -32,8 +33,14 @@ import './finish-v21.css'
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
 const PLAYER_AVATARS = ['✦', '✧', '✳', '❖']
-interface Settings { opponents: number; difficulties: Difficulty[]; palaceSide: PalaceSide }
-const DEFAULT_OPTIONS: Settings = { opponents: 3, difficulties: ['normal', 'normal', 'normal'], palaceSide: 'A' }
+interface Settings { opponents: number; difficulties: Difficulty[]; controllers: Controller[]; names: string[]; palaceSide: PalaceSide }
+const DEFAULT_OPTIONS: Settings = {
+  opponents: 3,
+  difficulties: ['normal', 'normal', 'normal'],
+  controllers: ['human', 'ai', 'ai', 'ai'],
+  names: ['Ty', 'Gracz 2', 'Gracz 3', 'Gracz 4'],
+  palaceSide: 'A',
+}
 interface Selection { source: Source; color: GlassColor }
 function sourceEquals(a: Source, b: Source): boolean {
   return a.type === b.type && (a.type === 'center' || (b.type === 'factory' && a.index === b.index))
@@ -148,27 +155,72 @@ function SetupModal({ settings, onClose, onStart }: {
   settings: Settings; onClose: () => void; onStart: (settings: Settings) => void
 }) {
   const [local, setLocal] = useState<Settings>(settings)
+  const playerCount = local.opponents + 1
+  const humans = Array.from({length: playerCount},(_,i)=>i).filter(i=>i === 0 || local.controllers[i] === 'human').length
   return <div className="modal-backdrop" onMouseDown={onClose}>
-    <div className="modal setup-modal" role="dialog" aria-modal="true" aria-label="Nowa rozgrywka" onMouseDown={(e) => e.stopPropagation()}>
+    <div className="modal setup-modal sg-hotseat-setup" role="dialog" aria-modal="true" aria-label="Nowa rozgrywka" onMouseDown={e => e.stopPropagation()}>
       <button className="close-btn" onClick={onClose} aria-label="Zamknij"><X size={18}/></button>
       <div className="modal-icon"><Settings2 size={23}/></div>
       <span className="overline">ROZPOCZNIJ PRZYGODĘ</span>
       <h2>Nowa rozgrywka</h2>
-      <p>Wybierz przeciwników i zasady punktowania. Każda partia ma nowy układ kwater.</p>
-      <label className="field-label">Liczba przeciwników AI</label>
-      <div className="option-row">{[1, 2, 3].map((n) => <button key={n} className={`option-choice${local.opponents === n ? ' chosen' : ''}`} onClick={() => setLocal({ ...local, opponents: n })}>{n}<small>{n === 1 ? 'Pojedynek' : `${n + 1} graczy`}</small></button>)}</div>
-      <div className="per-bot-header"><span className="field-label">Poziom trudności każdego bota</span><small>Możesz mieszać poziomy w jednej partii.</small></div>
-      {Array.from({length: local.opponents}, (_, i) => <div key={i} className="bot-setting-row">
-        <label htmlFor={`bot-level-${i}`}><Bot size={16}/><span>{['Aurora','Iris','Noctis'][i]}</span></label>
-        <select id={`bot-level-${i}`} value={local.difficulties[i] ?? 'normal'} onChange={(e) => setLocal(prev => ({...prev, difficulties: prev.difficulties.map((level, idx) => idx === i ? e.target.value as Difficulty : level)}))}>
-          <option value="easy">Łatwy · losowy</option><option value="normal">Normalny · zachłanny</option><option value="hard">Trudny · strategiczny</option><option value="expert">Ekspert · przewiduje przeciwników</option><option value="master">Trenowany · eksperymentalna strategia</option>
-        </select>
-      </div>)}
+      <p>Wybierz liczbę graczy i zdecyduj, kto gra osobiście, a kto jest botem.
+        Przy turze człowieka jego plansza pojawi się na dole stołu.</p>
+      <label className="field-label">Liczba graczy przy stole</label>
+      <div className="option-row">{[2, 3, 4].map(count => <button key={count} type="button"
+        className={`option-choice${playerCount === count ? ' chosen' : ''}`}
+        onClick={() => setLocal(previous => ({...previous, opponents: count - 1}))}>
+        {count}<small>{count === 2 ? 'Pojedynek' : count === 3 ? 'Trzy osoby' : 'Pełny stół'}</small>
+      </button>)}</div>
+      <div className="per-bot-header"><span className="field-label">Uczestnicy rozgrywki</span>
+        <small>{humans} {humans === 1 ? 'człowiek' : 'ludzi'} · {playerCount - humans} AI</small></div>
+      <div className="sg-hotseat-players">
+        {Array.from({length: playerCount}, (_, i) => {
+          const isHuman = i === 0 || local.controllers[i] === 'human'
+          return <div key={i} className="sg-hotseat-player">
+            <span className="sg-hotseat-number">{String(i + 1).padStart(2, '0')}</span>
+            <div className="sg-hotseat-player-fields">
+              <label htmlFor={`player-controller-${i}`}>Gracz {i + 1}</label>
+              <select id={`player-controller-${i}`} value={isHuman ? 'human' : 'ai'}
+                disabled={i === 0}
+                title={i === 0 ? 'Pierwszy uczestnik zawsze jest człowiekiem' : undefined}
+                onChange={e => setLocal(previous => ({
+                  ...previous, controllers: previous.controllers.map((controller,j) =>
+                    j === i ? e.target.value as Controller : controller),
+                }))}>
+                <option value="human">Człowiek</option>
+                <option value="ai">Bot AI</option>
+              </select>
+              {isHuman ? <input
+                aria-label={`Imię gracza ${i + 1}`}
+                value={local.names[i] ?? `Gracz ${i + 1}`}
+                maxLength={28}
+                onChange={e => setLocal(previous => ({
+                  ...previous, names: previous.names.map((name,j) => j === i ? e.target.value : name),
+                }))} placeholder={`Gracz ${i + 1}`}/>
+              : <select aria-label={`Poziom trudności bota ${i + 1}`}
+                  value={local.difficulties[i - 1] ?? 'normal'}
+                  onChange={e => setLocal(previous => ({
+                    ...previous,
+                    difficulties: previous.difficulties.map((level,j) =>
+                      j === i - 1 ? e.target.value as Difficulty : level),
+                  }))}>
+                  <option value="easy">Łatwy · losowy</option>
+                  <option value="normal">Normalny · zachłanny</option>
+                  <option value="hard">Trudny · strategiczny</option>
+                  <option value="expert">Ekspert · przewiduje przeciwników</option>
+                  <option value="master">Trenowany · eksperymentalna strategia</option>
+                </select>}
+            </div>
+          </div>
+        })}
+      </div>
+      {humans > 1 && <p className="sg-hotseat-hint">Tryb przy jednym ekranie: plansza obraca się na turę kolejnego człowieka.
+        Boty grają automatycznie, bez obracania widoku na siebie.</p>}
       <label className="field-label" htmlFor="palace-side">Punktowanie finałowe</label>
-      <select id="palace-side" value={local.palaceSide} onChange={(e) => setLocal({ ...local, palaceSide: e.target.value as PalaceSide })}>
+      <select id="palace-side" value={local.palaceSide} onChange={e => setLocal({...local, palaceSide:e.target.value as PalaceSide})}>
         <option value="A">Strona A — ornamenty</option><option value="B">Strona B — dominujący kolor</option>
       </select>
-      <button className="btn btn-primary modal-main" onClick={() => onStart(local)}>Rozpocznij partię <ArrowRight size={18} /></button>
+      <button className="btn btn-primary modal-main" onClick={() => onStart(local)}>Rozpocznij partię <ArrowRight size={18}/></button>
     </div>
   </div>
 }
