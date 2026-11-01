@@ -642,3 +642,12 @@ na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian
 - W pionowym układzie ekran rund pokazuje numer i kolor każdej z sześciu rund; tor ma osobny panel z polami, a plansza i warsztaty nie rozciągają się bez końca.
 - W panelu zasobów usunięto zbędny licznik 100/100 oraz „Rundy”, pozostawiając nowy wygląd szklanej wieży i trzy czytelne wartości. Mobilna plansza nadal nie pokazuje zasobów.
 - Bez zmian w mechanice gry; wspólny React zasila Vite, EXE i APK.
+
+
+### v33 — pięć lokalizacji szkła i zwarte panele laptopa
+
+- **Zasoby**: pięć równych pól z wartościami na stole, witraże, woreczek, wieża i **premie rund (tor rund)**. Nie wyświetlamy zbędnej sumy 100/100; zachowano pełny wewnętrzny bilans 100 tafli i sześć fizycznych znaczników premii.
+- **Przy stole**: zarezerwowane miejsce na aktywną turę i wszystkie cztery wyniki; panel nie może obcinać dolnego rzędu graczy.
+- **Stłuczone szkło**: dziewięć pól i kolorowe pionki graczy bez powtórzonej legendy nazw pod torem. Nazwy są nadal dostępne w opisach znaczników, a ich kolory widoczne przy graczach.
+- **Warsztaty i historia**: wspólna wysokość nagłówków i zmniejszony margines zasobów; żeton pierwszego gracza pozostaje w nagłówku warsztatów.
+- **Mechanika** `src/game/engine.ts` oraz AI bez zmian; Vite, Windows EXE i Android APK nadal korzystają z tych samych danych.

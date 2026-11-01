@@ -35,6 +35,7 @@ import './polish-v24.css'
 import './android-mobile-v25.css'
 import './home-v29.css'
 import './ui-refinement-v32.css'
+import './ui-refinement-v33.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
@@ -79,7 +80,7 @@ function Factory({ tiles, index, count, selected, disabled, onPick }: {
     </div>
   </div>
 }
-function Market({ game, selection, disabled, onPick }: {
+export function Market({ game, selection, disabled, onPick }: {
   game: GameState; selection: Selection | null; disabled: boolean;
   onPick: (source: Source, color: GlassColor) => void
 }) {
@@ -100,21 +101,16 @@ function Market({ game, selection, disabled, onPick }: {
         {!game.firstCenterTaken && <small className="sg-center-penalty">+1 stłuczenie</small>}
       </div>
     </div>
-    <div className="sg-inventory sg-inventory-v32" aria-label={`Zasoby tafli: ${inventory.table} na stole, ${inventory.playerBoards} w witrażach, ${inventory.bag} w woreczku, ${inventory.tower} w wieży. Razem ${inventory.total} ze 100.`}>
-      <div className="sg-inventory-tower" title={`W szklanej wieży: ${inventory.tower}`}>
-        <svg viewBox="0 0 28 36" aria-hidden="true" fill="none">
-          <path d="M8 3H20L24 30L19 34H9L4 30Z" fill="#245867" stroke="#bcdbd1" strokeWidth="1.3"/>
-          <path d="M10 7H18L20.5 29L17 31H11L7.5 29Z" fill="#6ad5df" fillOpacity=".18" stroke="#e0e3ce" strokeOpacity=".48"/>
-          <path d="M8 15H20M7 23H21" stroke="#b8dada" strokeOpacity=".5"/>
-          <path d="M11 7L9 28" stroke="#fff7dc" strokeWidth="2" strokeOpacity=".55"/>
-          <path d="M5 32H23" stroke="#c6b37a" strokeWidth="2"/>
-        </svg>
-        <span className="sg-inventory-tower-caption"><small>WIEŻA</small><strong>{inventory.tower}</strong></span>
-      </div>
-      <div className="sg-inventory-stats">
-        <span><small>Na stole</small><b>{inventory.table}</b></span>
-        <span><small>Witraże</small><b>{inventory.playerBoards}</b></span>
-        <span><small>Woreczek</small><b>{inventory.bag}</b></span>
+    <div className="sg-inventory sg-inventory-v33" role="group" aria-label={`Zasoby szkła: na stole ${inventory.table}, w witrażach ${inventory.playerBoards}, w woreczku ${inventory.bag}, w wieży ${inventory.tower}, na torze rund ${inventory.roundTrack}. Razem ${inventory.total} tafli.`}>
+      <div className="sg-stock-ledger">
+        <span className="sg-stock-place" title={`Tafle na warsztatach i pośrodku stołu: ${inventory.table}`}><small>Na stole</small><strong>{inventory.table}</strong></span>
+        <span className="sg-stock-place" title={`Ułożone tafle i zachowane witraże: ${inventory.playerBoards}`}><small>Witraże</small><strong>{inventory.playerBoards}</strong></span>
+        <span className="sg-stock-place" title={`Tafle w woreczku: ${inventory.bag}`}><small>Woreczek</small><strong>{inventory.bag}</strong></span>
+        <span className="sg-stock-place sg-stock-tower" title={`Tafle w szklanej wieży: ${inventory.tower}`}>
+          <svg viewBox="0 0 21 29" fill="none" aria-hidden="true"><path d="M7 2H14L18 23L14 27H7L3 23Z" fill="#174451" stroke="#d1c394" strokeWidth="1.4"/><path d="M8 5H13L15 22L12 24H9L6 22Z" fill="#5ac9dc" fillOpacity=".38" stroke="#a7e5e4" strokeWidth=".6"/><path d="M8 6L6.5 21" stroke="#e6ffff" strokeOpacity=".75" strokeWidth="1.4"/><path d="M5 24H16" stroke="#e5c98e" strokeWidth="1.4"/></svg>
+          <small>Wieża</small><strong>{inventory.tower}</strong>
+        </span>
+        <span className="sg-stock-place sg-stock-rounds" title={`Tafle kolorów premii pozostające na torze rund: ${inventory.roundTrack}`}><small>Premie rund</small><strong>{inventory.roundTrack}</strong></span>
       </div>
     </div>
     <div className="sg-first-token">{game.firstCenterTaken
@@ -128,12 +124,11 @@ export function PenaltyTrack({ game }: { game: GameState }) {
     <div className="sg-panel-title"><span>STŁUCZONE SZKŁO</span><small>tor kar</small></div>
     <div className="sg-track-cells" role="group" aria-label="Dziewięć pól toru stłuczonego szkła">{BROKEN_TRACK.map((value, i) =>
       <div key={i} className={`sg-track-step${i === 8 ? ' sg-track-last' : ''}${game.players.some(p => p.brokenSteps === i) ? ' sg-track-occupied' : ''}`}
-        title={`Pole ${i} z 8, kara ${value} pkt`}>
+        title={`Pole ${i} z 8, kara ${value} pkt; ${game.players.filter(p => p.brokenSteps === i).map(p => p.name).join(', ') || 'puste'}`}>
         <span className="sg-track-step-number">{i === 0 ? 'START' : String(i).padStart(2, '0')}</span>
         <strong>{value === 0 ? '0' : `−${value}`}</strong>
         <div className="sg-track-pawns">{game.players.map(p => p.brokenSteps === i && <i key={p.id} className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`} title={`${p.name}: pole ${i}`}/>)}</div>
       </div>)}</div>
-    <div className="sg-track-legend" aria-label="Kolory pionków">{game.players.map(p => <span key={p.id}><i className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`}/><span>{p.name}</span></span>)}</div>
   </section>
 }
 
