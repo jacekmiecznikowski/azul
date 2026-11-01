@@ -381,7 +381,14 @@ export default function App() {
     <header className="sg-header">
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span><small>WITRAŻE SINTRY · EDYCJA CYFROWA</small></div>
       <div className="sg-header-round"><span>RUNDA</span><strong>{game.round} <small>/ 6</small></strong><div className="sg-round-colors">{game.roundColors.map((c, i) =>
-        <i key={i} title={`Runda ${i + 1}: ${COLORS_PL[c]}`} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : i + 1 < game.round ? ' sg-color-past' : ''}`}/>)}</div></div>
+        <i key={i} title={`Runda ${i + 1}: ${COLORS_PL[c]}`} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : i + 1 < game.round ? ' sg-color-past' : ''}`}/>)}</div><div className="sg-round-mobile-colors" role="group" aria-label="Kolory punktowane w rundach od 1 do 6">
+          {game.roundColors.map((c, i) =>
+            <span key={i} className={`sg-round-mobile-color${i + 1 === game.round ? ' sg-round-mobile-color-active' : i + 1 < game.round ? ' sg-round-mobile-color-past' : ''}`}
+              title={`Runda ${i + 1}: ${COLORS_PL[c]}`}
+              aria-label={`Runda ${i + 1}, ${COLORS_PL[c]}`}>
+              <small>{i + 1}</small><i className={`sg-color-dot sg-color-dot-${c}`}/>
+            </span>)}
+        </div></div>
       <div className="sg-header-actions">
         <GameMenu effectsEnabled={effectsEnabled} reducedMotion={reducedMotion} toggleEffects={toggleEffects}
           musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}
@@ -411,9 +418,9 @@ export default function App() {
           className={`sg-mobile-player sg-palace-${p.palaceColor ?? 'red'}${mobileBoardIndex === i ? ' sg-mobile-player-selected' : ''}`}
           aria-pressed={mobileBoardIndex === i}
           onClick={() => setMobileBoard(i)}>
+          <span className="sg-mobile-palace-chip" aria-hidden="true" title={`Pałac: ${p.palaceColor ?? 'red'}`}/>
           <span className="sg-mobile-player-name">{p.name}</span>
           <strong>{p.score} pkt</strong>
-          <small className="sg-mobile-broken">Szkło: {p.brokenSteps}/8</small>
           {game.currentPlayer === i && game.phase === 'playing' && <i className="sg-mobile-now" aria-label="Aktualna tura"/>}
         </button>)}
         <button type="button" className="sg-mobile-panel-button" onClick={() => setMobilePanel('score')}>Wyniki</button>

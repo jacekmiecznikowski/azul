@@ -578,3 +578,11 @@ Przy aktualizacji webowej wersji gry w istniejącym katalogu Android można wyko
 - Przy każdym graczu widoczna liczba stłuczeń; pod warsztatami zawsze widoczny 9-polowy tor kar.
 - Muzyka na ekranach dotykowych jest przyciszona (0,12 zamiast 0,20), efekty akcji są podgłośnione (0,095 zamiast 0,035), a fanfara końca gry ma głośność 0,78. Desktop zachowuje dotychczasowe poziomy.
 - W APK Android ukryty jest górny pasek statusu systemu, przy zachowaniu dolnej belki gestów i obszaru aparatu. Weryfikacja na konkretnych urządzeniach jest nadal konieczna.
+
+
+### Android v27 — szlify po zdjęciu z telefonu
+- Widoczne sześć kolorów rund, kolejność i aktywna runda (1–6) na górnym pasku.
+- Każda zakładka gracza ma kropkę w kolorze pałacu, imię i wynik; zbędna liczba stłuczeń jest usunięta (pozostaje na widocznym torze).
+- Żeton pierwszego gracza jest zmniejszony i przeniesiony na krawędź środka, zamiast zasłaniać szkło.
+- Android wypełnia obszar przy wycięciu aparatu; interaktywne elementy respektują dostępne insets (wymaga potwierdzenia na telefonie).
+- Kompilacja Actions udostępnia artefakt `SintraGlass-Android-v27`.

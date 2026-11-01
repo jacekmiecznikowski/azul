@@ -27,6 +27,14 @@ const immersiveActivity = activity.replace(
         android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN,
         android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN
       );
+      // Landscape display cutouts otherwise reserve a blank vertical strip.
+      // Extend the background behind the cutout; CSS uses safe-area insets for controls.
+      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+        android.view.WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.layoutInDisplayCutoutMode =
+          android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        getWindow().setAttributes(params);
+      }
     }`,
 )
 await writeFile(activityPath, immersiveActivity, 'utf8')

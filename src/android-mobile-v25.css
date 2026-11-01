@@ -264,3 +264,73 @@
   .sg .sg-hotseat-setup>p:not(.sg-hotseat-hint){display:none}
   .sg .sg-hotseat-setup .sg-hotseat-player-fields{grid-template-columns:50px 92px minmax(0,1fr)}
 }
+
+/* v27: always-visible future round bonuses, palace colors, compact token */
+.sg-round-mobile-colors {display:none}
+@media (max-width:1100px) and (pointer:coarse) and (orientation:landscape) {
+  /* The full row remains legible without zooming or covering adjacent actions. */
+  .sg .sg-header {gap:7px;padding-left:max(6px,env(safe-area-inset-left));padding-right:max(6px,env(safe-area-inset-right))}
+  .sg .sg-brand {font-size:11px;letter-spacing:.65px;min-width:0}
+  .sg .sg-header-round {gap:6px;padding:3px 7px;max-width:100%;min-width:0}
+  .sg .sg-header-round > strong {white-space:nowrap;font-size:15px}
+  .sg .sg-header-round .sg-round-colors {display:none}
+  .sg .sg-round-mobile-colors {
+    display:flex;align-items:center;justify-content:center;gap:3px;
+    min-height:31px;max-width:100%;
+    padding-left:6px;border-left:1px solid #6b918c70;
+  }
+  .sg .sg-round-mobile-color {
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;width:19px;min-width:19px;height:31px;padding:2px 1px;
+    border-radius:5px;border:1px solid transparent;opacity:.85;
+  }
+  .sg .sg-round-mobile-color small {font-size:8px;font-weight:800;line-height:9px;color:#a9cbca}
+  .sg .sg-round-mobile-color .sg-color-dot {
+    display:block;width:9px;height:9px;min-width:9px;min-height:9px;
+    transform:rotate(45deg);scale:1;box-shadow:0 0 4px #0009;
+  }
+  .sg .sg-round-mobile-color-active {
+    opacity:1;border-color:#ecd69c;
+    background:#69593d55;box-shadow:inset 0 0 0 1px #e5c98a44
+  }
+  .sg .sg-round-mobile-color-active small{color:#ffe3a2}
+  .sg .sg-round-mobile-color-active .sg-color-dot{
+    outline:1px solid #ffdf9b;outline-offset:1px;box-shadow:0 0 6px #e5cc83a8
+  }
+  .sg .sg-round-mobile-color-past{opacity:.4;filter:saturate(.65)}
+  /* The penalty track already carries glass-loss details; tabs only show identity and score. */
+  .sg .sg-mobile-players {flex-basis:32px;min-height:32px;gap:4px}
+  .sg .sg-mobile-player {
+    display:grid;grid-template-columns:12px minmax(0,1fr) auto;
+    grid-template-rows:1fr;align-items:center;justify-items:start;
+    column-gap:5px;padding:2px 7px;min-width:0
+  }
+  .sg .sg-mobile-palace-chip {
+    grid-column:1;grid-row:1;
+    display:block;width:11px;height:11px;border-radius:50%;
+    background:var(--sg-player-accent,#d7e2e8);
+    border:1px solid #ffffffe3;
+    box-shadow:0 0 0 2px color-mix(in srgb,var(--sg-player-accent),transparent 70%);
+  }
+  .sg .sg-mobile-player-name{grid-column:2;grid-row:1;font-size:11px}
+  .sg .sg-mobile-player strong{grid-column:3;grid-row:1;font-size:10px;justify-self:end}
+  .sg .sg-mobile-now {top:1px;right:1px;left:auto;height:5px;width:5px}
+  .sg .sg-mobile-player-selected{box-shadow:inset 0 0 0 1px #dfd09844,0 0 5px #e5c87d40}
+  .sg .sg-mobile-panel-button {font-size:10px;padding:0 8px}
+  /* The first-player token must not hide panes in the central glass selection area. */
+  .sg .sg-mobile-market .sg-center-pile > .sg-start-tile.sg-start-on-market {
+    width:18px;height:18px;min-width:18px;min-height:18px;
+    top:-7px;right:-6px;left:auto;bottom:auto;
+    border-width:1px;outline-width:1px;border-radius:4px;
+    font-size:11px;line-height:1;z-index:4;
+    box-shadow:0 2px 4px #051821a8,inset 0 0 0 1px #ffffff8c;
+  }
+  .sg-mobile-layout {padding-left:max(3px,env(safe-area-inset-left));padding-right:max(3px,env(safe-area-inset-right))}
+}
+@media (max-width:700px) and (pointer:coarse) and (orientation:landscape) {
+  .sg .sg-brand{font-size:10px}
+  .sg .sg-header-round {gap:3px;padding:2px 4px}
+  .sg .sg-round-mobile-colors{gap:1px;padding-left:3px}
+  .sg .sg-round-mobile-color{width:15px;min-width:15px}
+  .sg .sg-header-actions .sg-new {min-width:69px;padding:0 6px;font-size:10px}
+}
