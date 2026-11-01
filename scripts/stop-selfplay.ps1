@@ -1,11 +1,14 @@
-# Request a graceful stop. The Node process saves the checkpoint at the next completed batch.
+# ASCII-only for Windows PowerShell 5.1 (UTF-8 without BOM is unsafe).
+# Request a graceful stop; the Node process finishes its current training batch.
+$ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $folder = Join-Path $root 'reports\selfplay'
-if (!(Test-Path (Join-Path $folder 'process.pid'))) {
+$pidFile = Join-Path $folder 'process.pid'
+if (!(Test-Path $pidFile)) {
   Write-Host 'Trening w tle nie jest uruchomiony.'
   exit 0
 }
 Set-Content -Path (Join-Path $folder 'stop.flag') -Value 'stop' -Encoding ascii
-Write-Host 'Wysłano polecenie bezpiecznego zatrzymania.'
-Write-Host 'Proces zapisze checkpoint po aktualnej partii, a potem się zakończy.'
-Write-Host 'Sprawdź postęp: npm.cmd run learn:status'
+Write-Host 'Wyslano sygnal bezpiecznego zatrzymania.'
+Write-Host 'Trening zapisze checkpoint po aktualnej partii i zakonczy prace.'
+Write-Host 'Sprawdz: npm.cmd run learn:status'
