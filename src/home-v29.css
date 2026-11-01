@@ -84,3 +84,26 @@
  .sg-home-guide{padding:0}
  .sg-home-footer{display:none}
 }
+
+/* v30: the physical table is fitted as ONE entire 1700 × 1000 canvas.
+   Never let the left/right rotated player boards overflow the viewport. */
+@media (min-width:1361px) and (min-height:781px) {
+  .sg .sg-responsive-stage {
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    overflow:hidden;
+    padding:10px 8px 10px;
+  }
+  .sg .sg-responsive-stage > .sg-felt {
+    flex:none;
+    margin:0;
+    max-width:none;
+    box-sizing:border-box;
+  }
+}
+/* Browsers and resizable Windows EXE switch to the complete-board compact
+   view when the height/width cannot preserve four readable physical seats. */
+@media (max-width:1360px), (max-height:780px) {
+  .sg .sg-responsive-stage{display:none!important}
+}

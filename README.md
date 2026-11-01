@@ -612,3 +612,14 @@ automatycznie wyświetlany jest sprawdzony układ kompaktowy także na PC.
 Wszystkie testy i buildy trzech wersji trzeba sprawdzać po zmianach wspólnego UI.
 
 APK v29: <https://github.com/jacekmiecznikowski/azul/releases/tag/android-v29-preview> (publiczny prerelease, bez logowania).
+
+
+## v30 — poprawka regresji laptop/2K/4K
+
+Błąd w v29 wynikał z tego, że skala stołu nie mogła spadać poniżej 1.0,
+a jego wysokość potrafiła przekroczyć realną wysokość viewportu.
+W v30 cały układ stołu ma stabilne wymiary logiczne 1700 × 1000 px,
+z identycznymi planszami (900 px długości) i skalą obliczaną z obu wymiarów ekranu.
+Przy typowym laptopie 1650×930 CSS px plansza powinna zmieścić się w całości.
+Szerokość do 1360px lub wysokość do 780px włącza kompletny widok kompaktowy
+na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian.

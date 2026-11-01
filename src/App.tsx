@@ -417,7 +417,7 @@ export default function App() {
         </button>
       </div>
     </header>
-    <main className="sg-stage" aria-label="Wspólny stół Sintra Glass">
+    <main className="sg-stage sg-responsive-stage" aria-label="Wspólny stół Sintra Glass">
       <div className="sg-felt" style={{ zoom: desktopTable.scale, width: desktopTable.width, minWidth: desktopTable.width, height: desktopTable.height, '--sg-long': `${desktopTable.boardLong}px` } as React.CSSProperties}>
         {tableSeats.filter(seatInfo => seatInfo.place !== 'south').map(seatInfo => seat(seatInfo.playerIndex, seatInfo.place))}
         <div className="sg-center">
