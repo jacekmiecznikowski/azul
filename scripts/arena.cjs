@@ -68,7 +68,8 @@ function paired({ games, seed, players, candidate, incumbent, rival = 'hard', ve
   const candidateRows = [], incumbentRows = [], marginDiff = [], winDiff = []
   for (let k = 0; k < games; k++) {
     const gameSeed = seed + k * 197
-    const side = k % 2 ? 'B' : 'A'
+    // Balance palace side independently of the player's seat.
+    const side = Math.floor(k / players) % 2 ? 'B' : 'A'
     const seat = k % players
     const actualRival = rival === 'mixed' ? ['hard','incumbent','expert'][k % 3] : rival
     const agents = Array(players).fill(actualRival)
@@ -92,7 +93,8 @@ function paired({ games, seed, players, candidate, incumbent, rival = 'hard', ve
 function headToHead({ games, seed, candidate, incumbent }) {
   const results = [], baseline = []
   for (let i = 0; i < games; i++) {
-    const side = i % 2 ? 'B' : 'A'
+    // Test each palace face from both seats.
+    const side = Math.floor(i / 2) % 2 ? 'B' : 'A'
     const slot = i % 2
     const a = ['incumbent', 'incumbent']
     a[slot] = 'candidate'
