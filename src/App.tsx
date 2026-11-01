@@ -38,6 +38,7 @@ import './home-v29.css'
 import './ui-refinement-v32.css'
 import './ui-refinement-v33.css'
 import './ui-refinement-v34.css'
+import './ui-refinement-v36.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }

@@ -663,3 +663,11 @@ na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian
 ### v35 — finalny szlif licznika rund
 
 - Usunięto redundantny blok „PREMIA TERAZ” z nazwaną barwą. Informacja o aktualnie punktowanym szkle nadal wynika z obwódki aktywnego kafelka oraz opisów dostępności (aria-label/title). Bez zmian zasad gry i mechaniki tafli.
+
+
+### v36 — równowaga warsztatów i toru kar w wysokim układzie kompaktowym
+
+- Na wąskim, ale wysokim oknie poziomym (CSS: do 1100 px szerokości, co najmniej 700 px wysokości) przywrócono właściwe proporcje dwóch sekcji po prawej: warsztaty zajmują dostępną górną część, a tor stłuczeń dostaje osobny panel 3×3 o wysokości zależnej od viewportu.
+- Wszystkie pola kar START, −1, −2, −4, −6, −8, −11, −14, −18 są czytelne i pokazują kolorowe znaczniki graczy; kliknięcie nadal otwiera wyniki.
+- Zwiększono czytelność tafli i środkowego okręgu warsztatów tam, gdzie jest miejsce.
+- Układ wieloosobowego pełnego stołu na desktopie, dotychczasowy układ telefonu w poziomie (niski viewport) i pionowy pozostawiono bez zmian. Silnik gry i pula 100 szkieł bez zmian.
