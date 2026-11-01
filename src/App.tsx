@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, BookOpen, Check, Gem, Info, RotateCcw, Settings2, X } from 'lucide-react'
+import { ArrowRight, BookOpen, Check, Gem, House, Info, RotateCcw, Settings2, X } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, standings } from './game/engine'
 import type { Controller, Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
@@ -16,6 +16,9 @@ import { useAmbientMusic } from './hooks/useAmbientMusic'
 import { GameBoard, GlassPiece } from './components/GameBoard'
 import { ManualPlacementDialog } from './components/ManualPlacementDialog'
 import { GameMenu } from './components/GameMenu'
+import { HomeScreen } from './components/HomeScreen'
+import { RoundTracker } from './components/RoundTracker'
+import { desktopTableMetrics } from './ui/responsiveTable'
 import './match.css'
 import './redesign.css'
 import './center-v9.css'
@@ -30,6 +33,12 @@ import './ornaments-v20.css'
 import './finish-v21.css'
 import './hotseat-v23.css'
 import './polish-v24.css'
+import './android-mobile-v25.css'
+import './home-v29.css'
+import './ui-refinement-v32.css'
+import './ui-refinement-v33.css'
+import './ui-refinement-v34.css'
+import './ui-refinement-v36.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
@@ -74,14 +83,14 @@ function Factory({ tiles, index, count, selected, disabled, onPick }: {
     </div>
   </div>
 }
-function Market({ game, selection, disabled, onPick }: {
+export function Market({ game, selection, disabled, onPick }: {
   game: GameState; selection: Selection | null; disabled: boolean;
   onPick: (source: Source, color: GlassColor) => void
 }) {
   const center = COLORS.map(color => ({ color, count: game.center.filter(x => x === color).length })).filter(item => item.count > 0)
   const inventory = glassInventory(game)
   return <section className="sg-market sg-center-card" aria-label="Warsztaty szkła">
-    <div className="sg-panel-title"><span>WARSZTATY SZKŁA</span><small>{game.factories.filter(f => f.length).length} aktywnych</small></div>
+    <div className="sg-panel-title"><span>WARSZTATY SZKŁA</span><span className="sg-market-title-meta"><small>{game.factories.filter(f => f.length).length} aktywnych</small>{!game.firstCenterTaken && <span className="sg-start-tile sg-market-first-badge" aria-label="Żeton pierwszego gracza jest na środku stołu" title="Żeton pierwszego gracza jest na środku stołu">1</span>}</span></div>
     <div className="sg-market-circle">
       <div className="sg-market-ring"/>
       {game.factories.map((tiles, i) => <Factory key={i} tiles={tiles} index={i} count={game.factories.length} selected={selection} disabled={disabled} onPick={onPick}/>)}
@@ -92,30 +101,19 @@ function Market({ game, selection, disabled, onPick }: {
             className={`sg-center-choice${selection?.source.type === 'center' && selection.color === color ? ' sg-token-selected' : ''}`}>
             <GlassPiece color={color} small/><b>{count}</b>
           </button>) : <span className="sg-center-quiet">✧</span>}</div>
-        {!game.firstCenterTaken && <span className="sg-start-tile sg-start-on-market" title="Żeton pierwszego gracza — pierwszy pobór ze środka oznacza +1 stłuczenie">1</span>}
         {!game.firstCenterTaken && <small className="sg-center-penalty">+1 stłuczenie</small>}
       </div>
     </div>
-    <div className="sg-inventory" aria-label={`Bilans tafli szkła: ${inventory.total} ze 100`}>
-      <div className="sg-inventory-tower" title={`Szklana Wieża: ${inventory.tower} tafli`}>
-        <svg viewBox="0 0 34 42" role="img" aria-label="Szklana Wieża" fill="none">
-          <path d="M9 4 L25 4 L29 35 L25 39 L9 39 L5 35 Z" fill="#2b7180" fillOpacity=".28" stroke="#9dc6c5" strokeWidth="1.4"/>
-          <path d="M11 8 L23 8 L26 33 L22 36 L12 36 L8 33 Z" fill="#72c4d7" fillOpacity=".13" stroke="#9ad3db" strokeOpacity=".45"/>
-          <path d="M9 14 L24 14 M8 23 L26 23 M10 32 L24 32" stroke="#ddf1e8" strokeOpacity=".35"/>
-          <path d="M13 6 L11 32" stroke="#f3ffff" strokeOpacity=".55" strokeWidth="2"/>
-          <path d="M6 38 L28 38" stroke="#e1b578" strokeWidth="2.2"/>
-        </svg>
-        <span>WIEŻA</span>
-      </div>
-      <div className="sg-inventory-stats">
-        <span title={`Warsztaty: ${inventory.factories}, środek: ${inventory.center}`}><small>Na stole</small><b>{inventory.table}</b></span>
-        <span><small>Witraże</small><b>{inventory.playerBoards}</b></span>
-        <span><small>Woreczek</small><b>{inventory.bag}</b></span>
-        <span className="sg-inventory-highlight"><small>W wieży</small><b>{inventory.tower}</b></span>
-        <span><small>Rundy</small><b>{inventory.roundTrack}</b></span>
-      </div>
-      <div className={`sg-inventory-total${inventory.total !== 100 ? ' sg-inventory-warning' : ''}`} title="Razem: 100 tafli szkła">
-        <strong>{inventory.total}<small> / 100</small></strong><span>SUMA</span>
+    <div className="sg-inventory sg-inventory-v33 sg-inventory-v34" role="group" aria-label={`Zasoby szkła: wieża ${inventory.tower}; warsztaty i środek ${inventory.table}; witraże ${inventory.playerBoards}; szkła premii ${inventory.roundTrack}; woreczek ${inventory.bag}. Razem ${inventory.total} tafli.`}>
+      <div className="sg-stock-ledger">
+        <span className="sg-stock-place sg-stock-tower" title={`Tafle w wieży: ${inventory.tower}`}>
+          <svg viewBox="0 0 21 29" fill="none" aria-hidden="true"><path d="M7 2H14L18 23L14 27H7L3 23Z" fill="#174451" stroke="#d1c394" strokeWidth="1.4"/><path d="M8 5H13L15 22L12 24H9L6 22Z" fill="#5ac9dc" fillOpacity=".38" stroke="#a7e5e4" strokeWidth=".6"/><path d="M8 6L6.5 21" stroke="#e6ffff" strokeOpacity=".75" strokeWidth="1.4"/><path d="M5 24H16" stroke="#e5c98e" strokeWidth="1.4"/></svg>
+          <small>Wieża</small><strong>{inventory.tower}</strong>
+        </span>
+        <span className="sg-stock-place" title={`Warsztaty i środek stołu: ${inventory.table}`}><small>Warsztat</small><strong>{inventory.table}</strong></span>
+        <span className="sg-stock-place" title={`Tafle w witrażach: ${inventory.playerBoards}`}><small>Witraże</small><strong>{inventory.playerBoards}</strong></span>
+        <span className="sg-stock-place sg-stock-rounds" title={`Szkła niezużytych premii rund: ${inventory.roundTrack}`}><small>Szkła premii</small><strong>{inventory.roundTrack}</strong></span>
+        <span className="sg-stock-place" title={`Tafle w woreczku: ${inventory.bag}`}><small>Woreczek</small><strong>{inventory.bag}</strong></span>
       </div>
     </div>
     <div className="sg-first-token">{game.firstCenterTaken
@@ -124,23 +122,23 @@ function Market({ game, selection, disabled, onPick }: {
   </section>
 }
 
-function PenaltyTrack({ game }: { game: GameState }) {
+export function PenaltyTrack({ game }: { game: GameState }) {
   return <section className="sg-track sg-center-card" aria-label="Tor stłuczonego szkła">
-    <div className="sg-panel-title"><span>STŁUCZONE SZKŁO</span><small>tor kar</small></div>
-    <div className="sg-track-cells">{BROKEN_TRACK.map((value, i) =>
-      <div key={i} className={`sg-track-step${i === 8 ? ' sg-track-last' : ''}`}>
-        <span>{i === 0 ? 'START' : i}</span>
+    <div className="sg-panel-title"><span>STŁUCZONE SZKŁO</span></div>
+    <div className="sg-track-cells" role="group" aria-label="Dziewięć pól toru stłuczonego szkła">{BROKEN_TRACK.map((value, i) =>
+      <div key={i} className={`sg-track-step${i === 8 ? ' sg-track-last' : ''}${game.players.some(p => p.brokenSteps === i) ? ' sg-track-occupied' : ''}`}
+        title={`Pole ${i} z 8, kara ${value} pkt; ${game.players.filter(p => p.brokenSteps === i).map(p => p.name).join(', ') || 'puste'}`}>
+        <span className="sg-track-step-number">{i === 0 ? 'START' : String(i).padStart(2, '0')}</span>
         <strong>{value === 0 ? '0' : `−${value}`}</strong>
-        <div className="sg-track-pawns">{game.players.map(p => p.brokenSteps === i && <i key={p.id} className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`} title={`${p.name}: ${i}/8`}/>)}</div>
+        <div className="sg-track-pawns">{game.players.map(p => p.brokenSteps === i && <i key={p.id} className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`} title={`${p.name}: pole ${i}`}/>)}</div>
       </div>)}</div>
-    <div className="sg-track-legend">{game.players.map(p => <span key={p.id}><i className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`}/>{p.name} <b>{p.brokenSteps}/8</b></span>)}</div>
   </section>
 }
 
 export function TurnSummary({ game }: { game: GameState }) {
   const current = game.players[game.currentPlayer]
   return <section className="sg-turn sg-center-card" aria-label="Tura i wyniki">
-    <div className="sg-panel-title"><span>PRZY STOLE</span><span className="sg-live-dot"/></div>
+    <div className="sg-panel-title"><span>PRZY STOLE</span></div>
     <div className="sg-turn-player"><span className={`sg-player-icon sg-palace-icon-${current.palaceColor ?? 'red'}`}>{PLAYER_AVATARS[game.currentPlayer]}</span>
       <div><strong>{game.phase === 'finished' ? 'Koniec rozgrywki' : current.controller === 'human' ? (current.name === 'Ty' ? 'Twój ruch' : `Tura: ${current.name}`) : `Gra ${current.name}`}</strong>
       <small>{game.phase === 'finished' ? 'Zobacz końcowe wyniki' : current.controller === 'human' ? 'Wybierz tafle i kwaterę' : 'Przeciwnik rozważa ruch…'}</small></div>
@@ -253,18 +251,25 @@ export default function App() {
   const [selection, setSelection] = useState<Selection | null>(null)
   const [finishing, setFinishing] = useState<Move[] | null>(null)
   const [placementOptions, setPlacementOptions] = useState<Move[] | null>(null)
+  const [screen, setScreen] = useState<'home' | 'game'>('home')
+  const [hasSave, setHasSave] = useState(() => restore() !== null)
+  const [viewport, setViewport] = useState(() => typeof window === 'undefined' ? { width: 1600, height: 900 } : { width: window.innerWidth, height: window.innerHeight })
   const [showSetup, setShowSetup] = useState(false)
   const [showRules, setShowRules] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [showStrategy, setShowStrategy] = useState(false)
+  const [mobileBoard, setMobileBoard] = useState<number | null>(null)
+  const [mobilePanel, setMobilePanel] = useState<'score' | 'history' | null>(null)
   const [lastHumanIndex, setLastHumanIndex] = useState(() =>
     game.players[game.currentPlayer]?.controller === 'human' ? game.currentPlayer : 0)
   const { enabled: soundEnabled, toggle: toggleSound, play } = useGameAudio()
   const { enabled: musicEnabled, toggle: toggleMusic, unavailable: musicUnavailable } = useAmbientMusic()
   const { enabled: effectsEnabled, toggle: toggleEffects, emit: emitEffects, clear: clearEffects, bursts: visualBursts, reducedMotion } = useVisualEffects()
-  const humanTurn = game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
+  const humanTurn = screen === 'game' && game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
+  const desktopTable = useMemo(() => desktopTableMetrics(viewport.width, viewport.height), [viewport.width, viewport.height])
   const viewerIndex = viewingPlayerIndex(game.currentPlayer, lastHumanIndex, game.players.map(p => p.controller))
   const tableSeats = useMemo(() => seatsForViewer(viewerIndex, game.players.length), [viewerIndex, game.players.length])
+  const mobileBoardIndex = mobileBoard !== null && mobileBoard < game.players.length ? mobileBoard : viewerIndex
   const moves = useMemo(() => legalMoves(game), [game])
   const sourceOptions = useMemo(() => availableSources(game), [game])
   const selectionMoves = useMemo(() => selection ? moves.filter(m => m.kind === 'take' &&
@@ -280,14 +285,22 @@ export default function App() {
     : humanTurn ? `${current.name === 'Ty' ? 'Twój ruch' : `Ruch gracza ${current.name}`}: wybierz tafle z warsztatu lub środka stołu.`
     : `${current.name} wybiera ruch…`
 
-  useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(game)) }, [game])
+  useEffect(() => {
+    const onResize = () => setViewport({ width: window.innerWidth, height: window.innerHeight })
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+  useEffect(() => {
+    if (screen !== 'game') return
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(game)) } catch { /* private storage */ }
+  }, [game, screen])
   useEffect(() => {
     if (game.phase === 'playing' && game.players[game.currentPlayer]?.controller === 'human') {
       setLastHumanIndex(game.currentPlayer)
     }
   }, [game.currentPlayer, game.phase, game.players])
   useEffect(() => {
-    if (game.phase !== 'playing' || game.players[game.currentPlayer].controller !== 'ai' || finishing) return
+    if (screen !== 'game' || game.phase !== 'playing' || game.players[game.currentPlayer].controller !== 'ai' || finishing) return
     const difficulty = game.players[game.currentPlayer].difficulty ?? 'normal'
     const base = difficulty === 'easy' ? 1100 : difficulty === 'normal' ? 1500 : difficulty === 'expert' ? 2200 : difficulty === 'master' ? 2250 : 1900
     const delay = base + Math.round(Math.random() * 450)
@@ -301,7 +314,7 @@ export default function App() {
       }
     }, delay)
     return () => window.clearTimeout(timer)
-  }, [game, finishing, play, emitEffects])
+  }, [game, screen, finishing, play, emitEffects])
   useEffect(() => { if (!humanTurn) { setSelection(null); setFinishing(null); setPlacementOptions(null) } }, [humanTurn])
 
   function commit(move: Move) {
@@ -352,6 +365,10 @@ export default function App() {
       playerNames: options.names,
     }))
     setLastHumanIndex(0)
+    setScreen('game')
+    setHasSave(true)
+    setMobileBoard(null)
+    setMobilePanel(null)
     play('round')
     setSelection(null); setFinishing(null); setPlacementOptions(null); setShowSetup(false); setShowResults(false)
   }
@@ -371,23 +388,23 @@ export default function App() {
     </div>
   }
 
-  return <div className="sg">
+  return <div className={`sg${screen === "home" ? " sg-in-home" : ""}`}>
     <header className="sg-header">
-      <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span><small>WITRAŻE SINTRY · EDYCJA CYFROWA</small></div>
-      <div className="sg-header-round"><span>RUNDA</span><strong>{game.round} <small>/ 6</small></strong><div className="sg-round-colors">{game.roundColors.map((c, i) =>
-        <i key={i} title={`Runda ${i + 1}: ${COLORS_PL[c]}`} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : i + 1 < game.round ? ' sg-color-past' : ''}`}/>)}</div></div>
+      <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span></div>
+      <RoundTracker round={game.round} colors={game.roundColors}/>
       <div className="sg-header-actions">
         <GameMenu effectsEnabled={effectsEnabled} reducedMotion={reducedMotion} toggleEffects={toggleEffects}
           musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}
           soundEnabled={soundEnabled} toggleSound={toggleSound}
           openStrategy={() => setShowStrategy(true)} openRules={() => setShowRules(true)}/>
+        <button type="button" className="sg-home-return" onClick={() => { clearEffects(); setScreen('home'); setSelection(null); setFinishing(null); setPlacementOptions(null); setMobilePanel(null) }} aria-label="Menu główne" title="Menu główne"><House size={16}/><span>Główne</span></button>
         <button type="button" className="sg-new" onClick={() => setShowSetup(true)}>
           <RotateCcw size={16}/> Nowa gra
         </button>
       </div>
     </header>
-    <main className="sg-stage" aria-label="Wspólny stół Sintra Glass">
-      <div className="sg-felt">
+    <main className="sg-stage sg-responsive-stage" aria-label="Wspólny stół Sintra Glass">
+      <div className="sg-felt" style={{ zoom: desktopTable.scale, width: desktopTable.width, minWidth: desktopTable.width, height: desktopTable.height, '--sg-long': `${desktopTable.boardLong}px` } as React.CSSProperties}>
         {tableSeats.filter(seatInfo => seatInfo.place !== 'south').map(seatInfo => seat(seatInfo.playerIndex, seatInfo.place))}
         <div className="sg-center">
           <div className="sg-side-left"><TurnSummary game={game}/><PenaltyTrack game={game}/></div>
@@ -399,9 +416,87 @@ export default function App() {
         {tableSeats.filter(seatInfo => seatInfo.place === 'south').map(seatInfo => seat(seatInfo.playerIndex, seatInfo.place))}
       </div>
     </main>
-    <GlassVisualEffects bursts={visualBursts}/>
-    {finishOverlay.banner && <FinishCelebration state={game} onResults={() => setShowResults(true)} onNewGame={() => setShowSetup(true)}/>}
-    {finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
+    <div className="sg-mobile-layout" aria-label="Mobilny stół Sintra Glass">
+      <nav className="sg-mobile-players" aria-label="Wybierz planszę gracza">
+        {game.players.map((p,i) => <button type="button" key={p.id}
+          className={`sg-mobile-player sg-palace-${p.palaceColor ?? 'red'}${mobileBoardIndex === i ? ' sg-mobile-player-selected' : ''}`}
+          aria-pressed={mobileBoardIndex === i}
+          onClick={() => setMobileBoard(i)}>
+          <span className="sg-mobile-palace-chip" aria-hidden="true" title={`Pałac: ${p.palaceColor ?? 'red'}`}/>
+          <span className="sg-mobile-player-name">{p.name}</span>
+          <strong>{p.score} pkt</strong>
+          {game.currentPlayer === i && game.phase === 'playing' && <i className="sg-mobile-now" aria-label="Aktualna tura"/>}
+        </button>)}
+        <button type="button" className="sg-mobile-panel-button" onClick={() => setMobilePanel('score')}>Wyniki</button>
+        <button type="button" className="sg-mobile-panel-button" onClick={() => setMobilePanel('history')}>Historia</button>
+      </nav>
+      <div className="sg-mobile-game">
+        <div className="sg-mobile-board">
+          {game.players[mobileBoardIndex] && <GameBoard
+            player={game.players[mobileBoardIndex]} index={mobileBoardIndex}
+            isCurrent={game.currentPlayer === mobileBoardIndex && game.phase === 'playing'}
+            isHuman={game.players[mobileBoardIndex].controller === 'human'}
+            isHumanTurn={humanTurn && game.currentPlayer === mobileBoardIndex}
+            selected={!!selection && humanTurn && game.currentPlayer === mobileBoardIndex}
+            targets={humanTurn && game.currentPlayer === mobileBoardIndex ? targets : undefined}
+            onTarget={humanTurn && game.currentPlayer === mobileBoardIndex ? chooseTarget : undefined}
+            canReset={canReset && !finishing && game.currentPlayer === mobileBoardIndex}
+            onReset={() => commit({kind:'reset'})}
+            isStartingPlayer={game.startingPlayer === mobileBoardIndex}
+            palaceSide={game.palaceSide}
+            hasFirstToken={game.firstCenterTaken && game.nextStartingPlayer === mobileBoardIndex}/>}
+        </div>
+        <div className="sg-mobile-market">
+          <Market game={game} selection={selection} disabled={!humanTurn || !!finishing} onPick={chooseSource}/>
+          <div className="sg-mobile-penalty-strip" role="group" aria-label="Tor stłuczonego szkła — naciśnij pole, aby zobaczyć wyniki">
+            <span className="sg-mobile-penalty-label">STŁUCZONE SZKŁO</span>
+            {BROKEN_TRACK.map((points, i) => <button type="button" key={i}
+              title={`Pole ${i} z 8 · kara ${points} pkt`}
+              aria-label={`Tor szkła, pole ${i} z 8, kara ${points} punktów`}
+              onClick={() => setMobilePanel('score')}
+              className={`sg-mobile-penalty-step${i === 8 ? ' sg-mobile-penalty-final' : ''}${game.players.some(p => p.brokenSteps === i) ? ' sg-mobile-penalty-occupied' : ''}`}>
+              <small>{i === 0 ? 'START' : i}</small>
+              <strong>{i === 0 ? '0' : `−${points}`}</strong>
+              <span className="sg-mobile-penalty-pawns">
+                {game.players.map(p => p.brokenSteps === i ? <i key={p.id} className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`} title={p.name}/> : null)}
+              </span>
+            </button>)}
+          </div>
+          <div className="sg-mobile-status" aria-live="polite">
+            <span>{selection ? `Wskaż kwaterę — ${COLORS_PL[selection.color].toLowerCase()}` : humanTurn ? `Ruch: ${current.name}` : `${current.name} wybiera ruch…`}</span>
+            {selection && <button type="button" onClick={() => setSelection(null)}>Anuluj</button>}
+            {selection && selectionMoves.some(m => m.kind === 'take' && m.windowIndex === null) &&
+              <button type="button" onClick={() => chooseTarget(null)}>Stłucz</button>}
+            {humanTurn && mobileBoardIndex !== game.currentPlayer &&
+              <button type="button" onClick={() => setMobileBoard(game.currentPlayer)}>Moja tura</button>}
+          </div>
+        </div>
+      </div>
+      {mobilePanel && <div className="sg-mobile-overlay" onMouseDown={() => setMobilePanel(null)}>
+        <div className="sg-mobile-overlay-dialog" role="dialog" aria-modal="true"
+          aria-label={mobilePanel === 'score' ? 'Wyniki i tor szkła' : 'Historia rozgrywki'}
+          onMouseDown={e => e.stopPropagation()}>
+          <div className="sg-mobile-overlay-heading"><strong>{mobilePanel === 'score' ? 'Wyniki i stłuczone szkło' : 'Historia ruchów'}</strong>
+            <button type="button" onClick={() => setMobilePanel(null)}>Zamknij ×</button></div>
+          {mobilePanel === 'score'
+            ? <div className="sg-mobile-stats"><TurnSummary game={game}/><PenaltyTrack game={game}/></div>
+            : <LiveHistory state={game} status={status}
+                onCancel={selection ? () => setSelection(null) : undefined}
+                onDiscard={selection && selectionMoves.some(m => m.kind === 'take' && m.windowIndex === null) ? () => chooseTarget(null) : undefined}/>}
+        </div>
+      </div>}
+    </div>
+    {screen === 'home' && <HomeScreen
+      hasSave={hasSave}
+      onContinue={() => { setScreen('game'); setShowSetup(false) }}
+      onNewGame={() => setShowSetup(true)}
+      onRules={() => setShowRules(true)}
+      effectsEnabled={effectsEnabled} reducedMotion={reducedMotion} toggleEffects={toggleEffects}
+      musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}
+      soundEnabled={soundEnabled} toggleSound={toggleSound}/>} 
+    {screen === 'game' && <GlassVisualEffects bursts={visualBursts}/>}
+    {screen === 'game' && finishOverlay.banner && <FinishCelebration state={game} onResults={() => setShowResults(true)} onNewGame={() => setShowSetup(true)}/>}
+    {screen === 'game' && finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
     {showStrategy && <StrategyLab state={game} onClose={() => setShowStrategy(false)}/>}

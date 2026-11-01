@@ -1,0 +1,75 @@
+name: Android APK (current main, mobile layout)
+
+on:
+  push:
+    branches:
+      - main
+      - fix/android-main-mobile-v25
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.2'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Check Android SDK
+        run: |
+          test -d "$ANDROID_HOME/platforms"
+          find "$ANDROID_HOME/platforms" -maxdepth 1 -name 'android-*' -print
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Run TypeScript, web build, bundled-font verification and tests
+        run: |
+          npm run build
+          npm run portable:verify
+          npm test
+      - name: Create native Android project
+        run: npx cap add android
+      - name: Apply landscape orientation
+        run: node scripts/configure-android-landscape.mjs
+      - name: Copy offline web assets
+        run: npx cap sync android
+      - name: Build debug APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SintraGlass-Android-v36
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish public prerelease APK (no GitHub login required)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/fix/android-main-mobile-v25'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk SintraGlass-Android-v36.apk
+          if gh release view android-v36-preview --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload android-v36-preview SintraGlass-Android-v36.apk --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create android-v36-preview SintraGlass-Android-v36.apk \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "Sintra Glass Android v36 — test" \
+              --notes "Publiczny APK debug do testow na telefonie (bez logowania i bez rozpakowywania)." \
+              --prerelease
+          fi

@@ -540,3 +540,134 @@ Google Fonts. Weryfikacja działa także w GitHub Actions i po lokalnym
 EXE nadal potrzebuje systemowego WebView2, które na komputerze bez niego
 może wymagać jednorazowego doinstalowania. Po zapewnieniu runtime sama gra
 nie wymaga sieci.
+
+## Android — aktualny kod gry, wersja mobilna (v25)
+
+Android jest budowany z najnowszej gałęzi `main`, a **nie z dawnej v7**.
+Capacitor 8 pakuje do APK cały lokalny frontend (również muzykę `background.mp3`,
+`game-over.wav`, fonty i mechanikę AI). Gra działa offline.
+Na telefonach w orientacji poziomej interfejs przełącza się na osobny,
+czytelny układ: pełna plansza wybranego gracza, warsztaty obok,
+przełączanie między graczami oraz panele wyników i historii.
+Duży, czteroosobowy stół desktopowy pozostaje bez zmian.
+
+**Zbudowanie przez GitHub:** Actions → **Android APK (current main, mobile layout)**
+→ uruchom workflow lub pobierz ostatnią udaną kompilację → artefakt
+`SintraGlass-Android-Main-Mobile` → `app-debug.apk`.
+
+**Na Windows (z Android SDK i Java 21):**
+```powershell
+npm.cmd install
+npm.cmd run build
+npx.cmd cap add android
+node scripts/configure-android-landscape.mjs
+npx.cmd cap sync android
+cd android
+.\gradlew.bat assembleDebug
+```
+
+APK debug jest przeznaczony do testów, a nie do publikacji w Google Play.
+Przy aktualizacji webowej wersji gry w istniejącym katalogu Android można wykonać
+`npm run android:sync`, a następnie `gradlew assembleDebug`.
+
+
+### Mobilne dopracowanie v26 (ekran w poziomie)
+
+- Czytelniejsza belka aplikacji: uproszczona informacja o rundzie bez nakładających się znaczników.
+- Konfiguracja nowej gry w dwóch kolumnach i mniejszej wysokości (dla bardzo małych ekranów nadal może być przewijana).
+- Przy każdym graczu widoczna liczba stłuczeń; pod warsztatami zawsze widoczny 9-polowy tor kar.
+- Muzyka na ekranach dotykowych jest przyciszona (0,12 zamiast 0,20), efekty akcji są podgłośnione (0,095 zamiast 0,035), a fanfara końca gry ma głośność 0,78. Desktop zachowuje dotychczasowe poziomy.
+- W APK Android ukryty jest górny pasek statusu systemu, przy zachowaniu dolnej belki gestów i obszaru aparatu. Weryfikacja na konkretnych urządzeniach jest nadal konieczna.
+
+
+### Android v27 — szlify po zdjęciu z telefonu
+- Widoczne sześć kolorów rund, kolejność i aktywna runda (1–6) na górnym pasku.
+- Każda zakładka gracza ma kropkę w kolorze pałacu, imię i wynik; zbędna liczba stłuczeń jest usunięta (pozostaje na widocznym torze).
+- Żeton pierwszego gracza jest zmniejszony i przeniesiony na krawędź środka, zamiast zasłaniać szkło.
+- Android wypełnia obszar przy wycięciu aparatu; interaktywne elementy respektują dostępne insets (wymaga potwierdzenia na telefonie).
+- Kompilacja Actions udostępnia artefakt `SintraGlass-Android-v27`.
+
+
+### Android v28 — użyteczność pełnego ekranu
+
+- Ukryte status bar i dolna nawigacja Androida w trybie immersive-sticky, w tym nowszy Android 11+ przez WindowInsetsController. Paski mogą pojawiać się przejściowo po przeciągnięciu od krawędzi.
+- Po odzyskaniu fokusu ponowne ukrycie pasków, aby ikony nie nachodziły na menu i rundy.
+- Układ mobilnego stołu nie otrzymuje już ogromnego marginesu lewej krawędzi od notch/cutout; wymagana weryfikacja położenia aparatu na konkretnym urządzeniu.
+- Ukryty licznik 100/100, szklana wieża i powtórzona informacja o stłuczeniach pod tytułem witraży (tylko w mobilnym układzie), a środek stołu może wykorzystać dodatkową wysokość.
+- Wersja desktopowa bez zmian. Publiczny prerelease Android: `android-v28-preview`.
+
+
+## v29 — wspólne menu główne i trzy platformy
+
+Wersje **Vite (przeglądarka)**, **Windows EXE (Tauri)** oraz **Android APK (Capacitor)**
+korzystają z tego samego React/TypeScript i tych samych ustawień. Po uruchomieniu
+pokazywane jest menu główne: Nowa gra, Kontynuuj (jeśli istnieje zapisana gra),
+Ustawienia dźwięku i efektów, O twórcy oraz zasady. Partia nie jest automatycznie
+rozgrywana w tle podczas pobytu w menu. Powrót do menu nie usuwa zapisu.
+
+Stół desktopowy skalowany jest jako całość w zależności od szerokości i wysokości
+CSS viewportu (w tym przy zoomie przeglądarki) — proporcje witraży są zachowane.
+Przy małym oknie (szerokość ≤1180 CSS px lub wysokość ≤640 CSS px)
+automatycznie wyświetlany jest sprawdzony układ kompaktowy także na PC.
+Wszystkie testy i buildy trzech wersji trzeba sprawdzać po zmianach wspólnego UI.
+
+APK v29: <https://github.com/jacekmiecznikowski/azul/releases/tag/android-v29-preview> (publiczny prerelease, bez logowania).
+
+
+## v30 — poprawka regresji laptop/2K/4K
+
+Błąd w v29 wynikał z tego, że skala stołu nie mogła spadać poniżej 1.0,
+a jego wysokość potrafiła przekroczyć realną wysokość viewportu.
+W v30 cały układ stołu ma stabilne wymiary logiczne 1700 × 1000 px,
+z identycznymi planszami (900 px długości) i skalą obliczaną z obu wymiarów ekranu.
+Przy typowym laptopie 1650×930 CSS px plansza powinna zmieścić się w całości.
+Szerokość do 1360px lub wysokość do 780px włącza kompletny widok kompaktowy
+na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian.
+
+
+### v31 — poprawki UI po testach na laptopie i Androidzie
+
+- **Ekran główny** (nie modal nowej rozgrywki) nie przewija się pionowo. Na bardzo krótkich ekranach ukrywa dekoracyjny witraż i zmniejsza odstępy, zachowując wszystkie akcje.
+- Tryb mobilny w Vite i EXE dopiero przy szerokości ≤1100 CSS px lub wysokości ≤620 CSS px. Android z niskim viewportem nadal automatycznie korzysta z niego.
+- W desktopowym stole plansze są nieco płytsze, przez co środkowy rząd z historią jest wyższy; warsztaty wykorzystują więcej przestrzeni, a wskaźnik zapasu zajmuje mniej miejsca.
+- Żeton pierwszego gracza przeniesiony do nagłówka warsztatów, daleko od klikalnych tafli.
+- Usunięte zbędne dekoracyjne podpisy „SINTRA · PRACOWNIA WITRAŻY” pod planszami i „WITRAŻE SINTRY · EDYCJA CYFROWA” z górnej belki gry.
+- Wszystkie platformy korzystają z tego samego kodu React: Vite, Windows EXE, Android APK.
+
+
+### v32 — zgrywanie UI w trzech wersjach
+
+- Cztery nagłówki środkowych paneli mają jednakową wysokość i odstępy; zielona kropka została usunięta **tylko** z „PRZY STOLE”. Znaczniki aktualnej tury przy graczach pozostają.
+- Tor stłuczonego szkła to dziewięć wyraźnych progów z pionkami na pozycjach. Pod torami legenda wyświetla kolory/nazwy bez powtórzonego licznika „0/8”.
+- W pionowym układzie ekran rund pokazuje numer i kolor każdej z sześciu rund; tor ma osobny panel z polami, a plansza i warsztaty nie rozciągają się bez końca.
+- W panelu zasobów usunięto zbędny licznik 100/100 oraz „Rundy”, pozostawiając nowy wygląd szklanej wieży i trzy czytelne wartości. Mobilna plansza nadal nie pokazuje zasobów.
+- Bez zmian w mechanice gry; wspólny React zasila Vite, EXE i APK.
+
+
+### v33 — pięć lokalizacji szkła i zwarte panele laptopa
+
+- **Zasoby**: pięć równych pól z wartościami na stole, witraże, woreczek, wieża i **premie rund (tor rund)**. Nie wyświetlamy zbędnej sumy 100/100; zachowano pełny wewnętrzny bilans 100 tafli i sześć fizycznych znaczników premii.
+- **Przy stole**: zarezerwowane miejsce na aktywną turę i wszystkie cztery wyniki; panel nie może obcinać dolnego rzędu graczy.
+- **Stłuczone szkło**: dziewięć pól i kolorowe pionki graczy bez powtórzonej legendy nazw pod torem. Nazwy są nadal dostępne w opisach znaczników, a ich kolory widoczne przy graczach.
+- **Warsztaty i historia**: wspólna wysokość nagłówków i zmniejszony margines zasobów; żeton pierwszego gracza pozostaje w nagłówku warsztatów.
+- **Mechanika** `src/game/engine.ts` oraz AI bez zmian; Vite, Windows EXE i Android APK nadal korzystają z tych samych danych.
+
+
+### v34 — kolejność zasobów i czytelne premie rund
+
+- Zasoby: **Wieża → Warsztat (wliczając środek) → Witraże → Szkła premii**, a na końcu pozostaje **Woreczek**, by zachować widoczność wszystkich pięciu miejsc. Liczniki mają spójny neutralny kolor.
+- Jeden komponent `RoundTracker` dla desktopu, laptopa, Androida w poziomie i pionie. Pokazuje sześć numerów i kolorów, aktualnie premiowany kolor również tekstowo, a rundy minione przygasza.
+- Bez zmian w `src/game/engine.ts`, logice kolorów, szkle i zasadach.
+
+
+### v35 — finalny szlif licznika rund
+
+- Usunięto redundantny blok „PREMIA TERAZ” z nazwaną barwą. Informacja o aktualnie punktowanym szkle nadal wynika z obwódki aktywnego kafelka oraz opisów dostępności (aria-label/title). Bez zmian zasad gry i mechaniki tafli.
+
+
+### v36 — równowaga warsztatów i toru kar w wysokim układzie kompaktowym
+
+- Na wąskim, ale wysokim oknie poziomym (CSS: do 1100 px szerokości, co najmniej 700 px wysokości) przywrócono właściwe proporcje dwóch sekcji po prawej: warsztaty zajmują dostępną górną część, a tor stłuczeń dostaje osobny panel 3×3 o wysokości zależnej od viewportu.
+- Wszystkie pola kar START, −1, −2, −4, −6, −8, −11, −14, −18 są czytelne i pokazują kolorowe znaczniki graczy; kliknięcie nadal otwiera wyniki.
+- Zwiększono czytelność tafli i środkowego okręgu warsztatów tam, gdzie jest miejsce.
+- Układ wieloosobowego pełnego stołu na desktopie, dotychczasowy układ telefonu w poziomie (niski viewport) i pionowy pozostawiono bez zmian. Silnik gry i pula 100 szkieł bez zmian.

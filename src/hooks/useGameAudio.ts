@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 type Cue = 'pick' | 'place' | 'score' | 'round' | 'gameOver'
 const GAME_OVER_URL = `${import.meta.env.BASE_URL}game-over.wav`
 const GAME_OVER_VOLUME = 0.52
+const MOBILE_AUDIO_QUERY = '(max-width: 1100px) and (pointer: coarse)'
+const mobileAudio = () => typeof window !== 'undefined' && window.matchMedia?.(MOBILE_AUDIO_QUERY).matches
 const KEY = 'sintra-glass-sounds-v1'
 const melodies: Record<Exclude<Cue, 'gameOver'>, [number, number, number][]> = {
   pick: [[540, 0, .08]],
@@ -23,7 +25,7 @@ export function useGameAudio() {
     const wav = new window.Audio(GAME_OVER_URL)
     wav.preload = 'auto'
     wav.loop = false
-    wav.volume = GAME_OVER_VOLUME
+    wav.volume = mobileAudio() ? 0.78 : GAME_OVER_VOLUME
     finishRef.current = wav
     return wav
   }, [])
@@ -50,7 +52,7 @@ export function useGameAudio() {
         osc.type = 'sine'
         osc.frequency.setValueAtTime(hz, ctx.currentTime + offset)
         volume.gain.setValueAtTime(0.0001, ctx.currentTime + offset)
-        volume.gain.exponentialRampToValueAtTime(0.035, ctx.currentTime + offset + .013)
+        volume.gain.exponentialRampToValueAtTime(mobileAudio() ? 0.095 : 0.035, ctx.currentTime + offset + .013)
         volume.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + offset + duration)
         osc.connect(volume)
         volume.connect(ctx.destination)

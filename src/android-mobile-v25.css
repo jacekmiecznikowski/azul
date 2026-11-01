@@ -1,0 +1,377 @@
+/* Android v25: the full four-board tabletop remains untouched on desktop.
+   Android landscape presents one complete game board and its shared market. */
+.sg-mobile-layout{display:none}
+@media (max-width: 1100px), (max-height: 620px) {
+  .sg{min-height:0;height:100dvh;overflow:hidden}
+  .sg-header{height:40px;min-height:40px;padding:0 9px;gap:6px;grid-template-columns:minmax(0,1fr) auto auto}
+  .sg-brand{font-size:12px;letter-spacing:1px;gap:5px}
+  .sg-brand-symbol{width:25px;height:25px}
+  .sg-brand small{display:none}
+  .sg-header-round{display:flex;gap:5px}
+  .sg-header-round>span{font-size:8px;letter-spacing:0}
+  .sg-header-round strong{font-size:15px}
+  .sg-header-round strong small{font-size:9px}
+  .sg-round-colors{gap:4px;padding-left:3px}
+  .sg-round-colors .sg-color-dot{width:6px;height:6px}
+  .sg-header-actions{gap:4px}
+  .sg-header-actions button{height:28px;padding:0 7px;font-size:10px}
+  .sg-header-actions .sg-menu-trigger>span,.sg-header-actions .sg-menu-trigger>svg:last-child{display:none}
+  .sg-stage{display:none}
+  .sg-mobile-layout{display:flex;flex-direction:column;height:calc(100dvh - 40px);padding:4px 6px 5px;gap:4px;min-height:0;overflow:hidden;background:radial-gradient(ellipse at center,#1c4d4a,#0c2a34)}
+  .sg-mobile-players{display:flex;flex:0 0 32px;gap:4px;min-height:0}
+  .sg-mobile-player{position:relative;display:flex;align-items:center;justify-content:space-between;gap:4px;flex:1 1 0;min-width:0;padding:0 7px;border:1px solid #65968d77;border-radius:6px;background:#163742;color:#d5e5e5;font-size:10px}
+  .sg-mobile-player.sg-mobile-player-selected{border-color:#e9ce8a;background:#355b58;box-shadow:inset 0 0 0 1px #e8d28a44}
+  .sg-mobile-player-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sg-mobile-player strong{font-size:10px;white-space:nowrap;color:#f1daaa}
+  .sg-mobile-now{position:absolute;top:1px;right:2px;width:5px;height:5px;background:#9df3a3;border-radius:50%}
+  .sg-mobile-panel-button{flex:0 0 auto;padding:0 9px;border:1px solid #7c9b98;border-radius:6px;background:#18313e;color:#e1e6d8;font-size:10px}
+  .sg-mobile-game{display:grid;grid-template-columns:minmax(0,1fr) minmax(225px,32%);gap:5px;flex:1 1 auto;min-height:0}
+  .sg-mobile-board{min-width:0;min-height:0}
+  .sg-mobile-board .sg-board{padding:3px 4px 2px;border-width:1px}
+  .sg-mobile-board .sg-board-top{height:22px;min-height:22px;gap:4px;padding-bottom:2px}
+  .sg-mobile-board .sg-board-name{font-size:12px}
+  .sg-mobile-board .sg-board-label,.sg-mobile-board .sg-palace-label{display:none}
+  .sg-mobile-board .sg-board-stat{font-size:9px}
+  .sg-mobile-board .sg-board-stat small{font-size:8px}
+  .sg-mobile-board .sg-board-score{font-size:13px}
+  .sg-mobile-board .sg-reset{padding:2px 4px;font-size:9px!important;gap:2px}
+  .sg-mobile-board .sg-board-windows{gap:3px}
+  .sg-mobile-board .sg-ornament-pair{padding:12px 1px 1px;gap:1px;border-radius:6px}
+  .sg-mobile-board .sg-ornament-crown{height:16px;top:-3px}
+  .sg-mobile-board .sg-window{grid-template-rows:13px 12px minmax(0,1fr) 17px;padding:1px;border-radius:7px 7px 4px 4px}
+  .sg-mobile-board .sg-window-head{font-size:7px;padding:0 2px}
+  .sg-mobile-board .sg-window-head>span:last-child{min-width:10px;line-height:10px}
+  .sg-mobile-board .sg-window-glazier{height:11px}
+  .sg-mobile-board .sg-window-reverse{margin:0 1px 1px;gap:2px}
+  .sg-mobile-board .sg-window-reverse .sg-color-dot{width:4px;height:4px}
+  .sg-mobile-board .sg-window-lancet{gap:1px;padding:2px 1px 1px;border-width:1px;border-radius:10px 10px 3px 3px}
+  .sg-mobile-board .sg-pane{border-radius:2px}
+  .sg-mobile-board .sg-glass{width:min(93cqi,93cqb,32px);border-radius:3px}
+  .sg-mobile-board .sg-window-foot{min-height:16px;padding:0 1px;margin-top:1px}
+  .sg-mobile-board .sg-window-foot>b{font-size:9px}
+  .sg-mobile-board .sg-window-foot>b small{display:none}
+  .sg-mobile-board .sg-window-kept>span{width:11px;height:11px}
+  .sg-mobile-board .sg-window-kept .sg-glass-small{width:8px;height:8px}
+  .sg-mobile-board .sg-board-engraving{display:none}
+  .sg-mobile-market{position:relative;display:flex;flex-direction:column;min-width:0;min-height:0;gap:3px}
+  .sg-mobile-market .sg-market{flex:1 1 auto;min-height:0;position:relative;container-type:size;padding:19px 5px 40px;justify-content:center;align-items:center;overflow:hidden}
+  .sg-mobile-market .sg-panel-title{position:absolute;top:0;left:0;right:0;height:18px;min-height:18px}
+  .sg-mobile-market .sg-panel-title>span:first-child{font-size:8px}
+  .sg-mobile-market .sg-panel-title small{font-size:8px}
+  .sg-mobile-market .sg-market-circle{container-type:size;width:min(100cqi - 14px,100cqb - 30px,240px);height:auto;max-width:none;max-height:none;min-height:0;aspect-ratio:1;flex:0 0 auto;margin:auto}
+  .sg-mobile-market .sg-factory{width:clamp(31px,19cqi,49px);height:clamp(31px,19cqi,49px)}
+  .sg-mobile-market .sg-factory-grid{width:84%;height:84%;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:2px}
+  .sg-mobile-market .sg-market-token .sg-glass{width:100%;height:100%}
+  .sg-mobile-market .sg-factory-num{font-size:8px;top:-9px}
+  .sg-mobile-market .sg-center-pile{width:clamp(60px,33cqi,82px);height:clamp(60px,33cqi,82px)}
+  .sg-mobile-market .sg-center-pile>span{font-size:8px}
+  .sg-mobile-market .sg-center-tokens{max-width:82%}
+  .sg-mobile-market .sg-center-choice .sg-glass{width:11px;height:11px}
+  .sg-mobile-market .sg-inventory{position:absolute;left:3px;right:3px;bottom:18px;height:21px;min-height:21px;padding:1px 3px;overflow:hidden}
+  .sg-mobile-market .sg-inventory-tower,.sg-mobile-market .sg-inventory-stats>span:not(.sg-inventory-highlight){display:none}
+  .sg-mobile-market .sg-inventory-stats{display:flex;align-items:center;justify-content:center}
+  .sg-mobile-market .sg-inventory-stats small,.sg-mobile-market .sg-inventory-total>span{display:none}
+  .sg-mobile-market .sg-inventory-total strong{font-size:10px}
+  .sg-mobile-market .sg-first-token{position:absolute;bottom:0;left:0;right:0;min-height:17px;height:17px;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 3px}
+  .sg-mobile-status{flex:0 0 23px;display:flex;align-items:center;gap:3px;padding:0 5px;font-size:9px;border-radius:5px;background:#122b37;overflow:hidden}
+  .sg-mobile-status span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sg-mobile-status button{border:1px solid #7baba0;border-radius:4px;background:#285760;color:#fff;padding:2px 4px;white-space:nowrap}
+  .sg-mobile-overlay{position:fixed;inset:0;z-index:70;background:#04131edb;display:grid;place-items:center;padding:5px}
+  .sg-mobile-overlay-dialog{display:flex;flex-direction:column;width:min(850px,98vw);height:min(420px,94dvh);min-height:0;padding:8px;border:1px solid #d1b782;border-radius:12px;background:#102b36}
+  .sg-mobile-overlay-heading{display:flex;justify-content:space-between;align-items:center;flex:0 0 27px}
+  .sg-mobile-overlay-heading button{padding:4px 8px;border:1px solid #87aaa6;background:#254752;color:#fff;border-radius:5px}
+  .sg-mobile-stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;min-height:0;flex:1}
+  .sg-mobile-stats>.sg-turn,.sg-mobile-stats>.sg-track{min-height:0;height:100%;overflow:auto}
+  .sg-mobile-overlay-dialog>.sg-history{flex:1;min-height:0}
+  .sg .sg-game-menu .sg-menu-popup{position:fixed;right:7px;top:41px;max-height:calc(100dvh - 45px);overflow:auto;z-index:100}
+  .sg .sg-menu-popup .sg-menu-item{min-height:39px;padding:4px 9px}
+  .sg .sg-menu-popup{gap:1px;padding:6px}
+  .modal-backdrop{z-index:80}
+  .modal{max-height:96dvh;overflow:auto}
+}
+@media (max-width: 1100px) and (max-height: 360px){
+  .sg-mobile-layout{padding:2px 4px;gap:2px}
+  .sg-mobile-players{flex-basis:27px}
+  .sg-mobile-game{grid-template-columns:minmax(0,1fr) minmax(220px,35%)}
+  .sg-mobile-board .sg-board-top{height:19px;min-height:19px}
+  .sg-mobile-board .sg-ornament-pair{padding-top:10px}
+  .sg-mobile-market .sg-market{padding-bottom:29px}
+  .sg-mobile-market .sg-inventory{display:none}
+}
+@media (max-width: 1100px) and (orientation: portrait), (max-height: 620px) and (orientation: portrait){
+  .sg-mobile-layout{overflow:auto}
+  .sg-mobile-game{min-height:500px;grid-template-columns:minmax(0,1fr)}
+  .sg-mobile-board{min-height:310px}
+  .sg-mobile-market{min-height:225px}
+}
+
+
+/* v26 landscape refinements based on real-device feedback. */
+@media (max-width:1100px) and (orientation:landscape), (max-height:620px) and (orientation:landscape) {
+  .sg .sg-header {
+    height:44px;
+    min-height:44px;
+    padding:0 8px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .sg .sg-brand{flex:1 1 auto;min-width:0;font-size:12px;letter-spacing:1.3px}
+  .sg .sg-brand-symbol{width:27px;height:27px}
+  .sg .sg-header-round {
+    flex:none;display:flex;gap:4px;align-items:center;
+    padding:4px 8px;border:1px solid #537f79;border-radius:8px;
+    background:#193944;
+  }
+  .sg .sg-header-round .sg-round-colors{display:none}
+  .sg .sg-header-round>span{display:inline;font-size:10px;letter-spacing:.7px}
+  .sg .sg-header-round strong{font-size:15px}
+  .sg .sg-header-actions{flex:none;gap:6px}
+  .sg .sg-header-actions button{height:32px;padding:0 10px;font-size:11px}
+  .sg .sg-header-actions .sg-menu-trigger{min-width:37px;justify-content:center;padding:0 7px}
+  .sg .sg-header-actions .sg-new{min-width:93px;justify-content:center}
+  .sg-mobile-layout{height:calc(100dvh - 44px);gap:3px;padding:3px 5px 4px}
+  .sg-mobile-players{flex:0 0 40px;gap:4px}
+  .sg-mobile-player {
+    display:grid;grid-template-columns:minmax(0,1fr) auto;
+    grid-template-rows:1fr 1fr;
+    align-content:center;
+    column-gap:3px;row-gap:0;
+    padding:3px 7px;
+  }
+  .sg-mobile-player-name{grid-column:1;grid-row:1;font-size:10px;font-weight:700}
+  .sg-mobile-player strong{grid-column:2;grid-row:1;font-size:10px}
+  .sg-mobile-broken{grid-column:1/-1;grid-row:2;font-size:9px;color:#a7c4bf}
+  .sg-mobile-player:has(.sg-mobile-now) .sg-mobile-broken{color:#efd596}
+  .sg-mobile-now{left:2px;right:auto;top:2px;width:4px;height:4px}
+  .sg-mobile-panel-button{padding:0 8px;font-size:11px}
+  .sg-mobile-game{gap:4px;grid-template-columns:minmax(0,1fr) minmax(218px,33%)}
+  .sg-mobile-market .sg-market{padding:19px 5px 27px}
+  .sg-mobile-market .sg-market-circle {
+    width:min(calc(100cqi - 6px),calc(100cqb - 10px),340px);
+    max-width:none;max-height:none;
+  }
+  .sg-mobile-market .sg-factory {
+    width:clamp(32px,18cqi,59px);
+    height:clamp(32px,18cqi,59px);
+  }
+  .sg-mobile-market .sg-first-token{height:18px;min-height:18px}
+  .sg-mobile-market .sg-inventory{bottom:18px;height:12px;min-height:12px}
+  .sg-mobile-penalty-strip {
+    flex:0 0 29px;min-width:0;
+    display:flex;align-items:stretch;gap:2px;
+    padding:2px 3px;border:1px solid #46757a;
+    border-radius:6px;background:#102d37;
+  }
+  .sg-mobile-penalty-label {
+    display:grid;place-items:center;
+    width:38px;flex:0 0 38px;
+    font-size:7px;line-height:1.15;text-align:center;
+    letter-spacing:.25px;font-weight:800;color:#c2dcd6;
+  }
+  .sg-mobile-penalty-step {
+    flex:1 1 0;min-width:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:space-between;
+    padding:1px;border:1px solid #4a7478;border-radius:3px;
+    background:#204451;color:#d8e7df;
+  }
+  .sg-mobile-penalty-step strong{font-size:9px;line-height:11px}
+  .sg-mobile-penalty-final strong{color:#ffaaa0}
+  .sg-mobile-penalty-pawns{display:flex;align-items:center;justify-content:center;gap:1px;min-height:6px;flex-wrap:wrap}
+  .sg-mobile-penalty-pawns .sg-pawn{width:5px;height:5px;min-width:5px;min-height:5px}
+  .sg-mobile-status{flex-basis:24px}
+  .sg .sg-game-menu .sg-menu-popup{top:45px}
+  /* Modal uses two functional columns instead of a tall scrolling form. */
+  .sg .sg-hotseat-setup {
+    width:min(930px,96vw);
+    height:auto;
+    max-height:calc(100dvh - 12px);
+    overflow-y:auto;
+    display:grid;
+    grid-template-columns:minmax(175px,.75fr) minmax(0,1.7fr);
+    grid-template-rows:auto auto auto auto auto auto minmax(0,1fr) auto;
+    column-gap:16px;
+    row-gap:5px;
+    padding:12px 18px 11px;
+    align-items:start;
+  }
+  .sg .sg-hotseat-setup>.modal-icon,
+  .sg .sg-hotseat-setup>.overline{display:none}
+  .sg .sg-hotseat-setup>h2{grid-column:1/-1;grid-row:1;font-size:21px;margin:0 35px 0 0;line-height:1.15}
+  .sg .sg-hotseat-setup>p:not(.sg-hotseat-hint){
+    grid-column:1/-1;grid-row:2;
+    margin:0;font-size:10px;line-height:1.25;max-width:none
+  }
+  .sg .sg-hotseat-setup>.field-label:not([for]){
+    grid-column:1;grid-row:3;align-self:end;margin:0;font-size:11px
+  }
+  .sg .sg-hotseat-setup>.option-row{grid-column:1;grid-row:4;display:flex;gap:5px;margin:0}
+  .sg .sg-hotseat-setup .option-choice{flex:1;min-width:0;padding:5px 4px;font-size:14px;min-height:42px}
+  .sg .sg-hotseat-setup .option-choice small{font-size:8px;white-space:nowrap}
+  .sg .sg-hotseat-setup>.per-bot-header{grid-column:2;grid-row:3;align-self:end;margin:0}
+  .sg .sg-hotseat-setup>.sg-hotseat-players{
+    grid-column:2;grid-row:4/8;
+    display:flex;flex-direction:column;
+    gap:4px;margin:0;min-width:0
+  }
+  .sg .sg-hotseat-setup .sg-hotseat-player{
+    padding:3px 6px;grid-template-columns:23px minmax(0,1fr);
+    gap:5px;border-radius:6px
+  }
+  .sg .sg-hotseat-setup .sg-hotseat-number{font-size:14px}
+  .sg .sg-hotseat-setup .sg-hotseat-player-fields{
+    grid-template-columns:minmax(48px,.47fr) minmax(90px,1fr) minmax(100px,1.4fr);
+    gap:5px;
+  }
+  .sg .sg-hotseat-setup .sg-hotseat-player-fields>label{font-size:10px}
+  .sg .sg-hotseat-setup .sg-hotseat-player-fields :is(select,input){
+    min-height:29px;height:29px;
+    font-size:11px;padding:3px 5px;border-radius:5px;
+  }
+  .sg .sg-hotseat-setup>.field-label[for="palace-side"]{
+    grid-column:1;grid-row:5;margin:4px 0 0;font-size:11px
+  }
+  .sg .sg-hotseat-setup>#palace-side{
+    grid-column:1;grid-row:6;
+    width:100%;min-width:0;min-height:32px;
+    padding:3px 6px;font-size:11px
+  }
+  .sg .sg-hotseat-setup>.sg-hotseat-hint{
+    grid-column:1;grid-row:7;
+    margin:3px 0 0;padding:4px 6px;
+    font-size:10px;line-height:1.3
+  }
+  .sg .sg-hotseat-setup>.modal-main{
+    grid-column:1/-1;grid-row:8;
+    min-height:35px;height:35px;
+    margin:2px 0 0;padding:5px 12px;font-size:12px
+  }
+  .sg .sg-hotseat-setup>.close-btn{top:9px;right:10px}
+  /* Improve the enlarged penalty panel shown from the new track. */
+  .sg-mobile-stats>.sg-track{display:flex;flex-direction:column}
+  .sg-mobile-stats .sg-track-cells{
+    flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-rows:repeat(3,minmax(0,1fr));
+    gap:3px;padding:4px;
+  }
+  .sg-mobile-stats .sg-track-step{min-height:0;display:flex;align-items:center;justify-content:center}
+  .sg-mobile-stats .sg-track-step>span{font-size:9px}
+  .sg-mobile-stats .sg-track-step strong{font-size:15px}
+  .sg-mobile-stats .sg-track-legend{display:flex;flex-wrap:wrap}
+}
+@media (max-width:750px) and (max-height:330px) {
+  .sg .sg-hotseat-setup{width:98vw;column-gap:8px;padding:8px 10px;row-gap:3px}
+  .sg .sg-hotseat-setup>p:not(.sg-hotseat-hint){display:none}
+  .sg .sg-hotseat-setup .sg-hotseat-player-fields{grid-template-columns:50px 92px minmax(0,1fr)}
+}
+
+/* v27: always-visible future round bonuses, palace colors, compact token */
+.sg-round-mobile-colors {display:none}
+@media (max-width:1100px) and (orientation:landscape), (max-height:620px) and (orientation:landscape) {
+  /* The full row remains legible without zooming or covering adjacent actions. */
+  .sg .sg-header {gap:7px;padding-left:max(6px,env(safe-area-inset-left));padding-right:max(6px,env(safe-area-inset-right))}
+  .sg .sg-brand {font-size:11px;letter-spacing:.65px;min-width:0}
+  .sg .sg-header-round {gap:6px;padding:3px 7px;max-width:100%;min-width:0}
+  .sg .sg-header-round > strong {white-space:nowrap;font-size:15px}
+  .sg .sg-header-round .sg-round-colors {display:none}
+  .sg .sg-round-mobile-colors {
+    display:flex;align-items:center;justify-content:center;gap:3px;
+    min-height:31px;max-width:100%;
+    padding-left:6px;border-left:1px solid #6b918c70;
+  }
+  .sg .sg-round-mobile-color {
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;width:19px;min-width:19px;height:31px;padding:2px 1px;
+    border-radius:5px;border:1px solid transparent;opacity:.85;
+  }
+  .sg .sg-round-mobile-color small {font-size:8px;font-weight:800;line-height:9px;color:#a9cbca}
+  .sg .sg-round-mobile-color .sg-color-dot {
+    display:block;width:9px;height:9px;min-width:9px;min-height:9px;
+    transform:rotate(45deg);scale:1;box-shadow:0 0 4px #0009;
+  }
+  .sg .sg-round-mobile-color-active {
+    opacity:1;border-color:#ecd69c;
+    background:#69593d55;box-shadow:inset 0 0 0 1px #e5c98a44
+  }
+  .sg .sg-round-mobile-color-active small{color:#ffe3a2}
+  .sg .sg-round-mobile-color-active .sg-color-dot{
+    outline:1px solid #ffdf9b;outline-offset:1px;box-shadow:0 0 6px #e5cc83a8
+  }
+  .sg .sg-round-mobile-color-past{opacity:.4;filter:saturate(.65)}
+  /* The penalty track already carries glass-loss details; tabs only show identity and score. */
+  .sg .sg-mobile-players {flex-basis:32px;min-height:32px;gap:4px}
+  .sg .sg-mobile-player {
+    display:grid;grid-template-columns:12px minmax(0,1fr) auto;
+    grid-template-rows:1fr;align-items:center;justify-items:start;
+    column-gap:5px;padding:2px 7px;min-width:0
+  }
+  .sg .sg-mobile-palace-chip {
+    grid-column:1;grid-row:1;
+    display:block;width:11px;height:11px;border-radius:50%;
+    background:var(--sg-player-accent,#d7e2e8);
+    border:1px solid #ffffffe3;
+    box-shadow:0 0 0 2px color-mix(in srgb,var(--sg-player-accent),transparent 70%);
+  }
+  .sg .sg-mobile-player-name{grid-column:2;grid-row:1;font-size:11px}
+  .sg .sg-mobile-player strong{grid-column:3;grid-row:1;font-size:10px;justify-self:end}
+  .sg .sg-mobile-now {top:1px;right:1px;left:auto;height:5px;width:5px}
+  .sg .sg-mobile-player-selected{box-shadow:inset 0 0 0 1px #dfd09844,0 0 5px #e5c87d40}
+  .sg .sg-mobile-panel-button {font-size:10px;padding:0 8px}
+  /* The first-player token must not hide panes in the central glass selection area. */
+  .sg .sg-mobile-market .sg-center-pile > .sg-start-tile.sg-start-on-market {
+    width:18px;height:18px;min-width:18px;min-height:18px;
+    top:-7px;right:-6px;left:auto;bottom:auto;
+    border-width:1px;outline-width:1px;border-radius:4px;
+    font-size:11px;line-height:1;z-index:4;
+    box-shadow:0 2px 4px #051821a8,inset 0 0 0 1px #ffffff8c;
+  }
+  .sg-mobile-layout {padding-left:max(3px,env(safe-area-inset-left));padding-right:max(3px,env(safe-area-inset-right))}
+}
+@media (max-width:700px) and (orientation:landscape) {
+  .sg .sg-brand{font-size:10px}
+  .sg .sg-header-round {gap:3px;padding:2px 4px}
+  .sg .sg-round-mobile-colors{gap:1px;padding-left:3px}
+  .sg .sg-round-mobile-color{width:15px;min-width:15px}
+  .sg .sg-header-actions .sg-new {min-width:69px;padding:0 6px;font-size:10px}
+}
+
+
+/* v28 — real-device landscape corrections.
+   Fill the usable field and remove desktop-only 100-glass inventory.
+   Full desktop table and its inventory remain unchanged. */
+@media (max-width:1100px) and (orientation:landscape), (max-height:620px) and (orientation:landscape) {
+  /* The broad left safe-area gutter was applied to ALL the game, not just
+     header controls, which cost ~80 pixels on phones with landscape cutouts. */
+  .sg .sg-mobile-layout {
+    width:100%;
+    padding-left:4px;
+    padding-right:4px;
+    margin:0;
+    box-sizing:border-box;
+    overflow:hidden;
+  }
+  .sg .sg-mobile-game {width:100%;min-width:0;gap:5px}
+  .sg .sg-mobile-board {min-width:0}
+  .sg .sg-mobile-players {width:100%;min-width:0}
+  /* The physical 100-tile inventory is useful on desktop, but doesn't assist
+     mobile play. It was drawing a redundant 100/100 bar over the workshops. */
+  .sg .sg-mobile-market .sg-inventory {display:none!important}
+  .sg .sg-mobile-market .sg-market {
+    padding-top:20px;
+    padding-bottom:21px;
+  }
+  .sg .sg-mobile-market .sg-market-circle {
+    width:min(calc(100cqi - 14px),calc(100cqb - 10px),390px);
+    max-width:100%;
+  }
+  /* Broken-glass penalties are visible in the dedicated row, so don't repeat
+     the same value in the currently selected board's tiny title row. */
+  .sg .sg-mobile-board .sg-board-stat[data-sg-break] {display:none}
+  .sg .sg-mobile-market .sg-first-token {bottom:0}
+}
+@media (max-width:1100px) and (orientation:landscape), (max-height:620px) and (orientation:landscape) and (max-height:360px) {
+  .sg .sg-mobile-market .sg-market {padding-bottom:20px}
+  .sg .sg-mobile-market .sg-inventory {display:none!important}
+}
+
+/* v29: small browser and EXE windows use the same complete-board layout as Android. */
