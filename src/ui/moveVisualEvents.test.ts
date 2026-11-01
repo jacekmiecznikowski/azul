@@ -26,7 +26,9 @@ describe('move-triggered glass feedback', () => {
       m.kind === 'take' && m.source.type === 'center')
     if (!move) {
       // No center tiles on initial setup; create a state with an available center tile.
-      before.center.push('rose')
+      const color = before.factories[0].pop()
+      if (!color) throw Error('Expected a tile in the initial factory')
+      before.center.push(color)
     }
     const taken = move ?? legalMoves(before).find((m): m is Extract<Move,{kind:'take'}> =>
       m.kind === 'take' && m.source.type === 'center')!
