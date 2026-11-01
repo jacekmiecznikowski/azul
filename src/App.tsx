@@ -8,6 +8,7 @@ import { FinalResults } from './components/FinalResults'
 import { FinishCelebration } from './components/FinishCelebration'
 import { StrategyLab } from './components/StrategyLab'
 import { finishOverlayVisibility } from './ui/finishOverlayVisibility'
+import { moveAudioCue } from './ui/moveAudioCue'
 import { useGameAudio } from './hooks/useGameAudio'
 import { GlassVisualEffects, useVisualEffects } from './components/GlassVisualEffects'
 import { useAmbientMusic } from './hooks/useAmbientMusic'
@@ -232,7 +233,7 @@ export default function App() {
         const next = applyMove(game, move)
         emitEffects(game, next, move)
         setGame(next)
-        play(next.round !== game.round ? 'round' : next.players[game.currentPlayer].score > game.players[game.currentPlayer].score ? 'score' : 'place')
+        play(moveAudioCue(game, next))
       }
     }, delay)
     return () => window.clearTimeout(timer)
@@ -243,7 +244,7 @@ export default function App() {
     const next = applyMove(game, move)
     emitEffects(game, next, move)
     setGame(next)
-    play(next.round !== game.round ? 'round' : next.players[game.currentPlayer].score > game.players[game.currentPlayer].score ? 'score' : 'place')
+    play(moveAudioCue(game, next))
     setSelection(null)
     setFinishing(null)
     setPlacementOptions(null)
