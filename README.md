@@ -416,3 +416,31 @@ zastępuje zwykły sygnał punktowania tej tury i jest odtwarzany tylko raz.
   na szybkie symulacje AI ani offline-owy trening.
 
 Testy wyzwalania sygnału: `src/ui/moveAudioCue.test.ts`.
+
+## Kilku prawdziwych graczy przy jednym komputerze — hot-seat (v23)
+
+W oknie **Nowa gra** wybierz 2, 3 lub 4 uczestników. Dla każdego miejsca przy stole
+poza pierwszym można ustawić **Człowiek** lub **Bot AI**; poziom trudności wybiera
+się tylko dla botów. Można także wpisać własne imię każdej osoby. Pierwszy gracz
+jest zawsze człowiekiem, tak aby gra nie uruchamiała się bez uczestnika.
+
+Gdy nadchodzi kolej **człowieka**, stół automatycznie pokazuje jego planszę
+**na dole**, a pozostałych uczestników wokół stołu zgodnie z istniejącą
+kolejnością ruchów w silniku. Przy stole czteroosobowym kolejne osoby znajdują
+się po lewej, na górze i po prawej; przy dwóch graczach plansze leżą naprzeciw siebie.
+Pozostałe plansze mogą być obrócone, ale ich punktacja, ułożone szkło, witrażysta
+i właściciel nie zmieniają się.
+
+- Klikalna jest wyłącznie **plansza aktualnego człowieka** — witraże innych
+  graczy pozostają niedostępne.
+- Rozmieszczanie jokerów, zachowywanie tafli i cofnięcie witrażysty
+  przypisane są do faktycznego gracza mającego turę.
+- Gdy ruch wykonuje **bot**, stół pozostaje ustawiony na perspektywę ostatniego
+  ludzkiego gracza — bez niepotrzebnego obracania.
+- Zapis w przeglądarce zachowuje kontrolerów, imiona i grę mieszanych składów.
+- Silnik punktacji i kolejność rund nie są zmienione. Domyślnie nadal gra
+  jeden człowiek z botami; symulacje AI działają tak jak dotąd.
+- Możliwe konfiguracje: 2–4 ludzi, ludzie + boty, a także jeden człowiek
+  z 1–3 botami.
+
+Testy regresyjne: `src/game/hotseat.test.ts` i `src/ui/tableSeating.test.ts`.
