@@ -5,6 +5,7 @@
 'use strict'
 const fs = require('fs')
 const path = require('path')
+const crypto = require('node:crypto')
 const policy = require('../.sim-dist/learnedPolicy.js')
 const arena = require('./arena.cjs')
 const root = path.join(__dirname, '..')
@@ -19,7 +20,7 @@ const presets = {
   deep:     { generations: 12,population: 16,games: 36, holdout: 240,h2h: 320, ablate: 45, patience: 5 },
 }
 function argsFromCLI(argv) {
-  const opts = { preset: 'balanced', seed: 20261101, participants: [2, 3, 4],
+  const opts = { preset: 'balanced', seed: null, participants: [2, 3, 4],
     rival: 'hard', resume: false, promote: true, budgetMinutes: 0 }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
@@ -42,6 +43,16 @@ function argsFromCLI(argv) {
     if (!Number.isSafeInteger(cfg[k]) || cfg[k] < 1 || cfg[k] > 20000) throw Error('Invalid ' + k)
   }
   if (!Number.isSafeInteger(cfg.ablate) || cfg.ablate < 0 || cfg.ablate > 1000) throw Error('Invalid ablate')
+  if (cfg.seed === null) {
+    if (cfg.resume) {
+      if (!fs.existsSync(checkpointPath)) throw Error('No saved checkpoint. Start a new run without --resume.')
+      const stored = JSON.parse(fs.readFileSync(checkpointPath, 'utf8'))
+      cfg.seed = JSON.parse(stored.fingerprint).seed
+      if (!Number.isSafeInteger(cfg.seed)) throw Error('Invalid checkpoint seed')
+    } else {
+      cfg.seed = crypto.randomInt(1, 0x7fffffff)
+    }
+  }
   if (!Number.isSafeInteger(cfg.seed) || cfg.seed < 1) throw Error('Invalid seed')
   if (!Number.isFinite(cfg.budgetMinutes) || cfg.budgetMinutes < 0) throw Error('Invalid budget')
   if (!cfg.participants.length || cfg.participants.some(p => ![2,3,4].includes(p)) ||
@@ -96,6 +107,7 @@ function buildReport(candidate, incumbent, cfg, trainingLog, score, eligible, pr
     incumbentWeights: incumbent, selectedCandidateWeights: candidate,
     eligible, promoted, promotionBlockedByFlag: !cfg.promote, activeWeights: promoted ? candidate : incumbent,
     promotionRule: 'at least 60 holdout and 100 head-to-head games, not quick; direct win >50% beyond 95% CI, duel margin >95% CI, no serious regression',
+    promotionChecks: null,
     training: { generations: trainingLog.length, candidatesEvaluated: trainingLog.reduce((n,g)=>n+g.trials.length,0),
       gamesPerCandidate: cfg.games * cfg.participants.length * 2, log: trainingLog, bestTrainingFitness: score },
     validation, headToHead: duel, ablations,
@@ -110,6 +122,10 @@ function markdown(r) {
   s.push('- Wykorzystany profil: **' + r.settings.preset + '**; seed: **' + r.seed + '**')
   s.push('- Wynik niezależnej walidacji: **' + (r.eligible ? 'KANDYDAT SPEŁNIA KRYTERIA' : 'BRAK POTWIERDZONEJ PRZEWAGI') + '**')
   s.push('- Automatyczne zaakceptowanie nowych wag: **' + (r.promoted ? 'TAK' : r.promotionBlockedByFlag ? 'WYŁĄCZONE (--no-promote)' : 'NIE — pozostawiono dotychczasowego bota') + '**','')
+  s.push('## Dlaczego model został zaakceptowany lub odrzucony?','')
+  s.push('| Warunek | Wynik | Ocena |','|---|---|---|')
+  for (const c of r.promotionChecks || []) s.push('| '+c.label+' | '+c.value+' | '+(c.passed ? '✓ zaliczony' : '✗ niespełniony')+' |')
+  s.push('')
   s.push('## Walidacja na nieznanych partiach','')
   s.push('| Graczy | Gry na wariant | Wygrane kandydata | Wygrane obecnego bota | Różnica punktowa (95% CI) |')
   s.push('|---:|---:|---:|---:|---:|')
@@ -161,6 +177,7 @@ function train(cfg) {
   process.on('SIGINT', () => {interrupted = true; console.log('\nStopping after current candidate. Resume with --resume.')})
   const started = Date.now()
   console.log('Training configuration:', JSON.stringify(cfg))
+  console.log('Seed:',cfg.seed, '(repeat this experiment with --seed '+cfg.seed+')')
   const deadline = cfg.budgetMinutes ? started + cfg.budgetMinutes * 60000 : Infinity
   for (let g = checkpoint.generation; g < cfg.generations; g++) {
     if (!checkpoint.pending) {
@@ -223,10 +240,17 @@ function train(cfg) {
   const main = validation['2'] || validation[String(cfg.participants[0])]
   const noSeriousRegressions = Object.values(validation).every(v =>
     v.deltaMargin >= -Math.max(1.5, v.marginCI95))
-  const eligible = cfg.preset !== 'quick' && cfg.holdout >= 60 && cfg.h2h >= 100 &&
-    duel.candidate.win > .5 + duel.winCI95 && duel.scoreDelta > .5 &&
-    main.deltaMargin > main.marginCI95 && noSeriousRegressions
+  const promotionChecks = [
+    { label: 'Rozmiar walidacji (profil inny niż quick)', value: cfg.holdout+' gier/format, '+cfg.h2h+' pojedynków', passed:cfg.preset !== 'quick' && cfg.holdout >= 60 && cfg.h2h >= 100 },
+    { label: 'Wygrane bezpośrednie powyżej 50% z zapasem błędu', value: (duel.candidate.win*100).toFixed(1)+'% > '+((.5 + duel.winCI95)*100).toFixed(1)+'%', passed:duel.candidate.win > .5 + duel.winCI95 },
+    { label: 'Wyższy wynik punktowy w pojedynkach', value: (duel.scoreDelta >= 0 ? '+':'') + duel.scoreDelta.toFixed(2)+' > +0,50 pkt', passed:duel.scoreDelta > .5 },
+    { label: 'Poprawa marginesu w walidacji 2-osobowej (95% CI)', value:main.deltaMargin.toFixed(2)+' > '+main.marginCI95.toFixed(2)+' pkt', passed:main.deltaMargin > main.marginCI95 },
+    { label: 'Bez dużych regresji w innych liczbach graczy', value:Object.values(validation).map(v=>v.players+' os.: '+v.deltaMargin.toFixed(2)+' pkt').join(', '), passed:noSeriousRegressions },
+    { label: 'Automatyczne wdrożenie włączone', value:cfg.promote ? 'tak' : 'nie (--no-promote)', passed:cfg.promote },
+  ]
+  const eligible = promotionChecks.slice(0,5).every(c=>c.passed)
   const promoted = cfg.promote && eligible
+  console.log('Promotion checks:', promotionChecks.map(c => (c.passed ? 'PASS ' : 'FAIL ') + c.label+': '+c.value).join(' | '))
   const ablations = {}
   const features = ['penaltyCost','rightChain','futureLeft','palaceSynergy','jokerUse','roundBonus','resetOpportunity','firstToken']
   if (cfg.ablate) {
@@ -240,6 +264,7 @@ function train(cfg) {
     }
   }
   const report=buildReport(candidate,incumbent,cfg,checkpoint.log,checkpoint.best.score,eligible,promoted,validation,duel,ablations)
+  report.promotionChecks = promotionChecks
   writeJSON(reportPath,report)
   saveAtomic(summaryPath,markdown(report))
   if (promoted) {
