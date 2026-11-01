@@ -658,3 +658,8 @@ na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian
 - Zasoby: **Wieża → Warsztat (wliczając środek) → Witraże → Szkła premii**, a na końcu pozostaje **Woreczek**, by zachować widoczność wszystkich pięciu miejsc. Liczniki mają spójny neutralny kolor.
 - Jeden komponent `RoundTracker` dla desktopu, laptopa, Androida w poziomie i pionie. Pokazuje sześć numerów i kolorów, aktualnie premiowany kolor również tekstowo, a rundy minione przygasza.
 - Bez zmian w `src/game/engine.ts`, logice kolorów, szkle i zasadach.
+
+
+### v35 — finalny szlif licznika rund
+
+- Usunięto redundantny blok „PREMIA TERAZ” z nazwaną barwą. Informacja o aktualnie punktowanym szkle nadal wynika z obwódki aktywnego kafelka oraz opisów dostępności (aria-label/title). Bez zmian zasad gry i mechaniki tafli.

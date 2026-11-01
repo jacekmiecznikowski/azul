@@ -19,8 +19,5 @@ export function RoundTracker({ round, colors }: { round: number; colors: GlassCo
         <span className="sg-round-v34-number">{i+1}</span><i className={`sg-color-dot sg-color-dot-${color}`} aria-hidden="true"/>
       </span>)}
     </div>
-    <div className="sg-round-v34-bonus" aria-label={`Teraz premiowane: ${active ? LABELS[active] : 'brak'}`}>
-      <small>PREMIA TERAZ</small><strong>{active ? LABELS[active] : '—'}</strong>
-    </div>
   </section>
 }

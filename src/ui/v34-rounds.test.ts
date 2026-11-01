@@ -10,7 +10,8 @@ describe('v34 round-bonus widget shared by all screen sizes', () => {
     const html = renderToStaticMarkup(createElement(RoundTracker,{round:1,colors:roundColors}))
     expect((html.match(/class="sg-round-v34-step/g) || [])).toHaveLength(6)
     expect((html.match(/aria-current="step"/g) || [])).toHaveLength(1)
-    expect(html).toContain('PREMIA TERAZ')
+    expect(html).not.toContain('PREMIA TERAZ')
+    expect(html).not.toContain('sg-round-v34-bonus')
     expect(html).toContain('Runda 1 z 6')
   })
   it('updates the highlight and dims earlier bonuses', () => {
