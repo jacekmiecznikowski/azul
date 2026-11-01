@@ -17,6 +17,7 @@ import { GameBoard, GlassPiece } from './components/GameBoard'
 import { ManualPlacementDialog } from './components/ManualPlacementDialog'
 import { GameMenu } from './components/GameMenu'
 import { HomeScreen } from './components/HomeScreen'
+import { RoundTracker } from './components/RoundTracker'
 import { desktopTableMetrics } from './ui/responsiveTable'
 import './match.css'
 import './redesign.css'
@@ -36,6 +37,7 @@ import './android-mobile-v25.css'
 import './home-v29.css'
 import './ui-refinement-v32.css'
 import './ui-refinement-v33.css'
+import './ui-refinement-v34.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
@@ -101,16 +103,16 @@ export function Market({ game, selection, disabled, onPick }: {
         {!game.firstCenterTaken && <small className="sg-center-penalty">+1 stłuczenie</small>}
       </div>
     </div>
-    <div className="sg-inventory sg-inventory-v33" role="group" aria-label={`Zasoby szkła: na stole ${inventory.table}, w witrażach ${inventory.playerBoards}, w woreczku ${inventory.bag}, w wieży ${inventory.tower}, na torze rund ${inventory.roundTrack}. Razem ${inventory.total} tafli.`}>
+    <div className="sg-inventory sg-inventory-v33 sg-inventory-v34" role="group" aria-label={`Zasoby szkła: wieża ${inventory.tower}; warsztaty i środek ${inventory.table}; witraże ${inventory.playerBoards}; szkła premii ${inventory.roundTrack}; woreczek ${inventory.bag}. Razem ${inventory.total} tafli.`}>
       <div className="sg-stock-ledger">
-        <span className="sg-stock-place" title={`Tafle na warsztatach i pośrodku stołu: ${inventory.table}`}><small>Na stole</small><strong>{inventory.table}</strong></span>
-        <span className="sg-stock-place" title={`Ułożone tafle i zachowane witraże: ${inventory.playerBoards}`}><small>Witraże</small><strong>{inventory.playerBoards}</strong></span>
-        <span className="sg-stock-place" title={`Tafle w woreczku: ${inventory.bag}`}><small>Woreczek</small><strong>{inventory.bag}</strong></span>
-        <span className="sg-stock-place sg-stock-tower" title={`Tafle w szklanej wieży: ${inventory.tower}`}>
+        <span className="sg-stock-place sg-stock-tower" title={`Tafle w wieży: ${inventory.tower}`}>
           <svg viewBox="0 0 21 29" fill="none" aria-hidden="true"><path d="M7 2H14L18 23L14 27H7L3 23Z" fill="#174451" stroke="#d1c394" strokeWidth="1.4"/><path d="M8 5H13L15 22L12 24H9L6 22Z" fill="#5ac9dc" fillOpacity=".38" stroke="#a7e5e4" strokeWidth=".6"/><path d="M8 6L6.5 21" stroke="#e6ffff" strokeOpacity=".75" strokeWidth="1.4"/><path d="M5 24H16" stroke="#e5c98e" strokeWidth="1.4"/></svg>
           <small>Wieża</small><strong>{inventory.tower}</strong>
         </span>
-        <span className="sg-stock-place sg-stock-rounds" title={`Tafle kolorów premii pozostające na torze rund: ${inventory.roundTrack}`}><small>Premie rund</small><strong>{inventory.roundTrack}</strong></span>
+        <span className="sg-stock-place" title={`Warsztaty i środek stołu: ${inventory.table}`}><small>Warsztat</small><strong>{inventory.table}</strong></span>
+        <span className="sg-stock-place" title={`Tafle w witrażach: ${inventory.playerBoards}`}><small>Witraże</small><strong>{inventory.playerBoards}</strong></span>
+        <span className="sg-stock-place sg-stock-rounds" title={`Szkła niezużytych premii rund: ${inventory.roundTrack}`}><small>Szkła premii</small><strong>{inventory.roundTrack}</strong></span>
+        <span className="sg-stock-place" title={`Tafle w woreczku: ${inventory.bag}`}><small>Woreczek</small><strong>{inventory.bag}</strong></span>
       </div>
     </div>
     <div className="sg-first-token">{game.firstCenterTaken
@@ -388,15 +390,7 @@ export default function App() {
   return <div className={`sg${screen === "home" ? " sg-in-home" : ""}`}>
     <header className="sg-header">
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span></div>
-      <div className="sg-header-round"><span>RUNDA</span><strong>{game.round} <small>/ 6</small></strong><div className="sg-round-colors">{game.roundColors.map((c, i) =>
-        <i key={i} title={`Runda ${i + 1}: ${COLORS_PL[c]}`} className={`sg-color-dot sg-color-dot-${c}${i + 1 === game.round ? ' sg-color-now' : i + 1 < game.round ? ' sg-color-past' : ''}`}/>)}</div><div className="sg-round-mobile-colors" role="group" aria-label="Kolory punktowane w rundach od 1 do 6">
-          {game.roundColors.map((c, i) =>
-            <span key={i} className={`sg-round-mobile-color${i + 1 === game.round ? ' sg-round-mobile-color-active' : i + 1 < game.round ? ' sg-round-mobile-color-past' : ''}`}
-              title={`Runda ${i + 1}: ${COLORS_PL[c]}`}
-              aria-label={`Runda ${i + 1}, ${COLORS_PL[c]}`}>
-              <small>{i + 1}</small><i className={`sg-color-dot sg-color-dot-${c}`}/>
-            </span>)}
-        </div></div>
+      <RoundTracker round={game.round} colors={game.roundColors}/>
       <div className="sg-header-actions">
         <GameMenu effectsEnabled={effectsEnabled} reducedMotion={reducedMotion} toggleEffects={toggleEffects}
           musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}

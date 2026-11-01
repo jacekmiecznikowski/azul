@@ -12,9 +12,12 @@ describe('v33 compact central panels', () => {
       game, selection: null, disabled: false, onPick: () => {},
     }))
     expect((html.match(/class="sg-stock-place/g) || [])).toHaveLength(5)
-    for (const label of ['Na stole','Witraże','Woreczek','Wieża','Premie rund']) {
+    for (const label of ['Wieża','Warsztat','Witraże','Szkła premii','Woreczek']) {
       expect(html).toContain(label)
     }
+    const order = ['Wieża','Warsztat','Witraże','Szkła premii','Woreczek'].map(label => html.indexOf(`>${label}</small>`))
+    expect(order.every(i => i >= 0)).toBe(true)
+    expect([...order].sort((a,b) => a-b)).toEqual(order)
     expect(html).not.toContain('100/100')
     expect(html).toContain('>6</strong>')
     expect(glassInventory(game).total).toBe(100)

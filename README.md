@@ -651,3 +651,10 @@ na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian
 - **Stłuczone szkło**: dziewięć pól i kolorowe pionki graczy bez powtórzonej legendy nazw pod torem. Nazwy są nadal dostępne w opisach znaczników, a ich kolory widoczne przy graczach.
 - **Warsztaty i historia**: wspólna wysokość nagłówków i zmniejszony margines zasobów; żeton pierwszego gracza pozostaje w nagłówku warsztatów.
 - **Mechanika** `src/game/engine.ts` oraz AI bez zmian; Vite, Windows EXE i Android APK nadal korzystają z tych samych danych.
+
+
+### v34 — kolejność zasobów i czytelne premie rund
+
+- Zasoby: **Wieża → Warsztat (wliczając środek) → Witraże → Szkła premii**, a na końcu pozostaje **Woreczek**, by zachować widoczność wszystkich pięciu miejsc. Liczniki mają spójny neutralny kolor.
+- Jeden komponent `RoundTracker` dla desktopu, laptopa, Androida w poziomie i pionie. Pokazuje sześć numerów i kolorów, aktualnie premiowany kolor również tekstowo, a rundy minione przygasza.
+- Bez zmian w `src/game/engine.ts`, logice kolorów, szkle i zasadach.
