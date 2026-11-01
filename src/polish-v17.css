@@ -17,100 +17,23 @@
   box-shadow: none;
 }
 
-/* A little enchanted dust: visible from a distance, but away from the visual hierarchy of the game. */
-.sg-table-ambient {
-  position: absolute;
-  inset: 7px;
-  overflow: hidden;
-  border-radius: 13px;
-  pointer-events: none;
-  z-index: 3;
-  opacity: 1;
-  contain: paint;
-}
-.sg-table-mote {
-  position: absolute;
-  width: var(--mote-size);
-  height: var(--mote-size);
-  border-radius: 50%;
-  background: #e2ffff;
-  box-shadow: 0 0 7px 2px #b6f7f0ae, 0 0 18px #bcebe862;
-  opacity: 0;
-  animation: sg-mote-drift var(--mote-duration) ease-in-out var(--mote-delay) infinite;
-  will-change: transform, opacity;
-}
-.sg-table-mote-1 {background:#ffe4ad;box-shadow:0 0 8px 2px #ffd88fa8,0 0 18px #d9bc7268}
-.sg-table-mote-2 {background:#90f1ef;box-shadow:0 0 7px 2px #6fdfdeb8,0 0 18px #6cd5d55b}
-.sg-table-mote-3 {background:#f2c8e5;box-shadow:0 0 8px 2px #e2a6e0a6,0 0 17px #dba6f454}
-.sg-table-flare {
-  border-radius: 1px;
-  transform-origin: 50% 50%;
-  filter: drop-shadow(0 0 3px #ffffffbb);
-}
-.sg-table-flare::before,
-.sg-table-flare::after {
-  content: '';
-  position: absolute;
-  left: 50%; top: 50%;
-  background: #eafdfa;
-  border-radius: 99px;
-  transform: translate(-50%,-50%);
-  box-shadow: 0 0 9px #aefff6c9;
-}
-.sg-table-flare::before { width: 1px; height: 13px; }
-.sg-table-flare::after { width: 13px; height: 1px; }
-.sg-table-light {
+/* v19: single low-cost canvas, not a cloud of CSS nodes.
+ * No broad radial gradients, animated circles or sweeping light beams. */
+.sg .sg-table-ambient {
   position:absolute;
+  inset:7px;
+  width:calc(100% - 14px);
+  height:calc(100% - 14px);
   display:block;
   pointer-events:none;
-  width:37%;
-  aspect-ratio:1;
-  border-radius:50%;
-  opacity:0;
-  filter:blur(35px);
-  background:radial-gradient(circle,#7be7d51d,transparent 67%);
-  animation:sg-felt-light 35s ease-in-out infinite alternate;
+  z-index:0;
+  border-radius:13px;
+  opacity:.84;
 }
-.sg-table-light-a {left:4%;top:7%}
-.sg-table-light-b {left:49%;top:49%;animation-delay:-21s;animation-duration:42s;background:radial-gradient(circle,#e5c7a31a,transparent 67%)}
-.sg-table-light-c {left:52%;top:3%;animation-delay:-11s;animation-duration:38s;background:radial-gradient(circle,#a2a2f522,transparent 67%)}
-.sg-table-caustic {
-  position: absolute;
-  top: -16%;
-  height: 132%;
-  width: 45%;
-  opacity: .22;
-  pointer-events:none;
-  mix-blend-mode:screen;
-  background:linear-gradient(102deg,transparent 29%,#a5e8e708 40%,#bffcf321 48%,#8ddde00c 53%,transparent 65%);
-  transform:rotate(-15deg);
-  animation:sg-felt-caustic 37s ease-in-out infinite alternate;
-}
-.sg-table-caustic-a {left:4%}
-.sg-table-caustic-b {
-  left:56%;
-  animation-delay:-20s;
-  animation-duration:47s;
-  background:linear-gradient(111deg,transparent 28%,#f7e4bd0b 40%,#d6a6dc26 50%,#d3eafa0b 57%,transparent 67%);
-}
-@keyframes sg-mote-drift {
-  0%,100% {transform:translate3d(-9px,var(--mote-distance),0) scale(.5);opacity:0}
-  16% {opacity:.86}
-  39% {opacity:.64}
-  62% {opacity:.9}
-  85% {opacity:.36}
-  96% {opacity:0}
-  55% {transform:translate3d(11px,calc(0px - var(--mote-distance)),0) scale(1.12)}
-}
-@keyframes sg-felt-light {
-  0% {transform:translate3d(-15px,20px,0) scale(.9);opacity:.16}
-  50% {opacity:.62}
-  100% {transform:translate3d(60px,-40px,0) scale(1.18);opacity:.32}
-}
-@keyframes sg-felt-caustic {
-  0% {transform:translate3d(-38px,35px,0) rotate(-15deg);opacity:.12}
-  50% {opacity:.32}
-  100% {transform:translate3d(55px,-38px,0) rotate(-11deg);opacity:.19}
+.sg .sg-felt > .sg-seat,
+.sg .sg-felt > .sg-center {
+  position:relative;
+  z-index:1;
 }
 
 /* The header now has three stable controls and one intentional dropdown. */
@@ -358,6 +281,5 @@
   box-shadow:0 0 20px #a2ccab12;
 }
 @media(prefers-reduced-motion:reduce) {
-  .sg-table-ambient {display:none!important}
-  .sg-table-mote,.sg-table-light,.sg-table-caustic {animation:none!important}
+  .sg .sg-table-ambient {display:none!important}
 }
