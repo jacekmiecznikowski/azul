@@ -20,7 +20,9 @@
     "learn:background": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-selfplay.ps1",
     "learn:stop": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/stop-selfplay.ps1",
     "learn:status": "node scripts/learn-status.cjs",
-    "learn:smoke": "node scripts/compileTraining.cjs && node scripts/learnSelfPlay.cjs --smoke"
+    "learn:smoke": "node scripts/compileTraining.cjs && node scripts/learnSelfPlay.cjs --smoke",
+    "portable:dev": "node scripts/make-portable-icon.cjs && tauri dev",
+    "portable:build": "node scripts/make-portable-icon.cjs && tauri build --no-bundle"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.0",
@@ -36,7 +38,8 @@
     "@vitejs/plugin-react": "^5.0.0",
     "typescript": "^5.9.0",
     "vite": "^8.0.0",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.0",
+    "@tauri-apps/cli": "^2.0.0"
   },
   "engines": {
     "node": ">=22.12.0"
