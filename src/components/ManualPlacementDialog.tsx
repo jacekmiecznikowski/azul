@@ -10,6 +10,9 @@ type TakeMove = Extract<Move, { kind: 'take' }>
 const COLOR_NAMES: Record<GlassColor, string> = {
   rose: 'czerwonych', citrine: 'żółtych', cyan: 'niebieskich', amber: 'pomarańczowych', slate: 'białych',
 }
+const PANE_NAMES: Record<GlassColor, string> = {
+  rose: 'CZERWONE', citrine: 'ŻÓŁTE', cyan: 'NIEBIESKIE', amber: 'POMARAŃCZOWE', slate: 'BIAŁE',
+}
 
 export function ManualPlacementDialog({ strip, candidates, picked, onClose, onConfirm }: {
   strip: WindowStrip
@@ -73,14 +76,14 @@ export function ManualPlacementDialog({ strip, candidates, picked, onClose, onCo
             variants.some(variant => [...selected, index].every(slot => variant.includes(slot)))
           return <button key={index} type="button"
             className={`sg-manual-pane${base === 'wild' ? ' sg-manual-joker' : ''}${active ? ' sg-manual-active' : ''}`}
-            aria-label={`Pole ${index + 1}, ${occupied ? 'już zajęte' : base === 'wild' ? 'joker' : 'kolor zwykły'}, ${active ? 'zaznaczone' : selectableField ? 'możliwe do wyboru' : 'niedostępne'}`}
+            aria-label={`Pole ${index + 1}, ${occupied ? 'już zajęte' : base === 'wild' ? 'joker' : PANE_NAMES[base].toLowerCase()}, ${active ? 'zaznaczone' : selectableField ? 'możliwe do wyboru' : 'niedostępne'}`}
             aria-pressed={selectableField ? active : undefined}
             disabled={!selectableField || (!active && !possible)}
             onClick={() => toggle(index)}>
             <span className="sg-manual-pane-index">{String(index + 1).padStart(2, '0')}</span>
             <GlassPiece color={active ? color : strip.panes[index] ?? base}
               placed={occupied || active}/>
-            <span className="sg-manual-pane-type">{occupied ? 'ZAŁOŻONE' : base === 'wild' ? 'JOKER ★' : 'ZWYKŁE'}</span>
+            <span className="sg-manual-pane-type">{occupied ? 'ZAŁOŻONE' : base === 'wild' ? 'JOKER ★' : PANE_NAMES[base]}</span>
             <span className="sg-manual-check">{active ? <Check size={15}/> : occupied ? '●' : '＋'}</span>
           </button>
         })}
@@ -100,7 +103,7 @@ export function ManualPlacementDialog({ strip, candidates, picked, onClose, onCo
           <Check size={16}/> Ułóż tafle
         </button>
       </div>
-      <span className="sg-manual-footnote">Możesz wybrać np. dwa jokery zamiast jokera i zwykłego pola. Zaznaczenia nie zmieniają zasad gry.</span>
+      <span className="sg-manual-footnote">Sam wskazujesz, które zwykłe i jokerowe pola zajmą tafle. Zasady gry pozostają bez zmian.</span>
     </div>
   </div>
 }
