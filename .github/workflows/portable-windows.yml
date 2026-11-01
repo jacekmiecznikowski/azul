@@ -1,0 +1,68 @@
+name: Portable Windows EXE (Tauri)
+run-name: Portable Sintra Glass - ${{ github.sha }}
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/portable-windows.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  portable:
+    name: Build x64 EXE
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout game
+        uses: actions/checkout@v4
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Rust stable for Windows
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - name: Install JavaScript dependencies
+        run: npm install --no-audit --no-fund
+      - name: Compile minimal portable EXE and embedded game assets
+        run: npm run portable:build
+      - name: Package one-file portable edition
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $exe = Get-ChildItem -Path 'src-tauri/target/release/*.exe' |
+            Where-Object { $_.Name -like 'sintra*' } |
+            Select-Object -First 1
+          if (-not $exe) { throw 'Tauri release EXE not found' }
+          New-Item -ItemType Directory -Path portable -Force | Out-Null
+          Copy-Item $exe.FullName 'portable/SintraGlass.exe'
+          @(
+            'SINTRA GLASS - PORTABLE WINDOWS x64'
+            ''
+            'Run SintraGlass.exe on Windows 10/11 (64-bit).'
+            'No setup, Node.js or server needed. Works offline.'
+            'Microsoft Edge WebView2 Runtime must be present on the target PC.'
+            'Windows 11 includes it; most up-to-date Windows 10 systems have it.'
+            'Game saves are stored locally on the computer running the game.'
+            'Unsigned EXE: Windows may show a SmartScreen warning.'
+          ) | Set-Content -Path 'portable/README-PORTABLE.txt' -Encoding utf8
+          $mib = [math]::Round((Get-Item 'portable/SintraGlass.exe').Length / 1MB, 2)
+          Write-Host "Portable executable: $mib MiB"
+          Compress-Archive -Path 'portable/SintraGlass.exe','portable/README-PORTABLE.txt' -DestinationPath 'SintraGlass-Portable-Win64.zip' -CompressionLevel Optimal -Force
+          $zip = [math]::Round((Get-Item 'SintraGlass-Portable-Win64.zip').Length / 1MB, 2)
+          Write-Host "Download ZIP: $zip MiB"
+      - name: Upload portable release
+        uses: actions/upload-artifact@v4
+        with:
+          name: SintraGlass-Portable-Win64
+          path: SintraGlass-Portable-Win64.zip
+          if-no-files-found: error
+          retention-days: 30
