@@ -59,7 +59,7 @@
   22% {opacity:.65}
   65% {opacity:.32}
   88% {opacity:0}
-  55% {transform:translate3d(5px,calc(-1 * var(--mote-distance)),0) scale(1)}
+  55% {transform:translate3d(5px,calc(0px - var(--mote-distance)),0) scale(1)}
 }
 @keyframes sg-felt-light {
   0% {transform:translate3d(-15px,20px,0) scale(.9);opacity:0}
