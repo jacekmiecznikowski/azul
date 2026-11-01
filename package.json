@@ -22,7 +22,8 @@
     "learn:status": "node scripts/learn-status.cjs",
     "learn:smoke": "node scripts/compileTraining.cjs && node scripts/learnSelfPlay.cjs --smoke",
     "portable:dev": "node scripts/make-portable-icon.cjs && tauri dev",
-    "portable:build": "node scripts/make-portable-icon.cjs && tauri build --no-bundle"
+    "portable:build": "node scripts/make-portable-icon.cjs && tauri build --no-bundle && node scripts/verify-portable-assets.cjs",
+    "portable:verify": "node scripts/verify-portable-assets.cjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.0",
