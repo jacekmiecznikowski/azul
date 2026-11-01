@@ -185,8 +185,7 @@
   .sg-manual-actions{flex-wrap:wrap}
 }
 @media(prefers-reduced-motion:reduce){
-  .sg-table-ambient{display:none!important}
-  .sg-table-mote,.sg-table-light{animation:none!important}
+  .sg .sg-table-ambient{display:none!important}
   .sg .sg-manual-pane,.sg-menu-switch:after{transition:none}
 }
 
