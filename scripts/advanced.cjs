@@ -267,6 +267,10 @@ function train(cfg) {
   report.promotionChecks = promotionChecks
   writeJSON(reportPath,report)
   saveAtomic(summaryPath,markdown(report))
+  // Preserve history of completed training runs instead of losing the previous report.
+  const runFolder = path.join(root, 'reports', 'runs')
+  writeJSON(path.join(runFolder, 'strategy-'+cfg.seed+'.json'), report)
+  saveAtomic(path.join(runFolder, 'strategy-'+cfg.seed+'.md'), markdown(report))
   if (promoted) {
     writeJSON(path.join(root,'reports/previous-trained-weights.json'),baselineData)
     // Keep the application StrategyLab schema in sync with promoted weights.
