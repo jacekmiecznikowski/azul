@@ -123,7 +123,7 @@ function Market({ game, selection, disabled, onPick }: {
   </section>
 }
 
-function PenaltyTrack({ game }: { game: GameState }) {
+export function PenaltyTrack({ game }: { game: GameState }) {
   return <section className="sg-track sg-center-card" aria-label="Tor stłuczonego szkła">
     <div className="sg-panel-title"><span>STŁUCZONE SZKŁO</span><small>tor kar</small></div>
     <div className="sg-track-cells" role="group" aria-label="Dziewięć pól toru stłuczonego szkła">{BROKEN_TRACK.map((value, i) =>
