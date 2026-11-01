@@ -1,0 +1,228 @@
+/* Sintra Glass v21 — an understated, premium match-finished ceremony.
+   No auto-results modal; the scoring breakdown is always opt-in. */
+.sg .sg-finish-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 65;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: #051820b5;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+.sg .sg-finish-card {
+  position: relative;
+  isolation: isolate;
+  width: min(480px, 100%);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: clamp(22px, 4vh, 37px) clamp(18px, 5vw, 37px) 23px;
+  border-radius: 19px;
+  border: 1px solid #d9b975bc;
+  background:
+    radial-gradient(ellipse at 50% 0%, #78c3a91f, transparent 56%),
+    linear-gradient(155deg, #234651 0%, #14343e 48%, #0b2835 100%);
+  box-shadow: 0 22px 85px #020b14cf,
+    0 0 0 5px #0b1d27aa,
+    0 0 0 6px #d4ae664f,
+    inset 0 1px 0 #fff7d655,
+    inset 0 0 30px #c8ae6220;
+  color: #f2eadb;
+  animation: sg-finish-appear .45s cubic-bezier(.2,.72,.25,1) both;
+}
+.sg .sg-finish-card::before,
+.sg .sg-finish-card::after {
+  position: absolute;
+  content: '';
+  width: 31px;
+  height: 31px;
+  pointer-events: none;
+  border-color: #c7a66d86;
+  border-style: solid;
+}
+.sg .sg-finish-card::before {
+  top: 10px;
+  left: 10px;
+  border-width: 1px 0 0 1px;
+  border-top-left-radius: 10px;
+}
+.sg .sg-finish-card::after {
+  right: 10px;
+  bottom: 10px;
+  border-width: 0 1px 1px 0;
+  border-bottom-right-radius: 10px;
+}
+.sg .sg-finish-decoration {
+  width: min(250px, 90%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  margin-bottom: 14px;
+}
+.sg .sg-finish-ornament-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e1c1808f);
+}
+.sg .sg-finish-ornament-line:last-child {
+  transform: rotate(180deg);
+}
+.sg .sg-finish-crest {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 56px;
+  height: 56px;
+  color: #f2d49d;
+  border-radius: 50%;
+  border: 1px solid #dfc187a6;
+  background: radial-gradient(circle at 35% 25%, #527678, #1b4045 73%, #112c39);
+  box-shadow: inset 0 0 0 4px #122f39,
+    inset 0 0 0 5px #d7b97863,
+    0 0 16px #e9c47d21;
+}
+.sg .sg-finish-kicker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font: 800 9px 'DM Sans',sans-serif;
+  color: #d4c89e;
+  letter-spacing: 2.1px;
+}
+.sg .sg-finish-kicker svg {color: #daba78;flex:none}
+.sg .sg-finish-card h2 {
+  margin: 8px 0 6px;
+  font: 600 clamp(29px, 5vw, 37px) 'Playfair Display',Georgia,serif;
+  line-height: 1.18;
+  letter-spacing: -.5px;
+  color: #f9eed2;
+  text-shadow: 0 3px 14px #071822aa;
+}
+.sg .sg-finish-subtitle {
+  color: #a4c8c5;
+  font: 500 12px 'DM Sans',sans-serif;
+  letter-spacing: .25px;
+}
+.sg .sg-finish-winner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  margin: 17px 0 6px;
+}
+.sg .sg-finish-winner-name {
+  color: #f2dcaa;
+  font: 700 clamp(18px, 3vw, 23px) 'Playfair Display',Georgia,serif;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+}
+.sg .sg-finish-score {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-top: 1px;
+  color: #f2e7c9;
+  font: 700 24px 'Playfair Display',Georgia,serif;
+}
+.sg .sg-finish-score b {font-weight:700;font-size: 27px; font-variant-numeric: tabular-nums;}
+.sg .sg-finish-score small {
+  font: 800 10px 'DM Sans',sans-serif;
+  letter-spacing: 1.2px;
+  color: #a9c2bd;
+}
+.sg .sg-finish-diamonds {
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+  margin: 8px 0 20px;
+}
+.sg .sg-finish-diamonds i {
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  background: #ca7992;
+  border: 1px solid #f4c5d39e;
+  box-shadow: 0 0 7px #cb809a51;
+}
+.sg .sg-finish-diamonds i:nth-child(2){background:#e4be6f;border-color:#f9e5aa}
+.sg .sg-finish-diamonds i:nth-child(3){background:#81c7d2;border-color:#c2f3f9}
+.sg .sg-finish-diamonds i:nth-child(4){background:#de9b73;border-color:#f9d2af}
+.sg .sg-finish-diamonds i:nth-child(5){background:#c2ced6;border-color:#f4f8f8}
+.sg .sg-finish-actions {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+.sg .sg-finish-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  font: 800 12px 'DM Sans',sans-serif;
+  cursor: pointer;
+  transition: border-color .18s, background-color .18s, box-shadow .18s, transform .18s;
+}
+.sg .sg-finish-actions button:focus-visible {
+  outline: 2px solid #f6d594;
+  outline-offset: 3px;
+}
+.sg .sg-finish-actions button:hover {transform: translateY(-1px)}
+.sg .sg-finish-actions .sg-finish-primary {
+  flex: 1 1 auto;
+  color: #17383a;
+  background: linear-gradient(135deg, #f2daa4, #d9b97b);
+  border-color: #f9e5b4;
+  box-shadow: inset 0 1px 0 #ffffff91, 0 4px 15px #e2be7826;
+}
+.sg .sg-finish-actions .sg-finish-primary:hover {
+  background: linear-gradient(135deg,#ffebc2,#e5c589);
+  box-shadow: inset 0 1px 0 #fff9cc,0 5px 18px #e2be783b;
+}
+.sg .sg-finish-actions .sg-finish-secondary {
+  flex: 0 0 auto;
+  padding: 0 19px;
+  color: #e3ece6;
+  background: #254650;
+  border-color: #789795aa;
+}
+.sg .sg-finish-actions .sg-finish-secondary:hover {
+  background: #365b63;
+  border-color: #bad0bb;
+}
+.sg .sg-finish-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  color: #91aea7;
+  font: 800 9px 'DM Sans',sans-serif;
+  letter-spacing: 1.9px;
+}
+.sg .sg-finish-foot span {color: #d8bc80}
+@keyframes sg-finish-appear {
+  from {opacity:0;transform:translateY(10px) scale(.975)}
+  to {opacity:1;transform:translateY(0) scale(1)}
+}
+@media (max-width: 460px) {
+  .sg .sg-finish-overlay {padding:14px 9px}
+  .sg .sg-finish-card {padding:21px 16px}
+  .sg .sg-finish-actions {flex-direction:column}
+  .sg .sg-finish-actions .sg-finish-secondary {min-height:40px}
+}
+@media (prefers-reduced-motion:reduce) {
+  .sg .sg-finish-card {animation:none}
+  .sg .sg-finish-actions button {transition:none}
+  .sg .sg-finish-actions button:hover {transform:none}
+}
