@@ -4,7 +4,7 @@ type Cue = 'pick' | 'place' | 'score' | 'round' | 'gameOver'
 const GAME_OVER_URL = `${import.meta.env.BASE_URL}game-over.wav`
 const GAME_OVER_VOLUME = 0.52
 const KEY = 'sintra-glass-sounds-v1'
-const melodies: Record<Cue, [number, number, number][]> = {
+const melodies: Record<Exclude<Cue, 'gameOver'>, [number, number, number][]> = {
   pick: [[540, 0, .08]],
   place: [[340, 0, .08], [500, .075, .10]],
   score: [[490, 0, .10], [650, .095, .12], [830, .19, .16]],
