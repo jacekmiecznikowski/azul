@@ -314,3 +314,15 @@ do nauki w tle od teraz używaj `learn:background`.
 - Użytkownicy z systemowym ustawieniem `prefers-reduced-motion: reduce` nie zobaczą animacji; przełącznik informuje o tym ograniczeniu.
 
 Weryfikacja reguł wywoływania efektów: `src/ui/moveVisualEvents.test.ts`.
+
+## Dopieszczony stół i ręczne jokery (v17)
+
+- Na filcowym stole delikatnie dryfują drobinki i bardzo słabe refleksy światła. Korzystają z CSS, nie z ciągłych aktualizacji stanu React.
+- **Puste jokery są nadal fioletowe, ale znacznie mniej nasycone i przygaszone**, podobnie jak pozostałe puste pola.
+- Jeżeli istnieje kilka legalnych miejsc dla wybranego szkła, otwiera się **ręczne wybieranie pól**. Gracz sam klika miejsca (w tym jokery), może usunąć zaznaczenie albo wyczyścić wybór i dopiero zatwierdza ruch. Gra nigdy nie narzuca wariantu.
+- Przykład: dla dwóch białych tafli i trzech wolnych pól [biały, joker, joker] można wybrać [biały, joker 1], [biały, joker 2] albo [joker 1, joker 2]. Każdy układ jest mapowany na istniejący legalny ruch silnika.
+- Gdy po wyborze pól następuje ukończenie kwatery, nadal działa oddzielny etap wyboru koloru zachowywanej tafli.
+- Górny pasek został uproszczony do: Muzyka, Dźwięk, Menu, Nowa gra. W **Menu** są Strategia, Zasady i przełącznik Efekty.
+- Wyłączenie efektów wyłącza również animację drobinek; respektowane jest `prefers-reduced-motion`. Efekty nie wpływają na symulacje i samouczenie botów.
+
+Test wyboru pól i jokerów: `src/ui/manualPlacement.test.ts`.
