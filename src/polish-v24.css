@@ -1,0 +1,17 @@
+/* v24 — color belongs to each randomized palace, never to a player's seat.
+   In particular, the center turn-summary avatar must match the palace badge. */
+.sg .sg-palace-icon-red { --sg-avatar-color: #de777a; --sg-avatar-text: #ffffff; }
+.sg .sg-palace-icon-yellow { --sg-avatar-color: #e9c769; --sg-avatar-text: #203137; }
+.sg .sg-palace-icon-blue { --sg-avatar-color: #6ac5df; --sg-avatar-text: #12313b; }
+.sg .sg-palace-icon-white { --sg-avatar-color: #d7e2e8; --sg-avatar-text: #21343b; }
+
+.sg .sg-player-icon[class*="sg-palace-icon-"] {
+  background: var(--sg-avatar-color);
+  border-color: color-mix(in srgb, var(--sg-avatar-color), #ffffff 27%);
+  color: var(--sg-avatar-text);
+}
+.sg .sg-event-avatar[class*="sg-palace-icon-"] {
+  background: color-mix(in srgb, var(--sg-avatar-color), #173841 26%);
+  border-color: var(--sg-avatar-color);
+  color: var(--sg-avatar-text);
+}
