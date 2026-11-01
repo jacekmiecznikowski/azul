@@ -610,3 +610,5 @@ CSS viewportu (w tym przy zoomie przeglądarki) — proporcje witraży są zacho
 Przy małym oknie (szerokość ≤1180 CSS px lub wysokość ≤640 CSS px)
 automatycznie wyświetlany jest sprawdzony układ kompaktowy także na PC.
 Wszystkie testy i buildy trzech wersji trzeba sprawdzać po zmianach wspólnego UI.
+
+APK v29: <https://github.com/jacekmiecznikowski/azul/releases/tag/android-v29-preview> (publiczny prerelease, bez logowania).
