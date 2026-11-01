@@ -28,8 +28,8 @@ function Window({ strip, index, glazier, target, selected, isHumanTurn, onTarget
     <span className="sg-window-head"><span>{String(index + 1).padStart(2, '0')}</span>
       <span className="sg-window-glazier">{glazier === index ? <Gem size={12}/> : null}</span>
       <span>{complete ? '✓' : strip.side === 0 ? 'A' : 'B'}</span></span>
-    <span className="sg-window-reverse" aria-label="Podgląd drugiej strony">
-      {reverse.map((color, i) => <i key={i} className={`sg-color-dot sg-color-dot-${color}`}/>)}</span>
+    {!complete && <span className="sg-window-reverse" aria-label="Podgląd drugiej strony">
+      {reverse.map((color, i) => <i key={i} className={`sg-color-dot sg-color-dot-${color}`}/>)}</span>}
     <span className="sg-window-lancet">
       {complete ? <span className="sg-finished"><Sparkles size={20}/><b>GOTOWE</b></span>
         : patternFor(strip).map((color, i) =>
