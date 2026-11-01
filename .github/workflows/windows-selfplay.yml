@@ -1,0 +1,68 @@
+name: Windows self-play launcher
+on:
+  push:
+    paths:
+      - 'scripts/*.ps1'
+      - 'scripts/learnSelfPlay.cjs'
+      - '.github/workflows/windows-selfplay.yml'
+  workflow_dispatch:
+
+jobs:
+  windows-selfplay:
+    runs-on: windows-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - name: Parse scripts in Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          foreach ($file in @('scripts/start-selfplay.ps1', 'scripts/stop-selfplay.ps1')) {
+            $tokens = $null
+            $parseErrors = $null
+            $null = [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $file).Path, [ref]$tokens, [ref]$parseErrors)
+            if ($parseErrors.Count -ne 0) {
+              $parseErrors | Format-List
+              throw "PowerShell syntax error in $file"
+            }
+          }
+      - name: Start and gracefully stop self-play in the background
+        shell: powershell
+        run: |
+          npm.cmd run learn:background
+          if ($LASTEXITCODE -ne 0) { throw 'Background launcher failed' }
+          Start-Sleep -Seconds 3
+          $pidFile = 'reports/selfplay/process.pid'
+          if (!(Test-Path $pidFile)) {
+            Get-Content 'reports/selfplay/training-errors.log' -ErrorAction SilentlyContinue
+            throw 'Self-play PID file was not created'
+          }
+          $workerPid = [int](Get-Content $pidFile | Select-Object -First 1)
+          if (!(Get-Process -Id $workerPid -ErrorAction SilentlyContinue)) {
+            Get-Content 'reports/selfplay/training-errors.log' -ErrorAction SilentlyContinue
+            throw 'Background Node process already exited'
+          }
+          npm.cmd run learn:status
+          npm.cmd run learn:stop
+          if ($LASTEXITCODE -ne 0) { throw 'Stop command failed' }
+          $stopped = $false
+          for ($i=0; $i -lt 60; $i++) {
+            if (!(Test-Path $pidFile)) { $stopped=$true; break }
+            Start-Sleep -Seconds 2
+          }
+          if (!$stopped) {
+            Get-Content 'reports/selfplay/training-errors.log' -ErrorAction SilentlyContinue
+            throw 'Self-play did not stop after receiving stop.flag'
+          }
+          if (!(Test-Path 'reports/selfplay/checkpoint.json')) { throw 'Checkpoint missing' }
+          Write-Host 'Windows self-play launcher, shutdown, and checkpoint passed'
+      - name: Ask for graceful shutdown on failure
+        if: always()
+        shell: powershell
+        run: |
+          if (Test-Path 'reports/selfplay/process.pid') {
+            npm.cmd run learn:stop
+          }
