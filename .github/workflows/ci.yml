@@ -17,3 +17,5 @@ jobs:
         run: npm run train:smoke
       - name: Training equivalence and guardrails
         run: node scripts/advanced.test.cjs
+      - name: Autonomiczny self-play (mały test)
+        run: npm run learn:smoke
