@@ -1,0 +1,123 @@
+/* Sintra Glass v20 — four ornamental diptychs, with two fully usable strips each.
+   The ornament represents the four completed sides, not a new gameplay rule. */
+.sg .sg-board-windows {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(5px, .62vw, 11px);
+}
+.sg .sg-ornament-pair {
+  --ornament-metal: #afaf90;
+  --ornament-gleam: #efce8d;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  min-height: 0;
+  padding: 16px 2px 2px;
+  gap: 3px;
+  border: 1px solid #b5b79d55;
+  border-radius: 13px 13px 8px 8px;
+  background: linear-gradient(90deg,#cfba8420 0%,#0d2d38 10%,#092630 48%,#102f3a 90%,#cfba8423 100%);
+  box-shadow: inset 0 0 0 1px #091824a3, inset 0 1px 6px #d9be7721,
+    0 2px 5px #0619227a;
+  transition: border-color .32s ease, box-shadow .32s ease;
+}
+.sg .sg-ornament-pair::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 13px;
+  bottom: 4px;
+  width: 1px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: linear-gradient(180deg,#cfbb8061,#c4d5c624 38%,#e8c58c47 90%,#cfbb807a);
+  box-shadow: 0 0 4px #dcc49745;
+}
+.sg .sg-ornament-pair .sg-window {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+}
+.sg .sg-ornament-crown {
+  position: absolute;
+  top: -3px;
+  left: 7%;
+  width: 86%;
+  height: 23px;
+  z-index: 2;
+  display: block;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 1px #050e16d2);
+}
+.sg .sg-ornament-crown svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.sg .sg-ornament-outline {
+  fill: none;
+  stroke: #b7ac85aa;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.sg .sg-ornament-wing {
+  fill: none;
+  stroke: #718d8a85;
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke .45s ease, filter .45s ease;
+}
+.sg .sg-ornament-wing-lit { stroke: #c0b084c2; }
+.sg .sg-ornament-wing-full { stroke: #ebcc8ce3; }
+.sg .sg-ornament-gem {
+  stroke: #a79d78c1;
+  stroke-width: 1.6;
+  fill: #26434b;
+  transition: fill .45s ease, stroke .45s ease;
+}
+.sg .sg-ornament-gem-line {
+  stroke: #a0ada66e;
+  stroke-width: .85;
+  fill: none;
+}
+.sg .sg-ornament-petal {
+  fill: #36535a;
+  stroke: #91a29e8f;
+  stroke-width: 1;
+  transition: fill .4s ease, stroke .4s ease, filter .4s ease;
+}
+.sg .sg-ornament-petal-lit {
+  fill: #f0d3a0;
+  stroke: #fceac7;
+  filter: drop-shadow(0 0 2px #f7ce80ae);
+}
+.sg .sg-ornament-complete {
+  border-color: #d8ba7baa;
+  box-shadow: inset 0 0 0 1px #eed6a52c,
+    inset 0 0 15px #f4d39713,
+    0 0 8px #dec78b20, 0 3px 6px #0008;
+}
+.sg .sg-ornament-complete .sg-ornament-gem {
+  stroke: #f7e3b7;
+  fill: #edce88;
+  filter: drop-shadow(0 0 5px #f2d18bb8);
+}
+.sg .sg-ornament-complete .sg-ornament-gem-line { stroke: #80663bbd; }
+.sg .sg-ornament-complete .sg-ornament-crown {
+  filter: drop-shadow(0 0 4px #efd58f6c) drop-shadow(0 1px 1px #050e16d2);
+}
+/* Keep the stained glass, its legal click targets, and the artisan marker above the frame. */
+.sg .sg-ornament-pair .sg-window-target { z-index: 3; }
+@media (prefers-reduced-motion: reduce) {
+  .sg .sg-ornament-pair,
+  .sg .sg-ornament-wing,
+  .sg .sg-ornament-gem,
+  .sg .sg-ornament-petal {transition:none}
+}
