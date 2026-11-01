@@ -137,7 +137,7 @@ function PenaltyTrack({ game }: { game: GameState }) {
   </section>
 }
 
-function TurnSummary({ game }: { game: GameState }) {
+export function TurnSummary({ game }: { game: GameState }) {
   const current = game.players[game.currentPlayer]
   return <section className="sg-turn sg-center-card" aria-label="Tura i wyniki">
     <div className="sg-panel-title"><span>PRZY STOLE</span><span className="sg-live-dot"/></div>
