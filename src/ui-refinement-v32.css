@@ -1,0 +1,30 @@
+/* v32: common titles across the four central desktop cards.
+   Do not hide turn indicators in the player tabs, portraits or scoreboards. */
+@media (min-width:1101px) and (min-height:621px) {
+  .sg .sg-center .sg-turn > .sg-panel-title,
+  .sg .sg-center .sg-track > .sg-panel-title,
+  .sg .sg-center .sg-market > .sg-panel-title,
+  .sg .sg-center .sg-history > .sg-panel-title {
+    box-sizing:border-box;
+    height:27px;min-height:27px;max-height:27px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 11px;
+    border-bottom:1px solid #69978c66;
+    line-height:1;
+    gap:7px;
+  }
+  .sg .sg-center .sg-panel-title > span:first-child{
+    font-size:10px;line-height:1;letter-spacing:1px;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .sg .sg-center .sg-panel-title small{font-size:10px;line-height:1.2;}
+}
+/* mobile market has its own compact rhythm; this is not a desktop title scaled down */
+@media (max-width:1100px), (max-height:620px) {
+  .sg .sg-mobile-market .sg-panel-title{
+    min-height:23px;height:23px;max-height:23px;
+    padding:0 8px;display:flex;align-items:center;
+  }
+  .sg .sg-mobile-market .sg-market {padding-top:24px;}
+  .sg .sg-mobile-market .sg-panel-title > span:first-child{font-size:9px;line-height:1;}
+}
