@@ -3,7 +3,7 @@ import { Check, Gem, RotateCcw, X } from 'lucide-react'
 import { patternFor } from '../game/engine'
 import type { GlassColor, Move, WindowStrip } from '../game/engine'
 import { GlassPiece } from './GameBoard'
-import { matchingPlacementMoves, distinctPlacementSlots, slotsSignature } from '../ui/manualPlacement'
+import { matchingPlacementMoves, distinctPlacementSlots } from '../ui/manualPlacement'
 
 type TakeMove = Extract<Move, { kind: 'take' }>
 
@@ -23,7 +23,7 @@ export function ManualPlacementDialog({ strip, candidates, picked, onClose, onCo
   const variants = useMemo(() => distinctPlacementSlots(candidates), [candidates])
   const required = variants[0]?.length ?? 0
   const selectable = new Set(variants.flat())
-  const color = candidates[0]?.color
+  const color = candidates[0].color
   const exactMoves = matchingPlacementMoves(candidates, selected)
   const remaining = required - selected.length
   const discarded = Math.max(0, picked - required)
