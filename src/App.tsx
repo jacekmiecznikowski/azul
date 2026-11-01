@@ -290,6 +290,7 @@ export default function App() {
         targets={index === 0 ? targets : undefined} onTarget={index === 0 ? i => chooseTarget(i) : undefined}
         canReset={canReset && !finishing} onReset={() => commit({ kind: 'reset' })}
         isStartingPlayer={game.startingPlayer === index}
+        palaceSide={game.palaceSide}
         hasFirstToken={game.firstCenterTaken && game.nextStartingPlayer === index}/></div>
     </div>
   }
