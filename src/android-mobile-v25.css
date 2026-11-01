@@ -334,3 +334,42 @@
   .sg .sg-round-mobile-color{width:15px;min-width:15px}
   .sg .sg-header-actions .sg-new {min-width:69px;padding:0 6px;font-size:10px}
 }
+
+
+/* v28 — real-device landscape corrections.
+   Fill the usable field and remove desktop-only 100-glass inventory.
+   Full desktop table and its inventory remain unchanged. */
+@media (max-width:1100px) and (pointer:coarse) and (orientation:landscape) {
+  /* The broad left safe-area gutter was applied to ALL the game, not just
+     header controls, which cost ~80 pixels on phones with landscape cutouts. */
+  .sg .sg-mobile-layout {
+    width:100%;
+    padding-left:4px;
+    padding-right:4px;
+    margin:0;
+    box-sizing:border-box;
+    overflow:hidden;
+  }
+  .sg .sg-mobile-game {width:100%;min-width:0;gap:5px}
+  .sg .sg-mobile-board {min-width:0}
+  .sg .sg-mobile-players {width:100%;min-width:0}
+  /* The physical 100-tile inventory is useful on desktop, but doesn't assist
+     mobile play. It was drawing a redundant 100/100 bar over the workshops. */
+  .sg .sg-mobile-market .sg-inventory {display:none!important}
+  .sg .sg-mobile-market .sg-market {
+    padding-top:20px;
+    padding-bottom:21px;
+  }
+  .sg .sg-mobile-market .sg-market-circle {
+    width:min(calc(100cqi - 14px),calc(100cqb - 10px),390px);
+    max-width:100%;
+  }
+  /* Broken-glass penalties are visible in the dedicated row, so don't repeat
+     the same value in the currently selected board's tiny title row. */
+  .sg .sg-mobile-board .sg-board-stat[data-sg-break] {display:none}
+  .sg .sg-mobile-market .sg-first-token {bottom:0}
+}
+@media (max-width:1100px) and (pointer:coarse) and (orientation:landscape) and (max-height:360px) {
+  .sg .sg-mobile-market .sg-market {padding-bottom:20px}
+  .sg .sg-mobile-market .sg-inventory {display:none!important}
+}

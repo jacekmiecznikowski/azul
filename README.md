@@ -586,3 +586,12 @@ Przy aktualizacji webowej wersji gry w istniejącym katalogu Android można wyko
 - Żeton pierwszego gracza jest zmniejszony i przeniesiony na krawędź środka, zamiast zasłaniać szkło.
 - Android wypełnia obszar przy wycięciu aparatu; interaktywne elementy respektują dostępne insets (wymaga potwierdzenia na telefonie).
 - Kompilacja Actions udostępnia artefakt `SintraGlass-Android-v27`.
+
+
+### Android v28 — użyteczność pełnego ekranu
+
+- Ukryte status bar i dolna nawigacja Androida w trybie immersive-sticky, w tym nowszy Android 11+ przez WindowInsetsController. Paski mogą pojawiać się przejściowo po przeciągnięciu od krawędzi.
+- Po odzyskaniu fokusu ponowne ukrycie pasków, aby ikony nie nachodziły na menu i rundy.
+- Układ mobilnego stołu nie otrzymuje już ogromnego marginesu lewej krawędzi od notch/cutout; wymagana weryfikacja położenia aparatu na konkretnym urządzeniu.
+- Ukryty licznik 100/100, szklana wieża i powtórzona informacja o stłuczeniach pod tytułem witraży (tylko w mobilnym układzie), a środek stołu może wykorzystać dodatkową wysokość.
+- Wersja desktopowa bez zmian. Publiczny prerelease Android: `android-v28-preview`.
