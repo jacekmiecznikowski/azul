@@ -9,3 +9,6 @@ coverage/
 .sim-dist/
 reports/strategy-checkpoint.json
 reports/strategy-checkpoint.json.tmp
+
+# Automatically saved long-running self-play sessions
+reports/selfplay/
