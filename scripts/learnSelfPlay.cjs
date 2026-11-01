@@ -136,7 +136,7 @@ function testChampion(data,rng,smoke){
     const v={duelVsHard:visual(comparisons['2'],'candidate'),baselineVsHard:visual(comparisons['2'],'incumbent'),
       fourVsHard:visual(comparisons['4'],'candidate'),fourBaselineVsHard:visual(comparisons['4'],'incumbent')}
     saveJSON(WEIGHTS_FILE,{...original,version:4,algorithm:'online policy-gradient self-play',weights:copy(data.champion),
-      validation:v,ablation:{},training:{...(original.training||{}),trainingGames:data.games},
+      validation:v,ablation:original.ablation||{},training:{...(original.training||{}),trainingGames:data.games},
       selfPlayReport:'reports/selfplay/strategy.md'})
   }
   data.rngSeed=rng.state
