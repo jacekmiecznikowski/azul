@@ -1,0 +1,98 @@
+/* Sintra Glass v23 — local hot-seat multiplayer and active-person perspective. */
+.sg .sg-hotseat-setup {
+  width: min(600px, 95vw);
+  max-height: 90dvh;
+  overflow-y: auto;
+  scrollbar-color: #648b85 #142f3b;
+}
+.sg .sg-hotseat-setup > p {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.sg .sg-hotseat-players {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 8px 0 13px;
+}
+.sg .sg-hotseat-player {
+  display: grid;
+  grid-template-columns: 34px minmax(0,1fr);
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #71938f55;
+  border-radius: 10px;
+  padding: 9px 11px;
+  background: linear-gradient(110deg,#173944db,#0b2b37d9);
+}
+.sg .sg-hotseat-number {
+  font: 700 19px 'Playfair Display', Georgia, serif;
+  color: #e3c88f;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.sg .sg-hotseat-player-fields {
+  display: grid;
+  grid-template-columns: minmax(66px,.45fr) minmax(95px,.9fr) minmax(135px,1.35fr);
+  gap: 7px;
+  min-width: 0;
+  align-items: center;
+}
+.sg .sg-hotseat-player-fields > label {
+  color: #c9ded8;
+  font-size: 11px;
+  font-weight: 800;
+}
+.sg .sg-hotseat-player-fields select,
+.sg .sg-hotseat-player-fields input {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid #6d9697aa;
+  border-radius: 7px;
+  background: #153743;
+  color: #eaf5ee;
+  padding: 7px 9px;
+  font: 600 12px 'DM Sans', sans-serif;
+  min-height: 34px;
+}
+.sg .sg-hotseat-player-fields select:disabled {
+  cursor: default;
+  color: #c1d1c5;
+  opacity: .72;
+}
+.sg .sg-hotseat-player-fields :is(select,input):focus-visible {
+  outline: 2px solid #e5c991;
+  outline-offset: 2px;
+}
+.sg .sg-hotseat-hint {
+  margin: 2px 0 16px;
+  padding: 9px 12px;
+  border-left: 2px solid #d2bb8a;
+  border-radius: 0 6px 6px 0;
+  background: #dfca934d;
+  color: #dcece3;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.sg .sg-seat-active-human.sg-seat-south .sg-seat-rotation .sg-board {
+  border-color: #f1d194;
+  box-shadow: 0 0 0 2px #f0ce8a6a,0 5px 30px #0008,inset 0 0 0 2px #0b252d;
+  animation: sg-human-seat-arrives .22s ease-out both;
+}
+@keyframes sg-human-seat-arrives {
+  from {opacity: .68; filter: brightness(.82)}
+  to {opacity: 1; filter: brightness(1)}
+}
+@media (max-width: 580px) {
+  .sg .sg-hotseat-player-fields {
+    grid-template-columns: minmax(90px,.6fr) minmax(0,1fr);
+    row-gap: 5px;
+  }
+  .sg .sg-hotseat-player-fields label {grid-column: 1 / -1}
+  .sg .sg-hotseat-player {grid-template-columns: 27px minmax(0,1fr);gap:7px;padding:7px}
+  .sg .sg-hotseat-player-fields :is(select,input) {font-size:11px;padding:7px 5px}
+}
+@media (prefers-reduced-motion: reduce) {
+  .sg .sg-seat-active-human.sg-seat-south .sg-seat-rotation .sg-board {animation: none}
+}
