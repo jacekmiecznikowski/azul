@@ -17,25 +17,6 @@
   box-shadow: none;
 }
 
-/* v19: single low-cost canvas, not a cloud of CSS nodes.
- * No broad radial gradients, animated circles or sweeping light beams. */
-.sg .sg-table-ambient {
-  position:absolute;
-  inset:7px;
-  width:calc(100% - 14px);
-  height:calc(100% - 14px);
-  display:block;
-  pointer-events:none;
-  z-index:0;
-  border-radius:13px;
-  opacity:.84;
-}
-.sg .sg-felt > .sg-seat,
-.sg .sg-felt > .sg-center {
-  position:relative;
-  z-index:1;
-}
-
 /* The header now has three stable controls and one intentional dropdown. */
 .sg .sg-header-actions {gap:8px}
 .sg .sg-game-menu {position:relative;flex:none}
@@ -185,7 +166,6 @@
   .sg-manual-actions{flex-wrap:wrap}
 }
 @media(prefers-reduced-motion:reduce){
-  .sg .sg-table-ambient{display:none!important}
   .sg .sg-manual-pane,.sg-menu-switch:after{transition:none}
 }
 
@@ -280,5 +260,4 @@
   box-shadow:0 0 20px #a2ccab12;
 }
 @media(prefers-reduced-motion:reduce) {
-  .sg .sg-table-ambient {display:none!important}
 }
