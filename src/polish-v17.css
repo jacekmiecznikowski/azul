@@ -17,54 +17,100 @@
   box-shadow: none;
 }
 
-/* A small amount of glass dust drifts over the felt, without blocking any input. */
+/* A little enchanted dust: visible from a distance, but away from the visual hierarchy of the game. */
 .sg-table-ambient {
-  position:absolute;
-  inset:7px;
-  overflow:hidden;
-  border-radius:13px;
-  pointer-events:none;
-  z-index:3;
-  opacity:.68;
+  position: absolute;
+  inset: 7px;
+  overflow: hidden;
+  border-radius: 13px;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 1;
+  contain: paint;
 }
 .sg-table-mote {
-  position:absolute;
-  width:var(--mote-size);
-  height:var(--mote-size);
-  border-radius:50%;
-  background: #e3f5ee;
-  box-shadow:0 0 6px 1px #d0fcf86a;
-  opacity:0;
-  animation:sg-mote-drift var(--mote-duration) ease-in-out var(--mote-delay) infinite;
-  will-change:transform,opacity;
+  position: absolute;
+  width: var(--mote-size);
+  height: var(--mote-size);
+  border-radius: 50%;
+  background: #e2ffff;
+  box-shadow: 0 0 7px 2px #b6f7f0ae, 0 0 18px #bcebe862;
+  opacity: 0;
+  animation: sg-mote-drift var(--mote-duration) ease-in-out var(--mote-delay) infinite;
+  will-change: transform, opacity;
 }
-.sg-table-mote-1 {background:#f5d9a8;box-shadow:0 0 8px 1px #fad3986e}
-.sg-table-mote-2 {background:#9bdfdc;box-shadow:0 0 8px 1px #79d9d985}
+.sg-table-mote-1 {background:#ffe4ad;box-shadow:0 0 8px 2px #ffd88fa8,0 0 18px #d9bc7268}
+.sg-table-mote-2 {background:#90f1ef;box-shadow:0 0 7px 2px #6fdfdeb8,0 0 18px #6cd5d55b}
+.sg-table-mote-3 {background:#f2c8e5;box-shadow:0 0 8px 2px #e2a6e0a6,0 0 17px #dba6f454}
+.sg-table-flare {
+  border-radius: 1px;
+  transform-origin: 50% 50%;
+  filter: drop-shadow(0 0 3px #ffffffbb);
+}
+.sg-table-flare::before,
+.sg-table-flare::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  background: #eafdfa;
+  border-radius: 99px;
+  transform: translate(-50%,-50%);
+  box-shadow: 0 0 9px #aefff6c9;
+}
+.sg-table-flare::before { width: 1px; height: 13px; }
+.sg-table-flare::after { width: 13px; height: 1px; }
 .sg-table-light {
   position:absolute;
   display:block;
   pointer-events:none;
-  width:35%;
+  width:37%;
   aspect-ratio:1;
   border-radius:50%;
   opacity:0;
-  filter:blur(32px);
-  background:radial-gradient(circle,#9ae0d514,transparent 67%);
-  animation:sg-felt-light 38s ease-in-out infinite alternate;
+  filter:blur(35px);
+  background:radial-gradient(circle,#7be7d51d,transparent 67%);
+  animation:sg-felt-light 35s ease-in-out infinite alternate;
 }
-.sg-table-light-a {left:14%;top:11%}
-.sg-table-light-b {left:55%;top:53%;animation-delay:-19s;animation-duration:45s;background:radial-gradient(circle,#f7dbac12,transparent 67%)}
+.sg-table-light-a {left:4%;top:7%}
+.sg-table-light-b {left:49%;top:49%;animation-delay:-21s;animation-duration:42s;background:radial-gradient(circle,#e5c7a31a,transparent 67%)}
+.sg-table-light-c {left:52%;top:3%;animation-delay:-11s;animation-duration:38s;background:radial-gradient(circle,#a2a2f522,transparent 67%)}
+.sg-table-caustic {
+  position: absolute;
+  top: -16%;
+  height: 132%;
+  width: 45%;
+  opacity: .22;
+  pointer-events:none;
+  mix-blend-mode:screen;
+  background:linear-gradient(102deg,transparent 29%,#a5e8e708 40%,#bffcf321 48%,#8ddde00c 53%,transparent 65%);
+  transform:rotate(-15deg);
+  animation:sg-felt-caustic 37s ease-in-out infinite alternate;
+}
+.sg-table-caustic-a {left:4%}
+.sg-table-caustic-b {
+  left:56%;
+  animation-delay:-20s;
+  animation-duration:47s;
+  background:linear-gradient(111deg,transparent 28%,#f7e4bd0b 40%,#d6a6dc26 50%,#d3eafa0b 57%,transparent 67%);
+}
 @keyframes sg-mote-drift {
-  0%,100% {transform:translate3d(0,var(--mote-distance),0) scale(.65);opacity:0}
-  22% {opacity:.65}
-  65% {opacity:.32}
-  88% {opacity:0}
-  55% {transform:translate3d(5px,calc(0px - var(--mote-distance)),0) scale(1)}
+  0%,100% {transform:translate3d(-9px,var(--mote-distance),0) scale(.5);opacity:0}
+  16% {opacity:.86}
+  39% {opacity:.64}
+  62% {opacity:.9}
+  85% {opacity:.36}
+  96% {opacity:0}
+  55% {transform:translate3d(11px,calc(0px - var(--mote-distance)),0) scale(1.12)}
 }
 @keyframes sg-felt-light {
-  0% {transform:translate3d(-15px,20px,0) scale(.9);opacity:0}
-  45% {opacity:.54}
-  100% {transform:translate3d(45px,-30px,0) scale(1.18);opacity:.22}
+  0% {transform:translate3d(-15px,20px,0) scale(.9);opacity:.16}
+  50% {opacity:.62}
+  100% {transform:translate3d(60px,-40px,0) scale(1.18);opacity:.32}
+}
+@keyframes sg-felt-caustic {
+  0% {transform:translate3d(-38px,35px,0) rotate(-15deg);opacity:.12}
+  50% {opacity:.32}
+  100% {transform:translate3d(55px,-38px,0) rotate(-11deg);opacity:.19}
 }
 
 /* The header now has three stable controls and one intentional dropdown. */
@@ -219,4 +265,99 @@
   .sg-table-ambient{display:none!important}
   .sg-table-mote,.sg-table-light{animation:none!important}
   .sg .sg-manual-pane,.sg-menu-switch:after{transition:none}
+}
+
+
+/* v18: the small settings menu owns all audio switches. Reset older header button rules. */
+.sg .sg-header-actions .sg-menu-popup .sg-menu-item.sg-music-toggle {
+  display: flex;
+  width:100%;
+  height:auto;
+  min-width:0;
+  min-height:55px;
+  padding:9px 11px;
+  justify-content:flex-start;
+  gap:12px;
+  color:#e7f4ed;
+  border:1px solid transparent;
+  background:transparent;
+}
+.sg .sg-header-actions .sg-menu-popup .sg-menu-item.sg-music-toggle[aria-pressed="true"] {
+  border-color:transparent;
+  color:#e7f4ed;
+  background:transparent;
+}
+.sg .sg-header-actions .sg-menu-popup .sg-menu-item.sg-music-toggle:hover {
+  border-color:#8eb3ab64;
+  background:#476c6d55;
+}
+.sg .sg-header-actions .sg-menu-popup .sg-menu-item.sg-music-toggle > span {
+  display:flex;
+  flex:1;
+}
+.sg .sg-header-actions .sg-menu-popup .sg-menu-item.sg-music-toggle > svg {flex:none}
+.sg-menu-item[aria-pressed="true"] .sg-menu-switch {
+  background:#578477;
+  border-color:#b1c99d;
+}
+.sg-menu-item[aria-pressed="true"] .sg-menu-switch::after {
+  transform:translateX(12px);
+  background:#f0e3b9;
+}
+.sg .sg-menu-popup .sg-menu-title:not(:first-child) {padding-top:10px}
+.sg .sg-menu-popup .sg-menu-item:focus-visible {outline:2px solid #e9d49d;outline-offset:1px}
+
+/* The reverse reference belongs only to an unfinished window. A fully completed
+   two-sided strip uses the whole central aperture for its completion emblem. */
+.sg .sg-window-completed {
+  grid-template-rows:14px minmax(0,1fr) 21px;
+}
+.sg .sg-window-completed .sg-window-reverse {display:none}
+.sg .sg-window-completed .sg-window-lancet {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:5px 2px;
+  background:
+    radial-gradient(ellipse at center,#37747745 0%,#1d474750 35%,transparent 74%),
+    linear-gradient(95deg,#194044,#122d39 55%,#173d40);
+}
+.sg .sg-window-completed .sg-finished {
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  min-height:75px;
+  gap:7px;
+  padding:7px 0;
+  color:#f0d89b;
+  font:800 clamp(9px,1.1vw,12px) 'DM Sans',sans-serif;
+  letter-spacing:1.15px;
+  line-height:1.2;
+  text-align:center;
+  text-shadow:0 1px 5px #0009,0 0 16px #f0d38a69;
+}
+.sg .sg-window-completed .sg-finished svg {
+  width:23px;
+  height:23px;
+  color:#f7df9c;
+  filter:drop-shadow(0 0 9px #f7cf8680);
+}
+.sg .sg-window-completed .sg-finished::before {
+  content:'';
+  position:absolute;
+  width:56px;
+  height:56px;
+  left:50%;
+  top:50%;
+  border:1px solid #c3ac6652;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 20px #a2ccab12;
+}
+@media(prefers-reduced-motion:reduce) {
+  .sg-table-ambient {display:none!important}
+  .sg-table-mote,.sg-table-light,.sg-table-caustic {animation:none!important}
 }
