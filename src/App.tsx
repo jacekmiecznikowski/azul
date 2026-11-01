@@ -29,6 +29,7 @@ import './glass-effects-v16.css'
 import './polish-v17.css'
 import './ornaments-v20.css'
 import './finish-v21.css'
+import './hotseat-v23.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
