@@ -56,13 +56,11 @@ jobs:
           ) | Set-Content -Path 'portable/README-PORTABLE.txt' -Encoding utf8
           $mib = [math]::Round((Get-Item 'portable/SintraGlass.exe').Length / 1MB, 2)
           Write-Host "Portable executable: $mib MiB"
-          Compress-Archive -Path 'portable/SintraGlass.exe','portable/README-PORTABLE.txt' -DestinationPath 'SintraGlass-Portable-Win64.zip' -CompressionLevel Optimal -Force
-          $zip = [math]::Round((Get-Item 'SintraGlass-Portable-Win64.zip').Length / 1MB, 2)
-          Write-Host "Download ZIP: $zip MiB"
+          Write-Host 'GitHub Actions will create the downloadable ZIP automatically (one layer).'
       - name: Upload portable release
         uses: actions/upload-artifact@v4
         with:
           name: SintraGlass-Portable-Win64
-          path: SintraGlass-Portable-Win64.zip
+          path: portable/
           if-no-files-found: error
           retention-days: 30
