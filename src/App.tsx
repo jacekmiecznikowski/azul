@@ -123,7 +123,7 @@ export function Market({ game, selection, disabled, onPick }: {
 
 export function PenaltyTrack({ game }: { game: GameState }) {
   return <section className="sg-track sg-center-card" aria-label="Tor stłuczonego szkła">
-    <div className="sg-panel-title"><span>STŁUCZONE SZKŁO</span><small>tor kar</small></div>
+    <div className="sg-panel-title"><span>STŁUCZONE SZKŁO</span></div>
     <div className="sg-track-cells" role="group" aria-label="Dziewięć pól toru stłuczonego szkła">{BROKEN_TRACK.map((value, i) =>
       <div key={i} className={`sg-track-step${i === 8 ? ' sg-track-last' : ''}${game.players.some(p => p.brokenSteps === i) ? ' sg-track-occupied' : ''}`}
         title={`Pole ${i} z 8, kara ${value} pkt; ${game.players.filter(p => p.brokenSteps === i).map(p => p.name).join(', ') || 'puste'}`}>

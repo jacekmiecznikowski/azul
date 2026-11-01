@@ -17,6 +17,7 @@ describe('v32 middle-panel presentation', () => {
     const markup = renderToStaticMarkup(createElement(PenaltyTrack, { game }))
     expect((markup.match(/<div class="sg-track-step(?=[ "])/g) ?? [])).toHaveLength(BROKEN_TRACK.length)
     expect(markup).toContain('−18')
+    expect(markup).not.toContain('tor kar')
     expect(markup).toContain('sg-track-occupied')
     expect(markup).not.toContain('sg-track-legend')
     expect(markup).not.toContain('/8</b>')
