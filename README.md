@@ -633,3 +633,12 @@ na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian
 - Żeton pierwszego gracza przeniesiony do nagłówka warsztatów, daleko od klikalnych tafli.
 - Usunięte zbędne dekoracyjne podpisy „SINTRA · PRACOWNIA WITRAŻY” pod planszami i „WITRAŻE SINTRY · EDYCJA CYFROWA” z górnej belki gry.
 - Wszystkie platformy korzystają z tego samego kodu React: Vite, Windows EXE, Android APK.
+
+
+### v32 — zgrywanie UI w trzech wersjach
+
+- Cztery nagłówki środkowych paneli mają jednakową wysokość i odstępy; zielona kropka została usunięta **tylko** z „PRZY STOLE”. Znaczniki aktualnej tury przy graczach pozostają.
+- Tor stłuczonego szkła to dziewięć wyraźnych progów z pionkami na pozycjach. Pod torami legenda wyświetla kolory/nazwy bez powtórzonego licznika „0/8”.
+- W pionowym układzie ekran rund pokazuje numer i kolor każdej z sześciu rund; tor ma osobny panel z polami, a plansza i warsztaty nie rozciągają się bez końca.
+- W panelu zasobów usunięto zbędny licznik 100/100 oraz „Rundy”, pozostawiając nowy wygląd szklanej wieży i trzy czytelne wartości. Mobilna plansza nadal nie pokazuje zasobów.
+- Bez zmian w mechanice gry; wspólny React zasila Vite, EXE i APK.

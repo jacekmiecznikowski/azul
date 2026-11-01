@@ -100,26 +100,21 @@ function Market({ game, selection, disabled, onPick }: {
         {!game.firstCenterTaken && <small className="sg-center-penalty">+1 stłuczenie</small>}
       </div>
     </div>
-    <div className="sg-inventory" aria-label={`Bilans tafli szkła: ${inventory.total} ze 100`}>
-      <div className="sg-inventory-tower" title={`Szklana Wieża: ${inventory.tower} tafli`}>
-        <svg viewBox="0 0 34 42" role="img" aria-label="Szklana Wieża" fill="none">
-          <path d="M9 4 L25 4 L29 35 L25 39 L9 39 L5 35 Z" fill="#2b7180" fillOpacity=".28" stroke="#9dc6c5" strokeWidth="1.4"/>
-          <path d="M11 8 L23 8 L26 33 L22 36 L12 36 L8 33 Z" fill="#72c4d7" fillOpacity=".13" stroke="#9ad3db" strokeOpacity=".45"/>
-          <path d="M9 14 L24 14 M8 23 L26 23 M10 32 L24 32" stroke="#ddf1e8" strokeOpacity=".35"/>
-          <path d="M13 6 L11 32" stroke="#f3ffff" strokeOpacity=".55" strokeWidth="2"/>
-          <path d="M6 38 L28 38" stroke="#e1b578" strokeWidth="2.2"/>
+    <div className="sg-inventory sg-inventory-v32" aria-label={`Zasoby tafli: ${inventory.table} na stole, ${inventory.playerBoards} w witrażach, ${inventory.bag} w woreczku, ${inventory.tower} w wieży. Razem ${inventory.total} ze 100.`}>
+      <div className="sg-inventory-tower" title={`W szklanej wieży: ${inventory.tower}`}>
+        <svg viewBox="0 0 28 36" aria-hidden="true" fill="none">
+          <path d="M8 3H20L24 30L19 34H9L4 30Z" fill="#245867" stroke="#bcdbd1" strokeWidth="1.3"/>
+          <path d="M10 7H18L20.5 29L17 31H11L7.5 29Z" fill="#6ad5df" fillOpacity=".18" stroke="#e0e3ce" strokeOpacity=".48"/>
+          <path d="M8 15H20M7 23H21" stroke="#b8dada" strokeOpacity=".5"/>
+          <path d="M11 7L9 28" stroke="#fff7dc" strokeWidth="2" strokeOpacity=".55"/>
+          <path d="M5 32H23" stroke="#c6b37a" strokeWidth="2"/>
         </svg>
-        <span>WIEŻA</span>
+        <span className="sg-inventory-tower-caption"><small>WIEŻA</small><strong>{inventory.tower}</strong></span>
       </div>
       <div className="sg-inventory-stats">
-        <span title={`Warsztaty: ${inventory.factories}, środek: ${inventory.center}`}><small>Na stole</small><b>{inventory.table}</b></span>
+        <span><small>Na stole</small><b>{inventory.table}</b></span>
         <span><small>Witraże</small><b>{inventory.playerBoards}</b></span>
         <span><small>Woreczek</small><b>{inventory.bag}</b></span>
-        <span className="sg-inventory-highlight"><small>W wieży</small><b>{inventory.tower}</b></span>
-        <span><small>Rundy</small><b>{inventory.roundTrack}</b></span>
-      </div>
-      <div className={`sg-inventory-total${inventory.total !== 100 ? ' sg-inventory-warning' : ''}`} title="Razem: 100 tafli szkła">
-        <strong>{inventory.total}<small> / 100</small></strong><span>SUMA</span>
       </div>
     </div>
     <div className="sg-first-token">{game.firstCenterTaken
@@ -131,13 +126,14 @@ function Market({ game, selection, disabled, onPick }: {
 function PenaltyTrack({ game }: { game: GameState }) {
   return <section className="sg-track sg-center-card" aria-label="Tor stłuczonego szkła">
     <div className="sg-panel-title"><span>STŁUCZONE SZKŁO</span><small>tor kar</small></div>
-    <div className="sg-track-cells">{BROKEN_TRACK.map((value, i) =>
-      <div key={i} className={`sg-track-step${i === 8 ? ' sg-track-last' : ''}`}>
-        <span>{i === 0 ? 'START' : i}</span>
+    <div className="sg-track-cells" role="group" aria-label="Dziewięć pól toru stłuczonego szkła">{BROKEN_TRACK.map((value, i) =>
+      <div key={i} className={`sg-track-step${i === 8 ? ' sg-track-last' : ''}${game.players.some(p => p.brokenSteps === i) ? ' sg-track-occupied' : ''}`}
+        title={`Pole ${i} z 8, kara ${value} pkt`}>
+        <span className="sg-track-step-number">{i === 0 ? 'START' : String(i).padStart(2, '0')}</span>
         <strong>{value === 0 ? '0' : `−${value}`}</strong>
-        <div className="sg-track-pawns">{game.players.map(p => p.brokenSteps === i && <i key={p.id} className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`} title={`${p.name}: ${i}/8`}/>)}</div>
+        <div className="sg-track-pawns">{game.players.map(p => p.brokenSteps === i && <i key={p.id} className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`} title={`${p.name}: pole ${i}`}/>)}</div>
       </div>)}</div>
-    <div className="sg-track-legend">{game.players.map(p => <span key={p.id}><i className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`}/>{p.name} <b>{p.brokenSteps}/8</b></span>)}</div>
+    <div className="sg-track-legend" aria-label="Kolory pionków">{game.players.map(p => <span key={p.id}><i className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`}/><span>{p.name}</span></span>)}</div>
   </section>
 }
 
@@ -462,15 +458,17 @@ export default function App() {
         </div>
         <div className="sg-mobile-market">
           <Market game={game} selection={selection} disabled={!humanTurn || !!finishing} onPick={chooseSource}/>
-          <div className="sg-mobile-penalty-strip" role="group" aria-label="Tor stłuczonego szkła — naciśnij, aby otworzyć szczegóły">
-            <span className="sg-mobile-penalty-label">TOR SZKŁA</span>
-            {BROKEN_TRACK.map((points, i) => <button type="button" key={i} title={`Pole ${i}/8 · kara −${points} pkt`}
-              aria-label={`Tor szkła, pole ${i}, kara ${points} punktów`}
+          <div className="sg-mobile-penalty-strip" role="group" aria-label="Tor stłuczonego szkła — naciśnij pole, aby zobaczyć wyniki">
+            <span className="sg-mobile-penalty-label">STŁUCZONE SZKŁO</span>
+            {BROKEN_TRACK.map((points, i) => <button type="button" key={i}
+              title={`Pole ${i} z 8 · kara ${points} pkt`}
+              aria-label={`Tor szkła, pole ${i} z 8, kara ${points} punktów`}
               onClick={() => setMobilePanel('score')}
-              className={`sg-mobile-penalty-step${i === 8 ? ' sg-mobile-penalty-final' : ''}`}>
+              className={`sg-mobile-penalty-step${i === 8 ? ' sg-mobile-penalty-final' : ''}${game.players.some(p => p.brokenSteps === i) ? ' sg-mobile-penalty-occupied' : ''}`}>
+              <small>{i === 0 ? 'START' : i}</small>
               <strong>{i === 0 ? '0' : `−${points}`}</strong>
               <span className="sg-mobile-penalty-pawns">
-                {game.players.map(p => p.brokenSteps === i ? <i key={p.id} className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`}/> : null)}
+                {game.players.map(p => p.brokenSteps === i ? <i key={p.id} className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`} title={p.name}/> : null)}
               </span>
             </button>)}
           </div>
