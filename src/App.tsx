@@ -141,7 +141,7 @@ function TurnSummary({ game }: { game: GameState }) {
   return <section className="sg-turn sg-center-card" aria-label="Tura i wyniki">
     <div className="sg-panel-title"><span>PRZY STOLE</span><span className="sg-live-dot"/></div>
     <div className="sg-turn-player"><span className={`sg-player-icon sg-player-icon-${game.currentPlayer}`}>{PLAYER_AVATARS[game.currentPlayer]}</span>
-      <div><strong>{game.phase === 'finished' ? 'Koniec rozgrywki' : current.controller === 'human' ? 'Twój ruch' : `Gra ${current.name}`}</strong>
+      <div><strong>{game.phase === 'finished' ? 'Koniec rozgrywki' : current.controller === 'human' ? (current.name === 'Ty' ? 'Twój ruch' : `Tura: ${current.name}`) : `Gra ${current.name}`}</strong>
       <small>{game.phase === 'finished' ? 'Zobacz końcowe wyniki' : current.controller === 'human' ? 'Wybierz tafle i kwaterę' : 'Przeciwnik rozważa ruch…'}</small></div>
       {current.controller === 'ai' && game.phase === 'playing' && <span className="sg-thinking" aria-label="AI myśli"><i/><i/><i/></span>}
     </div>
@@ -244,7 +244,9 @@ export default function App() {
   const [game, setGame] = useState<GameState>(() => restore() ?? newGame({ ...DEFAULT_OPTIONS, botDifficulties: DEFAULT_OPTIONS.difficulties }))
   const [settings, setSettings] = useState<Settings>(() => ({
     opponents: game.players.length - 1,
-    difficulties: game.players.slice(1).map(p => p.difficulty ?? 'normal'),
+    difficulties: DEFAULT_OPTIONS.difficulties.map((difficulty, i) => game.players[i + 1]?.difficulty ?? difficulty),
+    controllers: DEFAULT_OPTIONS.controllers.map((controller, i) => game.players[i]?.controller ?? controller),
+    names: DEFAULT_OPTIONS.names.map((name, i) => game.players[i]?.controller === 'human' ? game.players[i].name : name),
     palaceSide: game.palaceSide,
   }))
   const [selection, setSelection] = useState<Selection | null>(null)
@@ -254,10 +256,14 @@ export default function App() {
   const [showRules, setShowRules] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [showStrategy, setShowStrategy] = useState(false)
+  const [lastHumanIndex, setLastHumanIndex] = useState(() =>
+    game.players[game.currentPlayer]?.controller === 'human' ? game.currentPlayer : 0)
   const { enabled: soundEnabled, toggle: toggleSound, play } = useGameAudio()
   const { enabled: musicEnabled, toggle: toggleMusic, unavailable: musicUnavailable } = useAmbientMusic()
   const { enabled: effectsEnabled, toggle: toggleEffects, emit: emitEffects, clear: clearEffects, bursts: visualBursts, reducedMotion } = useVisualEffects()
   const humanTurn = game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
+  const viewerIndex = viewingPlayerIndex(game.currentPlayer, lastHumanIndex, game.players.map(p => p.controller))
+  const tableSeats = useMemo(() => seatsForViewer(viewerIndex, game.players.length), [viewerIndex, game.players.length])
   const moves = useMemo(() => legalMoves(game), [game])
   const sourceOptions = useMemo(() => availableSources(game), [game])
   const selectionMoves = useMemo(() => selection ? moves.filter(m => m.kind === 'take' &&
@@ -270,10 +276,15 @@ export default function App() {
   const status = selection
     ? `Wybrano ${COLORS_PL[selection.color].toLowerCase()}. Wskaż podświetloną kwaterę.`
     : game.phase === 'finished' ? `Koniec gry — wygrywa ${best[0].name}.`
-    : humanTurn ? 'Twój ruch: wybierz tafle z warsztatu lub środka stołu.'
+    : humanTurn ? `${current.name === 'Ty' ? 'Twój ruch' : `Ruch gracza ${current.name}`}: wybierz tafle z warsztatu lub środka stołu.`
     : `${current.name} wybiera ruch…`
 
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(game)) }, [game])
+  useEffect(() => {
+    if (game.phase === 'playing' && game.players[game.currentPlayer]?.controller === 'human') {
+      setLastHumanIndex(game.currentPlayer)
+    }
+  }, [game.currentPlayer, game.phase, game.players])
   useEffect(() => {
     if (game.phase !== 'playing' || game.players[game.currentPlayer].controller !== 'ai' || finishing) return
     const difficulty = game.players[game.currentPlayer].difficulty ?? 'normal'
@@ -332,17 +343,26 @@ export default function App() {
   function startNew(options: Settings) {
     clearEffects()
     setSettings(options)
-    setGame(newGame({ ...options, botDifficulties: options.difficulties }))
+    setGame(newGame({
+      opponents: options.opponents,
+      palaceSide: options.palaceSide,
+      botDifficulties: options.difficulties,
+      playerControllers: options.controllers,
+      playerNames: options.names,
+    }))
+    setLastHumanIndex(0)
     play('round')
     setSelection(null); setFinishing(null); setPlacementOptions(null); setShowSetup(false); setShowResults(false)
   }
   function seat(index: number, place: 'north' | 'west' | 'east' | 'south') {
     const player = game.players[index]
     if (!player) return null
-    return <div className={`sg-seat sg-seat-${place}`} key={player.id}>
+    const activeHuman = humanTurn && index === game.currentPlayer
+    const viewedHuman = player.controller === 'human' && index === viewerIndex
+    return <div className={`sg-seat sg-seat-${place}${activeHuman ? ' sg-seat-active-human' : ''}`} key={player.id}>
       <div className="sg-seat-rotation"><GameBoard player={player} index={index} isCurrent={game.currentPlayer === index && game.phase === 'playing'}
-        isHuman={index === 0} isHumanTurn={humanTurn} selected={!!selection}
-        targets={index === 0 ? targets : undefined} onTarget={index === 0 ? i => chooseTarget(i) : undefined}
+        isHuman={viewedHuman} isHumanTurn={activeHuman} selected={!!selection && activeHuman}
+        targets={activeHuman ? targets : undefined} onTarget={activeHuman ? i => chooseTarget(i) : undefined}
         canReset={canReset && !finishing} onReset={() => commit({ kind: 'reset' })}
         isStartingPlayer={game.startingPlayer === index}
         palaceSide={game.palaceSide}
@@ -368,9 +388,7 @@ export default function App() {
     <main className="sg-stage" aria-label="Wspólny stół Sintra Glass">
       <div className="sg-felt">
         <TableAmbient enabled={effectsEnabled && !reducedMotion}/>
-        {seat(1, 'north')}
-        {seat(3, 'west')}
-        {seat(2, 'east')}
+        {tableSeats.filter(seatInfo => seatInfo.place !== 'south').map(seatInfo => seat(seatInfo.playerIndex, seatInfo.place))}
         <div className="sg-center">
           <div className="sg-side-left"><TurnSummary game={game}/><PenaltyTrack game={game}/></div>
           <Market game={game} selection={selection} disabled={!humanTurn || !!finishing} onPick={chooseSource}/>
@@ -378,7 +396,7 @@ export default function App() {
             onDiscard={selection && selectionMoves.some(m => m.kind === 'take' && m.windowIndex === null) ? () => chooseTarget(null) : undefined}/>
 
         </div>
-        {seat(0, 'south')}
+        {tableSeats.filter(seatInfo => seatInfo.place === 'south').map(seatInfo => seat(seatInfo.playerIndex, seatInfo.place))}
       </div>
     </main>
     <GlassVisualEffects bursts={visualBursts}/>
