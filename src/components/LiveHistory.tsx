@@ -21,7 +21,7 @@ function EventItem({ event, state }: { event: GameEvent; state: GameState }) {
     ? `${event.picked} × ${COLOR_NAMES[event.color!]} · ${event.source?.type === 'center' ? 'środek stołu' : `warsztat ${event.source?.type === 'factory' ? event.source.index + 1 : ''}`}`
     : event.description
   return <li className={`sg-event sg-event-${event.kind}${event.points ? ' sg-event-scored' : ''}`}>
-    <span className={`sg-event-avatar${player ? ` sg-event-avatar-${event.playerIndex}` : ' sg-event-system'}`} aria-hidden="true">
+    <span className={`sg-event-avatar${player ? ` sg-palace-icon-${player.palaceColor ?? 'red'}` : ' sg-event-system'}`} aria-hidden="true">
       {event.kind === 'take' ? (player?.controller === 'ai' ? <Bot size={13}/> : <Sparkles size={13}/>) : event.kind === 'reset' ? <RotateCcw size={13}/> : <Check size={13}/>}
     </span>
     <div className="sg-event-body">
