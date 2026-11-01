@@ -15,7 +15,7 @@ describe('v32 middle-panel presentation', () => {
   })
   it('keeps all 9 real glass-penalty milestones, including the final -18', () => {
     const markup = renderToStaticMarkup(createElement(PenaltyTrack, { game }))
-    expect((markup.match(/<div class="sg-track-step(?:\\s|\")/g) ?? [])).toHaveLength(BROKEN_TRACK.length)
+    expect((markup.match(/<div class="sg-track-step(?=[ "])/g) ?? [])).toHaveLength(BROKEN_TRACK.length)
     expect(markup).toContain('−18')
     expect(markup).toContain('sg-track-occupied')
     expect(markup).toContain('Kolory pionków')
