@@ -326,3 +326,12 @@ Weryfikacja reguł wywoływania efektów: `src/ui/moveVisualEvents.test.ts`.
 - Wyłączenie efektów wyłącza również animację drobinek; respektowane jest `prefers-reduced-motion`. Efekty nie wpływają na symulacje i samouczenie botów.
 
 Test wyboru pól i jokerów: `src/ui/manualPlacement.test.ts`.
+
+
+## Wizualne dopracowanie stołu i menu (v18)
+
+- Ambient nad filcem został wzmocniony: **78 drobinek szkła**, drobne czteroramienne rozbłyski, trzy łagodne poświaty i dwa powolne refleksy pryzmatyczne. Wszystko działa w CSS i nie ma żadnych opóźnień ani pętli renderujących po stronie JS.
+- Nagłówek zawiera jedynie **Menu** i **Nowa gra**. W **Menu → Dźwięk i wygląd** znajdują się osobne włączniki: **Muzyka w tle**, **Efekty dźwiękowe**, **Efekty wizualne**. Ustawienia muzyki, dźwięku i efektów są pamiętane niezależnie.
+- Po ukończeniu **obu stron kwatery** nie pokazujemy już podglądu kolorów rewersu. Napis **GOTOWE** i ornament są wyśrodkowane w całej wysokości dostępnego okna; zachowane tafle i liczba punktów pozostają widoczne na dole.
+- Ograniczenie animacji w systemie operacyjnym i wyłączenie efektów wizualnych nadal wyłączają również animację drobinek na stole.
+- Testy regresyjne widoku: `src/components/presentation-v18.test.tsx`.
