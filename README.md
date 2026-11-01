@@ -232,3 +232,73 @@ promocję: trening może znaleźć słabszego bota, a to jest użyteczna informa
 Jeżeli kilka niezależnych sesji kończy się odrzuceniem, warto w kolejnym
 eksperymencie zwiększyć próbę albo zmienić przestrzeń cech i sposób planowania
 ruchów zamiast jedynie powtarzać ten sam zestaw wag.
+
+
+## Automatyczna nauka bota przez setki tysięcy partii (self-play)
+
+Nowy, osobny tryb nie wymaga ręcznego ustawiania generacji, wag ani populacji. Używa
+**policy-gradient reinforcement learning**: bot próbuje różnych legalnych ruchów,
+otrzymuje nagrodę dopiero za wynik *pełnej partii* i aktualizuje politykę wyboru ruchów.
+Rywalizuje z poprzednim zaakceptowanym mistrzem, wcześniejszym modelem i botem „Trudny”.
+Uczy się z rozgrywek 2-, 3- i 4-osobowych, naprzemiennie na stronach pałacu A/B.
+
+### Uruchamianie na Windows (Polecane)
+
+W folderze projektu, po `git pull --ff-only`, wpisz **jedno polecenie**:
+
+```powershell
+npm.cmd run learn:background
+```
+
+To kompiluje silnik i uruchamia go **w tle**, z priorytetem CPU „Below normal”.
+Możesz zamknąć terminal, a proces będzie grał dalej. Nie ma opóźnień animacyjnych
+React: trening uruchamia bezpośrednio silnik w Node.js.
+
+Żeby sprawdzić stan lub bezpiecznie zatrzymać pracę:
+
+```powershell
+npm.cmd run learn:status
+npm.cmd run learn:stop
+```
+
+Zatrzymanie jest realizowane przez plik sygnałowy — proces kończy aktualny blok
+partii, zapisuje checkpoint i dopiero się zamyka. Kolejne
+`npm.cmd run learn:background` **automatycznie wznowi naukę**.
+Nie uruchamiaj kilku kopii treningu w tym samym folderze.
+
+Pozostałe warianty:
+
+```powershell
+npm.cmd run learn:auto       # domyślnie 100 000 gier, potem zatrzymanie
+npm.cmd run learn:forever    # bez limitu, w widocznym terminalu
+```
+
+### Co dokładnie zapisuje?
+
+- `reports/selfplay/checkpoint.json` — wszystkie dotychczasowe parametry modelu,
+  stan generatora losowego, optymalizatora i ostatnie testy;
+- `reports/selfplay/strategy.md` — raport po polsku z wynikiem, porównaniem
+  strategii i ich niepewnością statystyczną;
+- `reports/selfplay/report.json` — statystyki do dalszych analiz;
+- `reports/selfplay/training.log` — log osobnego procesu Windows.
+
+**Bezpieczeństwo:** bot używany w grze nadal korzysta z wag zapisanych w
+`src/game/trained-weights.json`. Samo przeprowadzenie dużej liczby partii ich
+nie zmienia. Trener automatycznie zapisze nowe wagi dopiero wtedy, gdy model
+przejdzie niezależne testy porównawcze przeciwko obecnemu mistrzowi. Wynik
+„trening zakończony” NIE oznacza automatycznie poprawy skuteczności.
+
+### Ograniczenia i spodziewana wydajność
+
+Ten trening jest faktycznym **samouczeniem przez nagrodę za wynik**, ale nadal
+używa 17 cech oceny znanych z `learnedPolicy.ts`. Nie jest to duża sieć neuronowa
+i nie ma gwarancji, że po milionie partii będzie lepszy. Możliwe, że sama
+reprezentacja decyzji wymaga rozbudowy o długookresowe planowanie.
+
+Milion symulacji to cel liczbowy, a nie obietnica szybkiego wykonania.
+Raport podaje zmierzoną szybkość `gier/s` na Twoim komputerze.
+Na zwykłym procesorze może to potrwać bardzo długo. Obniżenie priorytetu
+zmniejsza zakłócenia innych programów, ale nie eliminuje zużycia CPU.
+
+Obecny trening `train:ai` nadal istnieje jako narzędzie **porównawcze**;
+do nauki w tle od teraz używaj `learn:background`.
