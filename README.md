@@ -335,3 +335,25 @@ Test wyboru pól i jokerów: `src/ui/manualPlacement.test.ts`.
 - Po ukończeniu **obu stron kwatery** nie pokazujemy już podglądu kolorów rewersu. Napis **GOTOWE** i ornament są wyśrodkowane w całej wysokości dostępnego okna; zachowane tafle i liczba punktów pozostają widoczne na dole.
 - Ograniczenie animacji w systemie operacyjnym i wyłączenie efektów wizualnych nadal wyłączają również animację drobinek na stole.
 - Testy regresyjne widoku: `src/components/presentation-v18.test.tsx`.
+
+## Ambient stołu v19 — mniej drobinek, bez fal
+
+Na podstawie uwag po v18 usunięto:
+- 78 animowanych elementów HTML/CSS z rozbudowanymi cieniami;
+- rozchodzące się okrągłe poświaty;
+- przesuwające się promienie światła imitujące pokaz slajdów.
+
+Zamiast tego jeden przezroczysty **Canvas 2D** rysuje **28 małych,
+przygaszonych drobinek szkła** i sporadyczne drobne refleksy.
+Ruch jest powolny i asynchroniczny. Nie ma żadnych dużych,
+pulsujących okręgów ani fal. Warstwa leży pod planszami i panelami,
+nie przechwytuje kliknięć.
+
+Dla wydajności rysowanie ma limit 24 kl./s, skalowanie rozdzielczości
+do 1,5 DPR, wstrzymanie przy ukrytej karcie lub niewidocznym stole,
+a podczas wyłączania „Efektów wizualnych” Canvas jest usuwany.
+Ustawienia systemowe ograniczenia ruchu są respektowane.
+Nie jest potrzebna nowa biblioteka ani dodatkowe zależności:
+dla tej jednej dekoracji Canvas 2D jest prostszy niż pełny silnik
+WebGL/PixiJS. Efekty ruchów (układanie szkła, rozbicia, punktacja)
+działają nadal tak jak wcześniej.
