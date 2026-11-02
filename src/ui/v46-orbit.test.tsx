@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { readFileSync } from 'node:fs'
-import { Market } from '../App'
+import { MARKET_ORBIT_POSITIONS, Market } from '../App'
 import { COLORS, glassInventory, newGame } from '../game/engine'
 
 const css = readFileSync(new URL('../market-orbit-v46.css', import.meta.url), 'utf8')
@@ -40,12 +40,32 @@ describe('v46 circular workshops and genuine shared center', () => {
     expect(glassInventory(state).total).toBe(100)
   })
 
+  it.each([5, 7, 9])('spreads %i workshops across the rectangular table without collisions', n => {
+    const positions = MARKET_ORBIT_POSITIONS[n]
+    expect(positions).toHaveLength(n)
+    const width = 570
+    const height = 310
+    const diameter = Math.min(92, .22 * height, .15 * width)
+    const rects = positions.map(([px, py]) => ({
+      x: px / 100 * width, y: py / 100 * height,
+    }))
+    rects.forEach(({x, y}) => {
+      expect(x).toBeGreaterThan(diameter/2)
+      expect(width-x).toBeGreaterThan(diameter/2)
+      expect(y).toBeGreaterThan(diameter/2)
+      expect(height-y).toBeGreaterThan(diameter/2)
+    })
+    for (let i=0; i<n; i++) for(let j=i+1;j<n;j++) {
+      const distance = Math.hypot(rects[i].x - rects[j].x, rects[i].y - rects[j].y)
+      expect(distance).toBeGreaterThan(diameter+6)
+    }
+  })
   it('keeps selections inside their circular discs without external outlines', () => {
     expect(css).toContain('.sg-orbit-position-v46 > .sg-factory-v45')
     expect(css).toContain('width:100%')
     expect(css).toContain('sg-token-selected')
     expect(css).toContain('box-shadow:inset 0 0 0 2px #f6d18a')
-    expect(css).toContain('width:49%')
+    expect(css).toContain('width:35%')
     expect(css).toContain('background:')
   })
 })
