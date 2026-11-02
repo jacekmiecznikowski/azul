@@ -1,17 +1,18 @@
 import { Gem, Sparkles } from 'lucide-react'
 import { patternFor, WINDOW_POINTS } from '../game/engine'
 import type { GlassColor, WindowStrip } from '../game/engine'
-import { EmptyGlassSocket } from './EmptyGlassSocket'
+import { EmptyGlassSocket, StainedGlassPane } from './EmptyGlassSocket'
 
 const COLORS_PL: Record<GlassColor, string> = {
   rose: 'Róż', citrine: 'Złoto', cyan: 'Turkus', amber: 'Bursztyn', slate: 'Srebro',
 }
 
-export function Glass({ color, small = false, ghost = false, onClick, selected = false, label }: {
-  color: GlassColor | 'wild'; small?: boolean; ghost?: boolean; selected?: boolean
+export function Glass({ color, small = false, ghost = false, pane = false, onClick, selected = false, label }: {
+  color: GlassColor | 'wild'; small?: boolean; ghost?: boolean; pane?: boolean; selected?: boolean
   onClick?: () => void; label?: string
 }) {
   if (ghost) return <EmptyGlassSocket color={color} small={small}/>
+  if (pane) return <StainedGlassPane color={color} filled small={small}/>
   const className = `glass glass-${color}${small ? ' glass-sm' : ''}${selected ? ' glass-selected' : ''}`
   const content = <><span className="glass-facet" /><span className="glass-spark">✦</span></>
   return onClick ? <button className={className} onClick={onClick} title={label || (color === 'wild' ? 'Joker' : COLORS_PL[color])} aria-label={label || (color === 'wild' ? 'Joker' : COLORS_PL[color])}>{content}</button>
@@ -39,7 +40,7 @@ export function WindowCard({ strip, index, glazier, highlighted, active, onClick
     <div className="pattern-frame">
       {complete ? <div className="pattern-finished"><Sparkles size={20} /><small>UKOŃCZONO</small></div> : pattern.map((slot, slotIndex) =>
         <div key={slotIndex} className={`pattern-cell${strip.panes[slotIndex] ? ' filled' : ''}`}>
-          {strip.panes[slotIndex] ? <Glass color={strip.panes[slotIndex]} /> : <Glass color={slot} ghost />}
+          {strip.panes[slotIndex] ? <Glass color={strip.panes[slotIndex]} pane /> : <Glass color={slot} ghost />}
         </div>)}
     </div>
     <div className="palace-window">

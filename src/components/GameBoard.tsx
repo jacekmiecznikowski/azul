@@ -1,7 +1,7 @@
 import { Gem, RotateCcw, Sparkles } from 'lucide-react'
 import { patternFor, WINDOW_POINTS } from '../game/engine'
 import type { GlassColor, Player, SlotColor, WindowStrip } from '../game/engine'
-import { EmptyGlassSocket } from './EmptyGlassSocket'
+import { EmptyGlassSocket, StainedGlassPane } from './EmptyGlassSocket'
 
 const colors: Record<GlassColor, string> = {
   rose: 'czerwony', citrine: 'żółty', cyan: 'niebieski', amber: 'pomarańczowy', slate: 'biały',
@@ -13,9 +13,10 @@ export function ornamentBonus(completedSides: number): number {
   return completedSides >= 4 ? 10 : completedSides === 3 ? 6 : completedSides === 2 ? 3 : 0
 }
 
-export function GlassPiece({ color, placed = true, small = false }: {
-  color: SlotColor; placed?: boolean; small?: boolean
+export function GlassPiece({ color, placed = true, small = false, boardPane = false }: {
+  color: SlotColor; placed?: boolean; small?: boolean; boardPane?: boolean
 }) {
+  if (boardPane) return <StainedGlassPane color={color} filled={placed} small={small}/>
   if (!placed) return <EmptyGlassSocket color={color} small={small}/>
   return <span className={`sg-glass sg-glass-${color} sg-glass-placed${small ? ' sg-glass-small' : ''}`}
     title={color === 'wild' ? 'Joker' : `Ułożona tafla: ${colors[color]}`}>
@@ -42,7 +43,7 @@ function Window({ strip, index, glazier, target, selected, isHumanTurn, onTarget
       {complete ? <span className="sg-finished"><Sparkles size={20}/><b>GOTOWE</b></span>
         : patternFor(strip).map((color, i) =>
           <span key={i} data-sg-pane={i} className={`sg-pane${strip.panes[i] ? ' sg-pane-filled' : ''}`}>
-            <GlassPiece color={strip.panes[i] ?? color} placed={!!strip.panes[i]}/>
+            <GlassPiece color={strip.panes[i] ?? color} placed={!!strip.panes[i]} boardPane/>
           </span>)}
     </span>
     <span className="sg-window-foot"><span className="sg-window-kept">
