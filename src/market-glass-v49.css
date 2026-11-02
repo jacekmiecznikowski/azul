@@ -6,7 +6,7 @@
 .sg .sg-market .sg-market-orbit-v46 {
   /* A single measurement for EVERY loose gem, whether it is in a round
      workshop or in the shared oval. The playable glass markup is identical. */
-  --sg-shared-gem: min(var(--sg-play-gem), calc(var(--sg-disc-size) * 0.44));
+  --sg-shared-gem: min(var(--sg-play-gem), calc(var(--sg-disc-size) * 0.60));
 }
 .sg .sg-market .sg-center-pile.sg-center-v45 {
   width:41%;
