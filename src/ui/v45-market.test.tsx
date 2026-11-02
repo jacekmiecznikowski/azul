@@ -3,6 +3,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { readFileSync } from 'node:fs'
 import { Market } from '../App'
+import { GlassResources } from '../components/GlassResources'
 import { GlassPiece, GameBoard } from '../components/GameBoard'
 import { COLORS, glassInventory, newGame } from '../game/engine'
 
@@ -17,7 +18,11 @@ describe('v45 market: visually identical playable diamonds and no floor gaps',()
     expect(html).toContain('sg-market-layout-v45')
     expect(html).toContain('sg-market-factories-v45')
     expect(html).toContain('sg-center-v45')
-    expect(html).toContain('sg-stock-ledger')
+    expect(html).not.toContain('sg-stock-ledger')
+    expect(html).not.toContain('sg-first-token')
+    const resources = renderToStaticMarkup(createElement(GlassResources,{game}))
+    expect(resources).toContain('sg-resource-trigger')
+    expect(resources).toContain('Zasoby szkła: razem 100 tafli')
     expect(html).not.toContain('sg-market-circle')
     expect(html).not.toContain('sg-market-ring')
     expect(glassInventory(game).total).toBe(100)
