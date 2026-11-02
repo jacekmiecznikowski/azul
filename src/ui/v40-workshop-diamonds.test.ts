@@ -23,6 +23,11 @@ describe('v40: cut glass diamonds in workshops', () => {
   })
   it('retains action buttons, scores and glass selection semantics', () => {
     const game=newGame({opponents:3,seed:40})
+    // Move one physical piece into the centre: an untouched starting board
+    // has an empty middle and cannot exercise its selectable diamonds.
+    const tile = game.factories[0].shift()
+    if (!tile) throw new Error('Starting factory unexpectedly empty')
+    game.center.push(tile)
     const html=renderToStaticMarkup(createElement(Market,{
       game,selection:null,disabled:false,onPick:()=>{},
     }))
