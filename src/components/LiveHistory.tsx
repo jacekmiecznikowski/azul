@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Bot, Check, History, RotateCcw, Sparkles } from 'lucide-react'
-import type { GameEvent, GameState, GlassColor } from '../game/engine'
+import type { GameEvent, GameState } from '../game/engine'
+import { GLASS_COLOR_LABELS_PL } from '../game/colorLabels'
 
-const COLOR_NAMES: Record<GlassColor, string> = {
-  rose: 'różowe', citrine: 'żółte', cyan: 'turkusowe', amber: 'pomarańczowe', slate: 'szare',
-}
 type Filter = 'all' | 'human' | 'ai'
 
 function PointChange({ value, label }: { value: number; label?: string }) {
@@ -18,7 +16,7 @@ function PointChange({ value, label }: { value: number; label?: string }) {
 function EventItem({ event, state }: { event: GameEvent; state: GameState }) {
   const player = event.playerIndex === null ? null : state.players[event.playerIndex]
   const text = event.kind === 'take'
-    ? `${event.picked} × ${COLOR_NAMES[event.color!]} · ${event.source?.type === 'center' ? 'środek stołu' : `warsztat ${event.source?.type === 'factory' ? event.source.index + 1 : ''}`}`
+    ? `${event.picked} × ${GLASS_COLOR_LABELS_PL[event.color!]} · ${event.source?.type === 'center' ? 'środek stołu' : `warsztat ${event.source?.type === 'factory' ? event.source.index + 1 : ''}`}`
     : event.description
   return <li className={`sg-event sg-event-${event.kind}${event.points ? ' sg-event-scored' : ''}`}>
     <span className={`sg-event-avatar${player ? ` sg-palace-icon-${player.palaceColor ?? 'red'}` : ' sg-event-system'}`} aria-hidden="true">
