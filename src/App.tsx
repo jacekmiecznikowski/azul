@@ -89,9 +89,9 @@ function Factory({ tiles, index, selected, disabled, onPick }: {
 /** Equal arc-length spacing on a wide oval, not equal angles on a squeezed circle.
  * The normalized coordinates adapt to market panels of any size. */
 export const MARKET_ORBIT_POSITIONS: Record<number, readonly (readonly [number, number])[]> = {
-  5: [[50,15],[86.6,34.2],[69.2,80.9],[30.8,80.9],[13.4,34.2]],
-  7: [[50,15],[77.1,23.7],[88.5,62],[63.8,83],[36.2,83],[11.5,62],[22.9,23.7]],
-  9: [[50,15],[71.3,20.1],[89.4,40.4],[81.3,72.6],[60.7,83.8],[39.3,83.8],[18.7,72.6],[10.6,40.4],[28.7,20.1]],
+  5: [[50,17.5],[86.6,34.2],[69.2,80.9],[30.8,80.9],[13.4,34.2]],
+  7: [[50,17.5],[77.1,23.7],[88.5,62],[63.8,83],[36.2,83],[11.5,62],[22.9,23.7]],
+  9: [[50,17.5],[71.3,20.1],[89.4,40.4],[81.3,72.6],[60.7,83.8],[39.3,83.8],[18.7,72.6],[10.6,40.4],[28.7,20.1]],
 }
 export function Market({ game, selection, disabled, onPick }: {
   game: GameState; selection: Selection | null; disabled: boolean;
