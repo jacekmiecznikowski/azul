@@ -65,7 +65,7 @@ try {
           gem.y + gem.height <= disc.y + disc.height + 1,
           `${label}: gem ${i} escapes its circular workshop`)
         const token = metrics.tokens[i]
-        assert(gem.x >= token.x-1 && gem.y >= token.y-1 && gem.x+gem.width <= token.x+token.width+1 && gem.y+gem.height <= token.y+token.height+1, `${label}: gem outside button ${i}`)
+        assert(gem.x >= token.x-1 && gem.y >= token.y-1 && gem.x+gem.width <= token.x+token.width+1 && gem.y+gem.height <= token.y+token.height+1, `${label}: gem outside button ${i}; gem=${JSON.stringify(gem)} button=${JSON.stringify(token)} disc=${JSON.stringify(metrics.gemDiscs[i])}`)
       })
       const first = page.locator(`${root} .sg-market-token`).first()
       await first.click()
