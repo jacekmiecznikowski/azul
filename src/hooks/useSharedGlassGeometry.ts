@@ -24,7 +24,7 @@ export function useSharedGlassGeometry(
       if (!root.getClientRects().length) return
       const pane = root.querySelector<HTMLElement>('.sg-pane')
       const grid = root.querySelector<HTMLElement>('.sg-factory-grid')
-      const center = root.querySelector<HTMLElement>('.sg-center-tokens-v45')
+      const center = root.querySelector<HTMLElement>('.sg-center-pile.sg-center-v45')
       if (!pane || !grid || !center) return
       if (pane.clientWidth === 0 || grid.clientWidth === 0) return
 
@@ -33,7 +33,7 @@ export function useSharedGlassGeometry(
       const paneSpace = Math.min(pane.clientWidth * .84, pane.clientHeight * .84)
       const factorySpace = Math.min(grid.clientWidth / 2, grid.clientHeight / 2) * .91
       const centerSpace = (center.clientWidth - (columns - 1) * 3) / columns - 11
-      const centerHeightSpace = center.clientHeight / Math.ceil(5 / columns) - 4
+      const centerHeightSpace = (center.clientHeight - 12) / Math.ceil(5 / columns) - 4
       const diameter = Math.max(8, Math.min(48, paneSpace, factorySpace, centerSpace, centerHeightSpace))
       const value = `${Math.round(diameter * 10) / 10}px`
       if (root.style.getPropertyValue('--sg-unified-gem-size') !== value) {
@@ -50,7 +50,7 @@ export function useSharedGlassGeometry(
     for (const layout of layouts) {
       const observer = new ResizeObserver(recalc)
       observer.observe(layout)
-      for (const selector of ['.sg-pane', '.sg-factory-grid', '.sg-center-tokens-v45']) {
+      for (const selector of ['.sg-pane', '.sg-factory-grid', '.sg-center-pile.sg-center-v45']) {
         const node = layout.querySelector(selector)
         if (node) observer.observe(node)
       }
