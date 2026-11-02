@@ -12,7 +12,7 @@ describe('v52 – premium physical glass round tracker and responsive stock', ()
   it.each([1, 2, 3, 4, 5, 6])('renders six identical faceted glass pieces in round %i', round => {
     const colors = [...COLORS, COLORS[0]]
     const html = renderToStaticMarkup(createElement(RoundTracker, {round,colors}))
-    expect((html.match(/class="sg-round-v52-step/g) ?? [])).toHaveLength(6)
+    expect((html.match(/class="sg-round-v52-step(?: sg-round-v52-(?:active|past|future))?"/g) ?? [])).toHaveLength(6)
     expect((html.match(/sg-glass-placed sg-gem-faceted/g) ?? [])).toHaveLength(6)
     expect(html).not.toContain('sg-color-dot')
     expect((html.match(/aria-current="step"/g) ?? [])).toHaveLength(1)
