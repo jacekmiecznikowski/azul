@@ -16,7 +16,7 @@ describe('v33 compact central panels', () => {
     expect(market).not.toContain('sg-stock-place')
     expect(market).not.toContain('sg-first-token')
     expect(header).toContain('sg-resource-trigger')
-    expect(header).toContain('Zasoby szkła: razem 100 tafli')
+    expect(header).toContain('Pokaż zasoby szkła')
     const inventory = glassInventory(game)
     expect(Object.keys(inventory)).toEqual(expect.arrayContaining(['tower', 'table', 'playerBoards', 'roundTrack', 'bag']))
     expect(inventory.roundTrack).toBe(6)
