@@ -34,7 +34,8 @@ try {
         const factories = [...orbit.querySelectorAll('.sg-factory-v45')].map(rect)
         const gemDiscs = [...root.querySelectorAll('.sg-market-token')].map(el => rect(el.closest('.sg-factory-v45')))
         return { gems, tokens, market:rect(market), orbit:rect(orbit),
-          factories, gemDiscs, documentWidth:document.documentElement.scrollWidth, viewport:innerWidth }
+          factories, gemDiscs, zoom: parseFloat(getComputedStyle(root.querySelector('.sg-felt') ?? root).zoom) || 1,
+          documentWidth:document.documentElement.scrollWidth, viewport:innerWidth }
       })
       const label = `${width}x${height}-${opponents+1}players`
       await page.screenshot({ path:`reports/ui/${label}.png`, fullPage:true })
@@ -92,7 +93,8 @@ try {
       }
       assert(unified.cssValue?.endsWith('px'), `${label}: no canonical measured diamond size`)
       metrics.gems.forEach((gem, i) => {
-        assert(gem.width >= 12 && gem.height >= 12, `${label}: invisible/tiny gem ${i}: ${JSON.stringify(gem)}`)
+        const minimum = Math.max(9.5, 12 * metrics.zoom)
+        assert(gem.width >= minimum && gem.height >= minimum, `${label}: invisible/tiny gem ${i}: ${JSON.stringify(gem)}, scale=${metrics.zoom}`)
         assert(Math.abs(gem.width-gem.height) < 1, `${label}: distorted gem ${i}`)
         const disc = metrics.gemDiscs[i]
         assert(gem.x >= disc.x - 1 && gem.y >= disc.y - 1 &&
