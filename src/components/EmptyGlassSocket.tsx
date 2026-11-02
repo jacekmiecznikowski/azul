@@ -14,7 +14,7 @@ export function StainedGlassPane({ color, filled, small = false }: {
   color: SlotColor; filled: boolean; small?: boolean
 }) {
   return <span
-    className={`${filled ? 'sg-glass-placed' : 'sg-empty-socket'} sg-stained-pane sg-stained-pane-${color} sg-empty-socket-${color}${small ? ' sg-stained-pane-small sg-empty-socket-small' : ''}${filled ? ' sg-stained-pane-filled' : ' sg-stained-pane-empty'}`}
+    className={`${filled ? 'sg-glass-placed' : 'sg-empty-socket'} sg-stained-pane sg-stained-pane-${color}${filled ? '' : ` sg-empty-socket-${color}`}${small ? ' sg-stained-pane-small sg-empty-socket-small' : ''}${filled ? ' sg-stained-pane-filled' : ' sg-stained-pane-empty'}`}
     role="img"
     aria-label={filled
       ? `Ułożona tafla: ${EMPTY_SLOT_LABELS[color]}`

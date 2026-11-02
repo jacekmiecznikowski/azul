@@ -686,3 +686,10 @@ na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian
 - Spokojniejsze barwy szkła: rubin `#AF393D`, złoto `#E3C45B`, niebieski `#4295B8`, miedź `#CA7247`, mleczna biel `#E1E9E7`; joker ametyst `#9560AE`.
 - W pustych polach zmniejszono połysk i masę zewnętrznych krawędzi; cztery odłamki otaczają mniejszy, ciemny środek. Ułożona tafla ma spokojniejszy połysk i delikatniejszy szlif.
 - Mechanika, układy ekranu i stany witrażysty bez zmian; to odpowiedź na ocenę v37 jako zbyt neonowej.
+
+
+### v39 — spójna ramka pustego i wypełnionego pola
+
+- Oba stany korzystają z **tej samej konstrukcji**: cztery barwne fragmenty i centralny romb. Po ułożeniu szkła wypełnia się tylko romb; obramowanie nie zmienia intensywności ani kształtu.
+- Barwy witraży: rubin `#A94452`, złoto `#D7BE63`, błękit `#4B90AE`, miedź `#B96E4E`, biel `#DCE5E3` i ametyst-joker `#8E6BAF`.
+- Warsztaty i tor rund korzystają z tych samych barw. Nie zmieniono zasad, silnika, fizycznej puli 100 tafli ani zapisów partii. Samouczek i pozostałe poprawki betatestów pozostają w rejestrze.
