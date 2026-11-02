@@ -86,6 +86,13 @@ function Factory({ tiles, index, selected, disabled, onPick }: {
     </div>
   </div>
 }
+/** Equal arc-length spacing on a wide oval, not equal angles on a squeezed circle.
+ * The normalized coordinates adapt to market panels of any size. */
+export const MARKET_ORBIT_POSITIONS: Record<number, readonly (readonly [number, number])[]> = {
+  5: [[50,15],[86.6,34.2],[69.2,80.9],[30.8,80.9],[13.4,34.2]],
+  7: [[50,15],[77.1,23.7],[88.5,62],[63.8,83],[36.2,83],[11.5,62],[22.9,23.7]],
+  9: [[50,15],[71.3,20.1],[89.4,40.4],[81.3,72.6],[60.7,83.8],[39.3,83.8],[18.7,72.6],[10.6,40.4],[28.7,20.1]],
+}
 export function Market({ game, selection, disabled, onPick }: {
   game: GameState; selection: Selection | null; disabled: boolean;
   onPick: (source: Source, color: GlassColor) => void
@@ -98,10 +105,10 @@ export function Market({ game, selection, disabled, onPick }: {
       <div className="sg-market-orbit-v46" data-sg-orbit-count={game.factories.length}>
         <div className="sg-market-factories-v45" role="group" aria-label="Warsztaty szkła">
           {game.factories.map((tiles, i) => {
-            const angle = -90 + 360 * i / game.factories.length
-            const rad = angle * Math.PI / 180
-            const x = 50 + 38 * Math.cos(rad)
-            const y = 50 + 38 * Math.sin(rad)
+            const [x, y] = MARKET_ORBIT_POSITIONS[game.factories.length]?.[i] ?? [
+              50 + 41 * Math.cos((-90 + 360 * i / game.factories.length) * Math.PI / 180),
+              50 + 35 * Math.sin((-90 + 360 * i / game.factories.length) * Math.PI / 180),
+            ]
             return <div key={i} className="sg-orbit-position-v46"
               style={{position:'absolute',left:`${x}%`,top:`${y}%`,width:'var(--sg-disc-size)',aspectRatio:'1',transform:'translate(-50%,-50%)',pointerEvents:'auto'}}>
               <Factory tiles={tiles} index={i} selected={selection} disabled={disabled} onPick={onPick}/>
