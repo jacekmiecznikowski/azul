@@ -3,7 +3,7 @@
 Ta lista pozostaje otwarta między kolejnymi wydaniami. Nie łączyć poprawki
 renderowania z modyfikacją zasad bez testu wykazującego błąd.
 
-- [x] v37: pięć fizycznych kolorów jest bardziej nasyconych i rozróżnialnych,
+- [x] v37/v38: pięć fizycznych kolorów o większej rozróżnialności, stonowanych w v38,
   fiolet #B81FFF jest kolorem WIZUALNYM pustego pola jokera (nie szóstym fizycznym szkłem).
 - [x] v37: puste pola są czterema dużymi odłamkami z ciemną, diamentową luką.
   Ułożone szkło ma odrębny wygląd; dotyczy głównej planszy i podglądów.
@@ -24,3 +24,5 @@ renderowania z modyfikacją zasad bez testu wykazującego błąd.
 Każdy etap: sprawdzić Vite, Windows EXE i Android APK, zachować 100 tafli
 (po 20 w pięciu barwach) oraz działające zapisy gry. Testy automatyczne nie
 zastępują wizualnego sprawdzenia na laptopie i telefonie.
+
+- [x] v38: po teście wizualnym v37 zredukowano jaskrawość i połysk pustych luk; oczekuje na ocenę użytkownika na docelowym ekranie.

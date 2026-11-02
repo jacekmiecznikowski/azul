@@ -6,7 +6,7 @@ import { GameBoard, GlassPiece } from '../components/GameBoard'
 import { Glass, WindowCard } from '../components/WindowBoard'
 import { COLORS, newGame } from '../game/engine'
 
-describe('v37: bold empty sockets, real tiles and accessible glazier', () => {
+describe('v38: balanced empty sockets, real tiles and accessible glazier', () => {
   it('preserves 20 pieces of each of the FIVE physical colors (not six)', () => {
     const state = newGame({ opponents: 3, seed: 37 })
     expect(COLORS).toHaveLength(5)

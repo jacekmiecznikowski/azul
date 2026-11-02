@@ -1,64 +1,66 @@
-/* v37: vivid single-source glass palette.
+/* v38: refined, lower-glare glass palette (continuation of v37 sockets).
  * 5 physical colors, plus violet for wild/JOKER slots only.
  * No engine values or saved-game representation are changed. */
 .sg{
-  --sg-red:#C6283D;--sg-blue:#1FB6FF;--sg-yellow:#FFD60A;
-  --sg-orange:#F35B04;--sg-white:#F4F7FB;--sg-wild:#B81FFF;
+  --sg-red:#AF393D;--sg-blue:#4295B8;--sg-yellow:#E3C45B;
+  --sg-orange:#CA7247;--sg-white:#E1E9E7;--sg-wild:#9560AE;
 }
-.sg .sg-glass-rose,.sg .sg-empty-socket-rose,.sg .glass-rose{--v37-glass:#C6283D;--v37-shadow:#6A1020;--shine:#C6283D;--glass-base:#C6283D;--glass-deep:#6A1020}
-.sg .sg-glass-citrine,.sg .sg-empty-socket-citrine,.sg .glass-citrine{--v37-glass:#FFD60A;--v37-shadow:#A86E00;--shine:#FFD60A;--glass-base:#FFD60A;--glass-deep:#A86E00}
-.sg .sg-glass-cyan,.sg .sg-empty-socket-cyan,.sg .glass-cyan{--v37-glass:#1FB6FF;--v37-shadow:#0D5C8B;--shine:#1FB6FF;--glass-base:#1FB6FF;--glass-deep:#0D5C8B}
-.sg .sg-glass-amber,.sg .sg-empty-socket-amber,.sg .glass-amber{--v37-glass:#F35B04;--v37-shadow:#8A2D04;--shine:#F35B04;--glass-base:#F35B04;--glass-deep:#8A2D04}
-.sg .sg-glass-slate,.sg .sg-empty-socket-slate,.sg .glass-slate{--v37-glass:#F4F7FB;--v37-shadow:#B8C6D6;--shine:#F4F7FB;--glass-base:#F4F7FB;--glass-deep:#B8C6D6}
-.sg .sg-glass-wild,.sg .sg-empty-socket-wild,.sg .glass-wild{--v37-glass:#B81FFF;--v37-shadow:#6E1AA6;--shine:#B81FFF;--glass-base:#B81FFF;--glass-deep:#6E1AA6}
-.sg .sg-color-dot-rose,.sg .tile-rose{--piece:#C6283D;background-color:#C6283D}
-.sg .sg-color-dot-citrine,.sg .tile-citrine{--piece:#FFD60A;background-color:#FFD60A}
-.sg .sg-color-dot-cyan,.sg .tile-cyan{--piece:#1FB6FF;background-color:#1FB6FF}
-.sg .sg-color-dot-amber,.sg .tile-amber{--piece:#F35B04;background-color:#F35B04}
-.sg .sg-color-dot-slate,.sg .tile-slate{--piece:#F4F7FB;background-color:#F4F7FB}
-.sg .sg-color-dot-wild,.sg .tile-wild{--piece:#B81FFF;background-color:#B81FFF}
-.sg .sg-color-dot{background:var(--piece);border-color:#ffffffb8}
-/* Placed pieces: full color, beveled gemstone, high contrast. */
+.sg .sg-glass-rose,.sg .sg-empty-socket-rose,.sg .glass-rose{--v37-glass:#AF393D;--v37-shadow:#682B32;--shine:#AF393D;--glass-base:#AF393D;--glass-deep:#682B32}
+.sg .sg-glass-citrine,.sg .sg-empty-socket-citrine,.sg .glass-citrine{--v37-glass:#E3C45B;--v37-shadow:#856A30;--shine:#E3C45B;--glass-base:#E3C45B;--glass-deep:#856A30}
+.sg .sg-glass-cyan,.sg .sg-empty-socket-cyan,.sg .glass-cyan{--v37-glass:#4295B8;--v37-shadow:#2A566C;--shine:#4295B8;--glass-base:#4295B8;--glass-deep:#2A566C}
+.sg .sg-glass-amber,.sg .sg-empty-socket-amber,.sg .glass-amber{--v37-glass:#CA7247;--v37-shadow:#81432D;--shine:#CA7247;--glass-base:#CA7247;--glass-deep:#81432D}
+.sg .sg-glass-slate,.sg .sg-empty-socket-slate,.sg .glass-slate{--v37-glass:#E1E9E7;--v37-shadow:#889CA4;--shine:#E1E9E7;--glass-base:#E1E9E7;--glass-deep:#889CA4}
+.sg .sg-glass-wild,.sg .sg-empty-socket-wild,.sg .glass-wild{--v37-glass:#9560AE;--v37-shadow:#603F70;--shine:#9560AE;--glass-base:#9560AE;--glass-deep:#603F70}
+.sg .sg-color-dot-rose,.sg .tile-rose{--piece:#AF393D;background-color:#AF393D}
+.sg .sg-color-dot-citrine,.sg .tile-citrine{--piece:#E3C45B;background-color:#E3C45B}
+.sg .sg-color-dot-cyan,.sg .tile-cyan{--piece:#4295B8;background-color:#4295B8}
+.sg .sg-color-dot-amber,.sg .tile-amber{--piece:#CA7247;background-color:#CA7247}
+.sg .sg-color-dot-slate,.sg .tile-slate{--piece:#E1E9E7;background-color:#E1E9E7}
+.sg .sg-color-dot-wild,.sg .tile-wild{--piece:#9560AE;background-color:#9560AE}
+.sg .sg-color-dot{background:var(--piece);border-color:#e4eae38a;box-shadow:0 1px 2px #0007}
+/* Filled windows have a single smooth glass facet, never a neon button. */
 .sg .sg-glass.sg-glass-placed {
   opacity:1;filter:none;
-  border:1px solid color-mix(in srgb,var(--v37-glass),white 18%);
-  background:linear-gradient(145deg,#ffffff79 0%,transparent 35%,#071c2859 100%),var(--v37-glass);
-  clip-path:polygon(14% 0,86% 0,100% 14%,100% 86%,86% 100%,14% 100%,0 86%,0 14%);
-  box-shadow:inset 0 0 0 2px #ffffff6b,inset -4px -4px 8px var(--v37-shadow),0 2px 5px #000a;
+  border:1px solid color-mix(in srgb,var(--v37-glass),#d9e8e8 18%);
+  background:linear-gradient(142deg,#ffffff47 0%,#ffffff18 22%,transparent 50%,#071d2b49 100%),var(--v37-glass);
+  clip-path:polygon(10% 0,90% 0,100% 10%,100% 90%,90% 100%,10% 100%,0 90%,0 10%);
+  box-shadow:inset 0 0 0 1px #ffffff3d,inset -3px -3px 5px #051b273d,0 2px 4px #0006;
 }
 .sg .sg-glass.sg-glass-placed .sg-glass-inner{
-  inset:20%;border:2px solid #ffffffe0;
-  background:linear-gradient(140deg,#fff7,transparent 62%);
-  box-shadow:0 0 7px #ffffff65;
+  inset:24%;border:1px solid #ffffff98;
+  background:linear-gradient(135deg,#fff4,transparent 65%);
+  box-shadow:none;
 }
 .sg .glass:not(.glass-ghost){opacity:1;filter:none}
-/* EMPTY SOCKET: 4 saturated shards surrounding a dark hole.
- * More than half the visible square is chromatic; not a faded tile or a
- * thin ambiguous outline. Each fragment has a distinct angular edge. */
+/* The empty slot reads as a recess in a stained-glass frame.
+   Four modest colored facets surround a genuinely dark center; never a
+   solid brightly outlined square or a black button. */
 .sg .sg-empty-socket{
   display:block;position:relative;flex:none;isolation:isolate;overflow:hidden;
   box-sizing:border-box;
   width:min(92cqi,90cqb,38px);height:auto;aspect-ratio:1;
   max-width:100%;max-height:100%;
-  border-radius:5px;border:1px solid var(--v37-glass);
-  background:linear-gradient(145deg,#071d2a,#061522);
+  border-radius:5px;
+  border:1px solid color-mix(in srgb,var(--v37-glass),#698995 38%);
+  background:linear-gradient(145deg,#102d3a,#071b29 64%,#061724);
   opacity:1;filter:none;
-  box-shadow:inset 0 0 0 1px #ffffff25,0 2px 4px #0009;
+  box-shadow:inset 0 1px 2px #0006,0 1px 3px #0004;
 }
-.sg .sg-empty-socket .sg-socket-shard {
-  position:absolute;inset:4%;display:block;
-  border:0;
-  background:linear-gradient(145deg,#ffffff57 0%,transparent 34%,#06172324 100%),var(--v37-glass);
-  filter:drop-shadow(0 0 1px var(--v37-glass));
+.sg .sg-empty-socket .sg-socket-shard{
+  position:absolute;inset:7%;display:block;border:0;
+  background:linear-gradient(145deg,#ffffff38 0%,transparent 40%,#091d2d24 100%),color-mix(in srgb,var(--v37-glass),#183843 20%);
+  opacity:.85;
+  filter:none;
 }
-.sg .sg-empty-socket .sg-socket-shard-nw{clip-path:polygon(0 0,47% 0,49% 18%,18% 49%,0 47%)}
-.sg .sg-empty-socket .sg-socket-shard-ne{clip-path:polygon(53% 0,100% 0,100% 47%,82% 49%,51% 18%)}
-.sg .sg-empty-socket .sg-socket-shard-se{clip-path:polygon(100% 53%,100% 100%,53% 100%,51% 82%,82% 51%)}
-.sg .sg-empty-socket .sg-socket-shard-sw{clip-path:polygon(47% 100%,0 100%,0 53%,18% 51%,49% 82%)}
+.sg .sg-empty-socket .sg-socket-shard-nw{clip-path:polygon(0 0,42% 0,46% 13%,13% 46%,0 42%)}
+.sg .sg-empty-socket .sg-socket-shard-ne{clip-path:polygon(58% 0,100% 0,100% 42%,87% 46%,54% 13%)}
+.sg .sg-empty-socket .sg-socket-shard-se{clip-path:polygon(100% 58%,100% 100%,58% 100%,54% 87%,87% 54%)}
+.sg .sg-empty-socket .sg-socket-shard-sw{clip-path:polygon(42% 100%,0 100%,0 58%,13% 54%,46% 87%)}
 .sg .sg-empty-socket .sg-socket-core{
-  position:absolute;inset:23%;transform:rotate(45deg);
-  border:2px solid var(--v37-glass);background:#061925;
-  box-shadow:inset 0 0 0 1px #000b,0 0 5px var(--v37-glass);
+  position:absolute;inset:30%;transform:rotate(45deg);
+  border:1px solid color-mix(in srgb,var(--v37-glass),#9db3b6 50%);
+  background:#071e2a;
+  box-shadow:inset 0 1px 2px #0008;
 }
 .sg .sg-empty-socket-wild .sg-socket-core{border-style:dashed}
 .sg .sg-empty-socket-small{width:12px;height:12px}

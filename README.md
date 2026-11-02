@@ -679,3 +679,10 @@ na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian
 - Nowy komponent EmptyGlassSocket: duże kolorowe narożniki i ciemny pusty diament. Po wypełnieniu pojawia się pełna, nasycona tafla. Wspólne dla obu rendererów i wyboru pozycji.
 - Wyraźna krawędź i strzałka pokazują, na której kwaterze stoi witrażysta.
 - Zgłoszenia testerów i dalsze zadania: docs/BETA-FEEDBACK.md. Silnik gry niezmieniony.
+
+
+### v38 — stonowanie palety po pierwszej ocenie v37
+
+- Spokojniejsze barwy szkła: rubin `#AF393D`, złoto `#E3C45B`, niebieski `#4295B8`, miedź `#CA7247`, mleczna biel `#E1E9E7`; joker ametyst `#9560AE`.
+- W pustych polach zmniejszono połysk i masę zewnętrznych krawędzi; cztery odłamki otaczają mniejszy, ciemny środek. Ułożona tafla ma spokojniejszy połysk i delikatniejszy szlif.
+- Mechanika, układy ekranu i stany witrażysty bez zmian; to odpowiedź na ocenę v37 jako zbyt neonowej.
