@@ -36,7 +36,8 @@ describe('v41: physically identical glass and larger, contained workshop center'
     const html=renderToStaticMarkup(createElement(Market,{game,selection:null,disabled:false,onPick:()=>{}}))
     expect(html).toContain('sg-center-tokens-v41')
     expect((html.match(/class="sg-center-choice/g)||[])).toHaveLength(5)
-    for (const c of COLORS) expect(html).toContain('Środek stołu: 2 ×')
+    const names=['czerwone','żółte','niebieskie','pomarańczowe','białe']
+    for (const name of names) expect(html).toContain(`Środek stołu: 2 × ${name} tafle`)
     expect(css).toContain('grid-template-columns:repeat(2,minmax(0,1fr))')
     expect(css).toContain('width:48cqi')
   })
