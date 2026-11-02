@@ -1,6 +1,7 @@
 import { Gem, RotateCcw, Sparkles } from 'lucide-react'
 import { patternFor, WINDOW_POINTS } from '../game/engine'
 import type { GlassColor, Player, SlotColor, WindowStrip } from '../game/engine'
+import { EmptyGlassSocket } from './EmptyGlassSocket'
 
 const colors: Record<GlassColor, string> = {
   rose: 'czerwony', citrine: 'żółty', cyan: 'niebieski', amber: 'pomarańczowy', slate: 'biały',
@@ -15,8 +16,9 @@ export function ornamentBonus(completedSides: number): number {
 export function GlassPiece({ color, placed = true, small = false }: {
   color: SlotColor; placed?: boolean; small?: boolean
 }) {
-  return <span className={`sg-glass sg-glass-${color}${placed ? ' sg-glass-placed' : ' sg-glass-guide'}${small ? ' sg-glass-small' : ''}`}
-    title={color === 'wild' ? 'Dowolny kolor' : `${placed ? 'Tafla' : 'Potrzebny kolor'}: ${colors[color]}`}>
+  if (!placed) return <EmptyGlassSocket color={color} small={small}/>
+  return <span className={`sg-glass sg-glass-${color} sg-glass-placed${small ? ' sg-glass-small' : ''}`}
+    title={color === 'wild' ? 'Joker' : `Ułożona tafla: ${colors[color]}`}>
     <span className="sg-glass-inner"/>
   </span>
 }
@@ -30,9 +32,9 @@ function Window({ strip, index, glazier, target, selected, isHumanTurn, onTarget
   const canPick = isHumanTurn && target
   return <button type="button" disabled={!canPick} onClick={() => onTarget?.(index)}
     data-sg-window={index} className={`sg-window${complete ? ' sg-window-completed' : ''}${canPick ? ' sg-window-target' : ''}${glazier === index ? ' sg-window-active' : ''}${selected ? ' sg-window-selecting' : ''}`}
-    title={`Kwatera ${index + 1}; ${WINDOW_POINTS[index]} pkt${canPick ? '; kliknij, aby ułożyć tafle' : ''}`}>
+    title={`Kwatera ${index + 1}; ${WINDOW_POINTS[index]} pkt${glazier === index ? '; tu stoi witrażysta' : ''}${canPick ? '; kliknij, aby ułożyć tafle' : ''}`}>
     <span className="sg-window-head"><span>{String(index + 1).padStart(2, '0')}</span>
-      <span className="sg-window-glazier">{glazier === index ? <Gem size={12}/> : null}</span>
+      <span className="sg-window-glazier">{glazier === index ? <><Gem size={12}/><span className="sg-glazier-arrow" aria-hidden="true">▼</span></> : null}</span>
       <span>{complete ? '✓' : strip.side === 0 ? 'A' : 'B'}</span></span>
     {!complete && <span className="sg-window-reverse" aria-label="Podgląd drugiej strony">
       {reverse.map((color, i) => <i key={i} className={`sg-color-dot sg-color-dot-${color}`}/>)}</span>}
