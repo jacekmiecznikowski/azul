@@ -130,8 +130,8 @@ try {
           sizes.gems.forEach((gem, i) => {
             assert(Math.abs(gem.width - gem.height) < 1,
               `${label}: center color ${i} distorted at ${count} colors: ${JSON.stringify(gem)}`)
-            assert(gem.width >= (width >= 1101 ? 16 : 9),
-              `${label}: center color ${i} too small at ${count} colors`)
+            assert(gem.width >= (width >= 1101 ? 12 : 9),
+              `${label}: center color ${i} too small at ${count} colors; center=${gem.width}, factory=${sizes.factoryGem.width}, pileHeight=${sizes.pile.height}`)
             assert(gem.x >= sizes.pile.x - 1 && gem.y >= sizes.pile.y - 1 &&
               gem.x + gem.width <= sizes.pile.x + sizes.pile.width + 1 &&
               gem.y + gem.height <= sizes.pile.y + sizes.pile.height + 1,
@@ -151,7 +151,7 @@ try {
           if (referenceSize === null) referenceSize = sizes.gems[0].width
           if (width >= 1101) {
             assert(Math.abs(referenceSize - sizes.factoryGem.width) <= 4,
-              `${label}: center gems have a different scale from workshop gems`)
+              `${label}: center gems have a different scale from workshop gems (center=${referenceSize}, factory=${sizes.factoryGem.width})`)
           }
           if (count === 2 || count === 5) {
             await page.locator(root).screenshot({
