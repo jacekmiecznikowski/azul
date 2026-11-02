@@ -161,6 +161,65 @@ try {
         }
         console.log(`PASS ${label}: square, consistent center gems with 1–5 colors`)
       }
+      // Symmetric physical stained-glass windows: no varying right border and
+      // no offset sockets / placed jewels across the 8 window strips.
+      if (width === 1440 && height === 900 && opponents === 3) {
+        await page.evaluate(() => {
+          const source = document.querySelector('.sg-stage .sg-market-token > .sg-glass')
+          const windows = [...document.querySelectorAll('.sg-stage .sg-seat-south .sg-window')]
+          for (const window of windows) for (const paneIndex of [0, 4]) {
+            const socket = window.querySelectorAll('.sg-pane-socket')[paneIndex]
+            if (!source || !socket) throw new Error('No workshop gem or pane socket')
+            socket.querySelector('.sg-pane-empty-diamond')?.remove()
+            socket.querySelector('.sg-glass')?.remove()
+            socket.append(source.cloneNode(true))
+          }
+        })
+        const geometry = await page.locator('.sg-stage .sg-seat-south').evaluate(seat => {
+          const rect = node => {
+            const r = node.getBoundingClientRect()
+            return {x:r.x,y:r.y,width:r.width,height:r.height,cx:r.x+r.width/2,cy:r.y+r.height/2}
+          }
+          return [...seat.querySelectorAll('.sg-window')].map(win => {
+            const lancet = win.querySelector('.sg-window-lancet')
+            const panes = [...win.querySelectorAll('.sg-pane')]
+            const border = getComputedStyle(lancet)
+            return {
+              window: rect(win), lancet:rect(lancet),
+              borderLeft:parseFloat(border.borderLeftWidth),
+              borderRight:parseFloat(border.borderRightWidth),
+              rows: panes.map(pane => ({
+                pane:rect(pane),
+                socket:rect(pane.querySelector('.sg-pane-socket')),
+                gem:pane.querySelector('.sg-pane-socket .sg-glass') ?
+                  rect(pane.querySelector('.sg-pane-socket .sg-glass')) : null,
+              })),
+            }
+          })
+        })
+        assert.equal(geometry.length, 8, 'There must be 8 windows')
+        for (const [i, window] of geometry.entries()) {
+          assert.equal(window.borderLeft,window.borderRight,`Window ${i+1}: unequal left and right gold borders`)
+          for (const [j,{pane,socket,gem}] of window.rows.entries()) {
+            const maxDelta = 1.2
+            assert(Math.abs(pane.cx - window.lancet.cx) < maxDelta,
+              `Window ${i+1}, floor ${j+1}: floor not horizontally centered`)
+            assert(Math.abs(socket.cx - pane.cx) < maxDelta,
+              `Window ${i+1}, floor ${j+1}: gold socket not centered`)
+            if (gem) {
+              assert(Math.abs(gem.cx - socket.cx) < maxDelta &&
+                Math.abs(gem.cy - socket.cy) < maxDelta,
+                `Window ${i+1}, floor ${j+1}: placed gem is off-center`)
+              assert(Math.abs(gem.width-gem.height)<1,
+                `Window ${i+1}, floor ${j+1}: placed gem isn't square`)
+            }
+          }
+        }
+        await page.locator('.sg-stage .sg-seat-south').screenshot({
+          path:'reports/ui/1440x900-stained-glass-centering.png',
+        })
+        console.log('PASS 1440x900: all 8 windows have symmetric borders and centered sockets/gems')
+      }
       assert.deepEqual(errors, [], label)
       console.log(`PASS ${label}: ${metrics.gems.length} visible gems, selection works`)
       await page.close()
