@@ -13,18 +13,19 @@
 .sg .sg-market .sg-market-orbit-v46 {
   position:relative;
   display:block;
-  width:min(100%, calc(100cqb - 20px));
-  height:auto;
-  aspect-ratio:1;
+  width:100%;
+  height:100%;
+  aspect-ratio:auto;
   min-width:0;
   min-height:0;
   isolation:isolate;
-  --sg-disc-size:22%;
+  /* Fit each circular tray to BOTH dimensions of the rectangular panel. */
+  --sg-disc-size:clamp(28px, min(22cqb, 15cqi), 92px);
 }
 .sg .sg-market .sg-market-orbit-v46::before {
   content:"";
   position:absolute;
-  inset:12.5%;
+  inset:14% 8%;
   border:1px solid #cba96b72;
   border-radius:50%;
   background:radial-gradient(circle,#1b4b5055 0%,#11333d3b 47%,transparent 71%);
@@ -34,7 +35,7 @@
 .sg .sg-market .sg-market-orbit-v46::after {
   content:"";
   position:absolute;
-  inset:32%;
+  inset:31% 29%;
   border-radius:50%;
   background:repeating-conic-gradient(from 11deg,#b89f6822 0deg 2deg,transparent 2deg 45deg);
   -webkit-mask:radial-gradient(circle,transparent 0 25%,#0007 31% 70%,transparent 78%);
@@ -64,7 +65,7 @@
   place-items:center;
   grid-template-columns:minmax(0,1fr);
   grid-template-rows:minmax(0,1fr);
-  padding:clamp(2px, .7cqb, 5px);
+  padding:clamp(2px, .6cqb, 5px);
   box-sizing:border-box;
   border:2px solid #b99a68;
   border-radius:50%;
@@ -126,8 +127,8 @@
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
   grid-template-rows:repeat(2,minmax(0,1fr));
-  width:100%;
-  height:100%;
+  width:84%;
+  height:84%;
   min-width:0;
   min-height:0;
   max-width:none;
@@ -154,8 +155,8 @@
 .sg .sg-market .sg-factory-v45 .sg-market-token .sg-glass.sg-gem-faceted {
   width:var(--sg-play-gem);
   height:var(--sg-play-gem);
-  max-width:94%;
-  max-height:94%;
+  max-width:92%;
+  max-height:92%;
   aspect-ratio:1;
   margin:auto;
   flex:none;
@@ -193,8 +194,8 @@
   top:50%;
   transform:translate(-50%,-50%);
   z-index:3;
-  width:49%;
-  height:49%;
+  width:35%;
+  height:39%;
   min-width:0;
   min-height:0;
   display:flex;
@@ -202,8 +203,8 @@
   align-items:stretch;
   justify-content:center;
   gap:2px;
-  padding:5%;
-  border-radius:50%;
+  padding:2.5%;
+  border-radius:43% / 50%;
   border:1px solid #b49b668a;
   box-sizing:border-box;
   background:
@@ -314,10 +315,12 @@
   overflow:visible;
 }
 .sg .sg-mobile-market .sg-market .sg-market-orbit-v46 {
-  width:min(100%, calc(100cqb - 10px));
+  width:100%;
+  height:100%;
+  aspect-ratio:auto;
 }
 .sg .sg-mobile-market .sg-center-pile.sg-center-v45 {
-  padding:4.5%;
+  padding:2.5%;
 }
 .sg .sg-mobile-market .sg-factory-v45 .sg-factory-num {
   font-size:clamp(8px,1.7cqb,10px);
@@ -351,8 +354,8 @@
   }
   .sg .sg-market .sg-center-pile.sg-center-v45 {
     position:absolute;
-    width:49%;
-    height:49%;
+    width:35%;
+    height:39%;
     min-height:0;
     overflow:visible;
   }
