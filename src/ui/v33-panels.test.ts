@@ -3,24 +3,24 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { glassInventory, newGame } from '../game/engine'
 import { Market, TurnSummary, PenaltyTrack } from '../App'
+import { GlassResources } from '../components/GlassResources'
 
 describe('v33 compact central panels', () => {
   const game = newGame({ opponents: 3, seed: 20261101 })
 
-  it('renders five separate glass locations including the six bonus markers', () => {
-    const html = renderToStaticMarkup(createElement(Market, {
+  it('keeps the five glass locations in header resources rather than inside workshops', () => {
+    const market = renderToStaticMarkup(createElement(Market, {
       game, selection: null, disabled: false, onPick: () => {},
     }))
-    expect((html.match(/class="sg-stock-place/g) || [])).toHaveLength(5)
-    for (const label of ['Wieża','Warsztat','Witraże','Szkła premii','Woreczek']) {
-      expect(html).toContain(label)
-    }
-    const order = ['Wieża','Warsztat','Witraże','Szkła premii','Woreczek'].map(label => html.indexOf(`>${label}</small>`))
-    expect(order.every(i => i >= 0)).toBe(true)
-    expect([...order].sort((a,b) => a-b)).toEqual(order)
-    expect(html).not.toContain('100/100')
-    expect(html).toContain('>6</strong>')
-    expect(glassInventory(game).total).toBe(100)
+    const header = renderToStaticMarkup(createElement(GlassResources, {game}))
+    expect(market).not.toContain('sg-stock-place')
+    expect(market).not.toContain('sg-first-token')
+    expect(header).toContain('sg-resource-trigger')
+    expect(header).toContain('Zasoby szkła: razem 100 tafli')
+    const inventory = glassInventory(game)
+    expect(Object.keys(inventory)).toEqual(expect.arrayContaining(['tower', 'table', 'playerBoards', 'roundTrack', 'bag']))
+    expect(inventory.roundTrack).toBe(6)
+    expect(inventory.total).toBe(100)
   })
 
   it('retains four active-player scoreboard entries without a duplicated glass legend', () => {
