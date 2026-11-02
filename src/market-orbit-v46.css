@@ -4,14 +4,14 @@
 .sg .sg-market .sg-market-layout-v45 {
   position:absolute;
   inset:27px 7px 65px;
-  display:grid;
-  place-items:center;
+  display:block;
   min-width:0;
   min-height:0;
   overflow:visible;
 }
 .sg .sg-market .sg-market-orbit-v46 {
-  position:relative;
+  position:absolute;
+  inset:0;
   display:block;
   width:100%;
   height:100%;
@@ -310,8 +310,7 @@
    the workshops to a vertical list. Ring positions work for 5/7/9 tiles. */
 .sg .sg-mobile-market .sg-market .sg-market-layout-v45 {
   inset:29px 5px 21px;
-  display:grid;
-  place-items:center;
+  display:block;
   overflow:visible;
 }
 .sg .sg-mobile-market .sg-market .sg-market-orbit-v46 {
@@ -336,7 +335,7 @@
 }
 @container sg-market (max-width:300px) {
   .sg .sg-market .sg-market-layout-v45 {
-    display:grid!important;
+    display:block!important;
     flex-direction:initial;
     overflow:visible!important;
   }
