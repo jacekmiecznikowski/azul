@@ -45,6 +45,14 @@ try {
       assert(metrics.orbit.width >= metrics.market.width - 1, `${label}: orbit does not fill panel width`)
       assert(metrics.orbit.height >= metrics.market.height - 1, `${label}: orbit does not fill panel height`)
       assert.equal(metrics.factories.length, 2 * (opponents+1) + 1, label)
+      if (root === '.sg-stage') {
+        const minY = Math.min(...metrics.factories.map(f => f.y))
+        const maxY = Math.max(...metrics.factories.map(f => f.y + f.height))
+        const coverage = (maxY - minY) / metrics.market.height
+        assert(coverage >= .85, `${label}: ring wastes vertical space (${coverage.toFixed(2)})`)
+        assert(Math.abs((minY+maxY)/2 - (metrics.market.y+metrics.market.height/2)) < 13,
+          `${label}: ring is not vertically centered`)
+      }
       metrics.factories.forEach((f, i) => {
         assert(f.x >= metrics.market.x - 1 && f.y >= metrics.market.y - 1 &&
           f.x + f.width <= metrics.market.x + metrics.market.width + 1 &&
@@ -80,7 +88,7 @@ try {
       const resources = page.locator('.sg-header .sg-resource-trigger')
       await resources.click()
       assert.equal(await resources.getAttribute('aria-expanded'), 'true', `${label}: resources disclosure failed`)
-      assert.equal(await page.getByRole('region', { name: 'Zasoby szkła i początek rundy' }).count(), 1,
+      assert.equal(await page.getByRole('region', { name: 'Zasoby szkła' }).count(), 1,
         `${label}: resources missing`)
       await page.getByRole('button', { name: 'Zamknij zasoby' }).click()
       assert.equal(await resources.getAttribute('aria-expanded'), 'false', `${label}: resources did not close`)
