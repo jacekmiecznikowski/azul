@@ -20,7 +20,7 @@
   min-height:0;
   isolation:isolate;
   /* Fit each circular tray to BOTH dimensions of the rectangular panel. */
-  --sg-disc-size:clamp(28px, min(22cqb, 15cqi), 92px);
+  --sg-disc-size:clamp(36px, min(23cqb, 19cqi), 92px);
 }
 .sg .sg-market .sg-market-orbit-v46::before {
   content:"";
@@ -127,8 +127,8 @@
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
   grid-template-rows:repeat(2,minmax(0,1fr));
-  width:84%;
-  height:84%;
+  width:90%;
+  height:90%;
   min-width:0;
   min-height:0;
   max-width:none;
@@ -156,8 +156,8 @@
 .sg .sg-market .sg-factory-v45 .sg-market-token .sg-glass.sg-gem-faceted {
   /* The button is a size container; glass cannot exceed its actual hit box.
      This fixes the formerly 26px glass protruding out of a 21px button. */
-  width:min(90cqi, var(--sg-play-gem));
-  height:min(90cqb, var(--sg-play-gem));
+  width:min(94cqi, var(--sg-play-gem));
+  height:min(94cqb, var(--sg-play-gem));
   max-width:none;
   max-height:none;
   aspect-ratio:1;
@@ -198,7 +198,7 @@
   transform:translate(-50%,-50%);
   z-index:3;
   width:35%;
-  height:39%;
+  height:34%;
   min-width:0;
   min-height:0;
   display:flex;
@@ -357,7 +357,7 @@
   .sg .sg-market .sg-center-pile.sg-center-v45 {
     position:absolute;
     width:35%;
-    height:39%;
+    height:34%;
     min-height:0;
     overflow:visible;
   }
