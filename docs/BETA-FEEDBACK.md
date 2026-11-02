@@ -28,3 +28,5 @@ zastępują wizualnego sprawdzenia na laptopie i telefonie.
 - [x] v38: po teście wizualnym v37 zredukowano jaskrawość i połysk pustych luk; oczekuje na ocenę użytkownika na docelowym ekranie.
 
 - [x] v39 (UI): puste i ułożone pola mają wspólną ramkę i kolor; wypełnia się tylko centralny diament. Rezygnacja z dwóch konkurencyjnych stylów z v37/v38. Wymaga zatwierdzenia wizualnego.
+
+- [x] v40: zgłoszenie wizualne — ciemniejszy niebieski, słomkowy żółty, rombowe szkło na warsztatach i środku. Dopieszczona oprawa okien bez zmiany układu; wymaga oceny na docelowym ekranie.

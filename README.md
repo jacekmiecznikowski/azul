@@ -693,3 +693,11 @@ na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian
 - Oba stany korzystają z **tej samej konstrukcji**: cztery barwne fragmenty i centralny romb. Po ułożeniu szkła wypełnia się tylko romb; obramowanie nie zmienia intensywności ani kształtu.
 - Barwy witraży: rubin `#A94452`, złoto `#D7BE63`, błękit `#4B90AE`, miedź `#B96E4E`, biel `#DCE5E3` i ametyst-joker `#8E6BAF`.
 - Warsztaty i tor rund korzystają z tych samych barw. Nie zmieniono zasad, silnika, fizycznej puli 100 tafli ani zapisów partii. Samouczek i pozostałe poprawki betatestów pozostają w rejestrze.
+
+
+### v40 — rombowe tafle warsztatów, ciemny błękit i słomkowa żółć
+
+- Niebieski szkła przyciemniony do `#397995`, żółty słomkowy `#D8C579`. Zmiana spójna dla witraży, warsztatów i oznaczeń koloru, bez zmiany mechanicznych wartości tafli.
+- Tafle wybierane z warsztatów oraz środka są teraz prawdziwymi **rombami**, nie kwadratami z rombem wewnątrz. Rotowana grafika mieści się w dotychczasowym przycisku, więc pole kliknięcia nie maleje.
+- Minimalne wygładzenie oprawy okien: cieńsze obramowania i spokojniejsze tło. Bez zmiany wysokości paneli, numeracji, witrażysty, ułożenia graczy i systemu punktacji.
+- Weryfikacja renderowania i funkcji wyboru odbywa się testami v40; ocena finalnej estetyki wymaga zrzutu od użytkownika.

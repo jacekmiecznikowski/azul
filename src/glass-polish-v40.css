@@ -1,0 +1,86 @@
+/* v40 — finishing pass on v39.
+ * Cool navy-blue and straw gold remain distinguishable from white/copper.
+ * The common empty/filled pane frame, shapes and mechanics are unchanged.
+ * True DIAMONDS in factories and centre; button targets remain squares.
+ */
+.sg{--sg-blue:#397995;--sg-yellow:#D8C579;}
+.sg .sg-glass-cyan,.sg .sg-stained-pane-cyan,.sg .glass-cyan{
+  --v39-color:#397995;--v39-shadow:#244D66;--v37-glass:#397995;
+  --v37-shadow:#244D66;--shine:#397995;--glass-base:#397995;--glass-deep:#244D66;
+}
+.sg .sg-color-dot-cyan,.sg .tile-cyan{--piece:#397995;background:#397995;}
+.sg .sg-glass-citrine,.sg .sg-stained-pane-citrine,.sg .glass-citrine{
+  --v39-color:#D8C579;--v39-shadow:#807041;--v37-glass:#D8C579;
+  --v37-shadow:#807041;--shine:#D8C579;--glass-base:#D8C579;--glass-deep:#807041;
+}
+.sg .sg-color-dot-citrine,.sg .tile-citrine{--piece:#D8C579;background:#D8C579;}
+
+/* The visible tile is a rotated cut-glass diamond, NOT a square with an
+ * inscribed diamond. The CSS transform does not change its parent <button>'s
+ * hit region; that grid cell still accepts mouse and touch taps everywhere.
+ *
+ * The .sg-glass element stays the same DOM size, but its 45-degree rotation
+ * and .70 scale keep the full rotated shape inside the original cell.
+ */
+.sg .sg-factory-grid .sg-market-token,
+.sg .sg-center-tokens .sg-center-choice{
+  touch-action:manipulation;
+}
+.sg .sg-factory-grid .sg-market-token .sg-glass.sg-glass-placed,
+.sg .sg-center-tokens .sg-center-choice .sg-glass.sg-glass-placed{
+  transform:rotate(45deg) scale(.70);
+  clip-path:none;
+  border-radius:2px;
+  overflow:hidden;
+  box-shadow:inset 0 0 0 1px #ffffff63,inset -2px -2px 3px #08233566,0 1px 3px #0006;
+}
+.sg .sg-factory-grid .sg-market-token .sg-glass-inner,
+.sg .sg-center-tokens .sg-center-choice .sg-glass-inner{
+  transform:none;
+  inset:18%;
+  border:1px solid #f4f1e58f;
+  background:linear-gradient(140deg,#ffffff37,transparent 67%);
+  box-shadow:none;
+}
+/* Remain clear when the centre pile offers multiple colors.
+   A larger diamond is visually comparable to workshop glass, while the
+   count remains outside the tile and is never covered. */
+.sg .sg-center .sg-center-choice{min-height:18px;gap:3px;}
+.sg .sg-center .sg-center-choice .sg-glass{
+  width:clamp(14px,4.8cqi,21px);
+}
+.sg .sg-center .sg-center-choice b{z-index:1;}
+.sg .sg-market-token:not(:disabled):focus-visible,
+.sg .sg-center-choice:not(:disabled):focus-visible{
+  outline:2px solid #f4dca0;
+  outline-offset:2px;
+}
+/* Modernize the WINDOW MOUNTING, not the tabletop geometry:
+   flatter lead frame, smoother header/foot and less duplicate beveling.
+   Existing player-turn/glazier highlights still take priority. */
+.sg .sg-window:not(.sg-window-target):not(.sg-window-active){
+  border-color:#668b91ab;
+  box-shadow:inset 0 0 0 1px #acc6bb1c,0 2px 3px #0006;
+}
+.sg .sg-window .sg-window-head{
+  border-bottom:1px solid #789f9c32;
+  color:#d2e2de;
+}
+.sg .sg-window .sg-window-lancet{
+  border-color:#698e94b8;
+  background:linear-gradient(160deg,#0c2634,#102c39 65%,#0b2230);
+  box-shadow:inset 0 0 0 1px #a0bdb323,inset 0 0 10px #03141f6b;
+}
+.sg .sg-window .sg-pane{
+  border-color:#7d9f9a3d;
+  background:radial-gradient(ellipse at center,#193745 5%,#0b2634 95%);
+}
+.sg .sg-window .sg-window-foot{
+  border-color:#5b858765;
+  background:#0c2b38;
+  box-shadow:inset 0 1px 0 #d6e6d218;
+}
+.sg .sg-window .sg-window-reverse{
+  background:#0d2b37;
+  border-color:#7fa29d38;
+}
