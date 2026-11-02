@@ -31,3 +31,5 @@ zastępują wizualnego sprawdzenia na laptopie i telefonie.
 - [x] v40: zgłoszenie wizualne — ciemniejszy niebieski, słomkowy żółty, rombowe szkło na warsztatach i środku. Dopieszczona oprawa okien bez zmiany układu; wymaga oceny na docelowym ekranie.
 
 - [x] v41: poprawiono rozbieżność wyglądu luźnej i ułożonej tafli poprzez współdzielony `CutGlassDiamond`; przeorganizowano wnętrze warsztatów dla maksymalnie pięciu barw.
+
+- [x] v42 (projekt do oceny wizualnej): identyczny element w pustej luce, wypełnionym witrażu i warsztacie; układ prostokątny 3 kolumn + duży środek, wspólny token rozmiaru, klikalne przyciski, bez zmian silnika.

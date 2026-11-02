@@ -709,3 +709,11 @@ na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian
 - Środek warsztatów powiększono proporcjonalnie do obręczy (48% jej średnicy) i uporządkowano w dwie kolumny. Przy pięciu dostępnych barwach przyciski już nie ustawiają się w długą kolumnę poza okręgiem; mają własne liczniki i czytelne podpisy dla czytników ekranu.
 - Warsztaty mają łagodniejszą oprawę, a szklane romby zajmują dostępne pola; obszary kliknięcia pozostają na pełnej powierzchni przycisków.
 - Zachowano pulę 100 tafli, działanie woreczka, interfejs 2–4 graczy, silnik i zapis partii. Pozostałe uwagi testerów w `docs/BETA-FEEDBACK.md`.
+
+
+### v42 — spójny kształt szkła i prostokątne warsztaty
+
+- Pola puste, ułożone tafle oraz wolne szkło korzystają z tego samego StainedGlassPane. Jeden romb ma jednolitą geometrię, odcień, krawędzie i rozmiar; zmienia się wyłącznie kolor wnętrza, gdy luka zostaje uzupełniona. Nie nakładamy kolejnego elementu na witraż.
+- Warsztaty ułożono w prostokątnej siatce 3 kolumn dla 5/7/9 miejsc (zależnie od liczby graczy); osobna, szeroka sekcja ŚRODEK ma duże tafle, liczniki i miejsce na wszystkie pięć barw.
+- Zmienna --sg-pane-size określa wielkość tej samej tafli na planszy i w warsztacie; przy ciasnym ekranie dopasowanie dotyczy całego interfejsu mobilnego. Przyciski wyboru nie tracą powierzchni klikania; w ciasnych wariantach przewija się wnętrze warsztatów, nie cała plansza.
+- Bez zmian w silniku, 100 taflach, zapisach i AI. Testy regresji: src/ui/v42-workshops.test.ts.
