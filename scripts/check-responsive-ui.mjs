@@ -70,7 +70,20 @@ try {
       const first = page.locator(`${root} .sg-market-token`).first()
       await first.click()
       assert(await page.locator(`${root} .sg-token-selected`).count() > 0, `${label}: source selection failed`)
+      const selectedShape = await page.locator(`${root} .sg-market-token.sg-token-selected`).first().evaluate(button => {
+        const style = getComputedStyle(button)
+        return {clip:style.clipPath, shadow:style.boxShadow, background:style.backgroundColor}
+      })
+      assert(selectedShape.clip.includes('polygon('), `${label}: selected target is not a diamond`)
+      assert(selectedShape.shadow === 'none', `${label}: rectangular selected highlight`)
       assert(await page.locator(`${root} .sg-window-target`).count() > 0, `${label}: no placement targets`)
+      const resources = page.locator('.sg-header .sg-resource-trigger')
+      await resources.click()
+      assert.equal(await resources.getAttribute('aria-expanded'), 'true', `${label}: resources disclosure failed`)
+      assert.equal(await page.getByRole('region', { name: 'Zasoby szkła i początek rundy' }).count(), 1,
+        `${label}: resources missing`)
+      await page.getByRole('button', { name: 'Zamknij zasoby' }).click()
+      assert.equal(await resources.getAttribute('aria-expanded'), 'false', `${label}: resources did not close`)
       assert.deepEqual(errors, [], label)
       console.log(`PASS ${label}: ${metrics.gems.length} visible gems, selection works`)
       await page.close()
