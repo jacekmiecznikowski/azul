@@ -1,0 +1,269 @@
+/* Sintra Glass v44 — colored leaded-glass floors and faceted jewels.
+   Visual only: 5 physical colors, no changes to engine, tile placement or saves.
+   Kept last in CSS import order so every layout (desktop/mobile) shares one style. */
+
+.sg {
+  --sg-lead:#c9a76d;
+  --sg-lead-bright:#f4d9a0;
+  --sg-lead-shadow:#775833;
+  --sg-gem-size:38px;
+}
+/* Five unambiguous color identities, plus the visual-only wild slot.
+   The palette is shared between floors, loose gems, completed gems and
+   the small pattern previews. */
+.sg .sg-pane-rose,.sg .sg-glass-rose,.sg .sg-color-dot-rose {--sg-ink:#b82731;--sg-ink-dark:#781822;--shine:#b82731}
+.sg .sg-pane-citrine,.sg .sg-glass-citrine,.sg .sg-color-dot-citrine {--sg-ink:#dec06b;--sg-ink-dark:#9d7635;--shine:#dec06b}
+.sg .sg-pane-cyan,.sg .sg-glass-cyan,.sg .sg-color-dot-cyan {--sg-ink:#17548b;--sg-ink-dark:#0b315d;--shine:#17548b}
+.sg .sg-pane-amber,.sg .sg-glass-amber,.sg .sg-color-dot-amber {--sg-ink:#d77b2f;--sg-ink-dark:#915020;--shine:#d77b2f}
+.sg .sg-pane-slate,.sg .sg-glass-slate,.sg .sg-color-dot-slate {--sg-ink:#f3f6f4;--sg-ink-dark:#a6b7c5;--shine:#f3f6f4}
+.sg .sg-pane-wild,.sg .sg-glass-wild,.sg .sg-color-dot-wild {--sg-ink:#9676ae;--sg-ink-dark:#634979;--shine:#9676ae}
+.sg .sg-color-dot {
+  background:linear-gradient(137deg,#ffffff67 0%,transparent 42%,#04172642 95%),var(--sg-ink);
+  transform:rotate(45deg);
+  border:1px solid color-mix(in srgb,var(--sg-ink),#f9e8bf 35%);
+  border-radius:1px;
+  box-shadow:0 1px 2px #0009;
+}
+/* Elegant gold-edged window architecture. Preserve original geometry,
+   interactive targets, player highlights and ornaments. */
+.sg .sg-window:not(.sg-window-target) {
+  border-color:#c6ac7a8c;
+  background:linear-gradient(90deg,#bc9e6852 0%,#102c3b 7%,#092839 90%,#c1a76d48 100%);
+  box-shadow:inset 0 0 0 1px #ead7a633,inset 0 1px 1px #fff5,0 2px 3px #0008;
+}
+.sg .sg-window-head {color:#f0dfbf;}
+.sg .sg-window-head>span:last-child {
+  border-color:#bcddda9c;
+  background:#244a5c;
+  color:#e5f3f1;
+}
+.sg .sg-window-lancet {
+  border:2px solid #c6a46e;
+  background:linear-gradient(90deg,#b9a07631,#0b2735 8%,#0b2735 92%,#d7bc8145);
+  box-shadow:inset 0 0 0 1px #f6e5b64d,inset 0 0 9px #0009;
+  border-radius:18px 18px 5px 5px;
+  gap:2px;
+  padding:3px 2px 2px;
+}
+/* Each floor is FULLY colored. No fading, opacity or saturation changes
+   on placement. A jewel merely occupies the center opening. */
+.sg .sg-pane,
+.sg .sg-pane.sg-pane-filled {
+  position:relative;
+  display:grid;
+  place-items:center;
+  min-width:0;
+  min-height:0;
+  isolation:isolate;
+  overflow:hidden;
+  opacity:1;
+  filter:none;
+  background:
+    radial-gradient(ellipse at 24% 13%,#fff6,transparent 48%),
+    linear-gradient(122deg,#071b2c35,transparent 38%,#07182952 98%),
+    var(--sg-ink,#173f58);
+  border:1px solid color-mix(in srgb,var(--sg-ink),#6a4d2c 58%);
+  border-radius:3px;
+  box-shadow:inset 0 0 0 1px #f6dc9a6b,inset 0 0 9px #07141a5a;
+  container-type:size;
+}
+/* Quiet etched stained-glass texture + ornate quarter-circle leadwork. */
+.sg .sg-pane::before {
+  content:"";
+  position:absolute;inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 0% 0%,transparent 21%,#e3c08a83 22%,transparent 23%),
+    radial-gradient(circle at 100% 0%,transparent 21%,#e3c08a83 22%,transparent 23%),
+    radial-gradient(circle at 0% 100%,transparent 21%,#d4b37d83 22%,transparent 23%),
+    radial-gradient(circle at 100% 100%,transparent 21%,#d4b37d83 22%,transparent 23%);
+  opacity:.6;
+  z-index:1;
+}
+.sg .sg-pane::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(to bottom,transparent calc(50% - .5px),#b99158bb 50%,transparent calc(50% + 1px));
+  border-top:1px solid #f8e6b891;
+  border-bottom:1px solid #50382488;
+  z-index:2;
+}
+.sg .sg-pane-lead {
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(90deg,#f0d9a200 0%,#f0d9a20c 24%,transparent 50%,#f0d9a214 75%,#f0d9a200);
+}
+/* Identical socket position and gold perimeter for empty and occupied.
+   The CSS gem material itself is shared with markets/center tiles. */
+.sg .sg-pane-socket {
+  position:relative;z-index:3;
+  display:grid;place-items:center;
+  width:min(90cqi,86cqb,50px);
+  height:auto;aspect-ratio:1;
+  min-width:0;min-height:0;
+  filter:drop-shadow(0 1px 1px #07141dcc);
+}
+.sg .sg-pane-socket::before {
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(145deg,#fff2c2,#b08348 50%,#f6da9d 76%,#775332);
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  z-index:0;
+}
+.sg .sg-pane-socket::after {
+  content:"";position:absolute;inset:4%;
+  background:#0b3144;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  box-shadow:inset 0 0 2px #000;
+  z-index:1;
+}
+.sg .sg-pane-empty-diamond {
+  position:absolute;inset:8%;z-index:2;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  background:linear-gradient(133deg,#123c53,#082738 64%,#041b2a);
+}
+.sg .sg-pane-empty-diamond::after {
+  content:"";position:absolute;inset:6%;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  background:linear-gradient(135deg,#3155694d,transparent 52%,#0000005a);
+}
+/* Every PLACED jewel, including loose workshop pieces, uses these same
+   bevels and four facets. The background floor keeps its original hue. */
+.sg .sg-glass.sg-glass-placed.sg-gem-faceted {
+  --sg-ink:var(--shine,#d2be8a);
+  position:relative;display:block;
+  width:var(--sg-gem-size);height:var(--sg-gem-size);
+  max-width:100%;max-height:100%;aspect-ratio:1;
+  box-sizing:border-box;flex:none;
+  border:0;border-radius:0;outline:0;
+  overflow:hidden;opacity:1;filter:none;
+  transform:none;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  background:linear-gradient(132deg,#fff8 0%,transparent 38%,#0315274d 100%),var(--sg-ink);
+  box-shadow:none;
+}
+.sg .sg-glass.sg-gem-faceted .sg-glass-inner {
+  position:absolute;inset:14%;transform:none;display:block;
+  border:0;border-radius:0;outline:0;box-shadow:none;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  background:linear-gradient(155deg,#ffffffb6 0%,#ffffff45 25%,transparent 55%,#03142449 100%);
+  z-index:2;
+}
+.sg .sg-glass.sg-gem-faceted .sg-gem-facet {
+  position:absolute;inset:3%;display:block;border:0;transform:none;
+  pointer-events:none;z-index:1;
+}
+.sg .sg-glass.sg-gem-faceted .sg-gem-facet-top{
+  clip-path:polygon(50% 2%,50% 50%,15% 50%,17% 33%);
+  background:#fff9;
+}
+.sg .sg-glass.sg-gem-faceted .sg-gem-facet-left{
+  clip-path:polygon(0 50%,49% 49%,50% 100%,28% 72%);
+  background:linear-gradient(120deg,#010d20a8,#ffffff4e);
+}
+.sg .sg-glass.sg-gem-faceted .sg-gem-facet-right{
+  clip-path:polygon(100% 50%,50% 50%,50% 100%,73% 72%);
+  background:#ffffff76;
+}
+.sg .sg-glass.sg-gem-faceted .sg-gem-facet-bottom{
+  clip-path:polygon(50% 100%,16% 49%,50% 53%,84% 49%);
+  background:#06152d51;
+}
+.sg .sg-pane-socket .sg-glass.sg-gem-faceted {
+  width:84%;height:84%;max-width:none;max-height:none;
+  position:relative;z-index:4;
+}
+/* Loose pieces inherit the very same ruby/sapphire/diamond finish;
+   only their available layout size is different. */
+.sg .sg-market-token .sg-glass.sg-gem-faceted {
+  width:100%;height:100%;aspect-ratio:1;
+}
+.sg .sg-center-choice .sg-glass.sg-gem-faceted {
+  width:clamp(12px,4cqi,18px);height:auto;aspect-ratio:1;
+}
+.sg .sg-glass.sg-glass-placed.sg-glass-small {
+  width:100%;height:100%;max-width:100%;max-height:100%;
+}
+/* Gold footer with TWO real bonus-glass sockets on the left,
+   slightly offset and larger, score isolated to the right. */
+.sg .sg-window-foot {
+  container-type:inline-size;
+  min-width:0;
+  min-height:26px;
+  margin-top:2px;
+  padding:2px 4px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:2px;
+  border-radius:7px 7px 9px 9px;
+  border:1px solid #c9a56d;
+  background:linear-gradient(145deg,#194252,#0b2c3d 60%,#0a2435);
+  box-shadow:inset 0 0 0 1px #f4d9a021,inset 0 1px 3px #0008;
+}
+.sg .sg-window-foot>b {
+  font:700 clamp(10px,1.05vw,15px)/1 'Playfair Display',Georgia,serif;
+  color:#f2d7a4;text-shadow:0 1px 2px #0009;
+  white-space:nowrap;text-align:right;
+}
+.sg .sg-window-foot>b small {
+  font-size:clamp(7px,.6vw,9px);
+  color:#e2cfac;
+}
+.sg .sg-window-kept {
+  display:flex;gap:clamp(2px,.45vw,6px);
+  align-items:center;justify-content:flex-start;
+  min-width:0;min-height:0;
+}
+.sg .sg-window-kept>span.sg-kept-slot{
+  position:relative;display:grid;place-items:center;
+  width:clamp(10px,21cqi,23px);
+  height:clamp(10px,21cqi,23px);
+  flex:none;box-sizing:border-box;
+  border:0;border-radius:0;outline:0;
+  transform:none;
+  background:linear-gradient(145deg,#f2da9d,#986f42);
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  box-shadow:none;
+}
+.sg .sg-window-kept>span.sg-kept-slot::before{
+  content:"";position:absolute;inset:12%;
+  background:#0c3548;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+}
+.sg .sg-window-kept .sg-kept-empty{
+  position:absolute;inset:22%;transform:none;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  background:#061f2e;border:0;opacity:1;
+}
+.sg .sg-window-kept .sg-glass.sg-gem-faceted {
+  width:77%;height:77%;max-width:none;max-height:none;
+  z-index:2;
+}
+/* Extreme compact view keeps all five floors and the two bonus sockets
+   legible without increasing panel height or causing overflow. */
+.sg .sg-mobile-board .sg-window-lancet{
+  padding:2px 1px 1px;
+  gap:1px;border-width:1px;border-radius:10px 10px 3px 3px;
+}
+.sg .sg-mobile-board .sg-pane {border-width:1px;border-radius:2px;}
+.sg .sg-mobile-board .sg-pane::before{opacity:.32;}
+.sg .sg-mobile-board .sg-pane-socket {
+  width:min(92cqi,86cqb,36px);
+}
+.sg .sg-mobile-board .sg-window{
+  grid-template-rows:13px 12px minmax(0,1fr) 21px;
+}
+.sg .sg-mobile-board .sg-window-foot{
+  min-height:20px;margin-top:1px;padding:1px 2px;
+}
+.sg .sg-mobile-board .sg-window-foot>b{font-size:9px;}
+.sg .sg-mobile-board .sg-window-foot>b small{display:none;}
+.sg .sg-mobile-board .sg-window-kept>span.sg-kept-slot{
+  width:clamp(9px,20cqi,16px);
+  height:clamp(9px,20cqi,16px);
+}
+.sg .sg-mobile-board .sg-color-dot {width:5px;height:5px;}
+@media(prefers-reduced-motion:reduce){
+  .sg .sg-glass.sg-gem-faceted{animation:none;transition:none;}
+}
