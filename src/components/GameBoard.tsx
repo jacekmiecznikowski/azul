@@ -15,9 +15,15 @@ export function ornamentBonus(completedSides: number): number {
 export function GlassPiece({ color, placed = true, small = false }: {
   color: SlotColor; placed?: boolean; small?: boolean
 }) {
-  return <span className={`sg-glass sg-glass-${color}${placed ? ' sg-glass-placed' : ' sg-glass-guide'}${small ? ' sg-glass-small' : ''}`}
+  return <span className={`sg-glass sg-glass-${color}${placed ? ' sg-glass-placed sg-gem-faceted' : ' sg-glass-guide'}${small ? ' sg-glass-small' : ''}`}
+    role="img"
+    aria-label={color === 'wild' ? 'Joker' : `${placed ? 'Ułożona tafla' : 'Potrzebny kolor'}: ${colors[color]}`}
     title={color === 'wild' ? 'Dowolny kolor' : `${placed ? 'Tafla' : 'Potrzebny kolor'}: ${colors[color]}`}>
     <span className="sg-glass-inner"/>
+    {placed && <><span className="sg-gem-facet sg-gem-facet-top" aria-hidden="true"/>
+      <span className="sg-gem-facet sg-gem-facet-left" aria-hidden="true"/>
+      <span className="sg-gem-facet sg-gem-facet-right" aria-hidden="true"/>
+      <span className="sg-gem-facet sg-gem-facet-bottom" aria-hidden="true"/></>}
   </span>
 }
 
@@ -39,13 +45,17 @@ function Window({ strip, index, glazier, target, selected, isHumanTurn, onTarget
     <span className="sg-window-lancet">
       {complete ? <span className="sg-finished"><Sparkles size={20}/><b>GOTOWE</b></span>
         : patternFor(strip).map((color, i) =>
-          <span key={i} data-sg-pane={i} className={`sg-pane${strip.panes[i] ? ' sg-pane-filled' : ''}`}>
-            <GlassPiece color={strip.panes[i] ?? color} placed={!!strip.panes[i]}/>
+          <span key={i} data-sg-pane={i} className={`sg-pane sg-pane-${color}${strip.panes[i] ? ' sg-pane-filled' : ''}`}
+            aria-label={`Piętro ${i + 1}: ${strip.panes[i] ? 'wypełnione' : 'puste'}`}>
+            <span className="sg-pane-lead" aria-hidden="true"/>
+            <span className="sg-pane-socket">
+              {strip.panes[i] ? <GlassPiece color={strip.panes[i]}/> : <span className="sg-pane-empty-diamond" aria-hidden="true"/>}
+            </span>
           </span>)}
     </span>
     <span className="sg-window-foot"><span className="sg-window-kept">
-      <span>{strip.upper ? <GlassPiece color={strip.upper} small/> : <i/>}</span>
-      <span>{strip.lower ? <GlassPiece color={strip.lower} small/> : <i/>}</span>
+      <span className="sg-kept-slot" title={strip.upper ? 'Górna ozdoba: szkło ułożone' : 'Górna ozdoba: pusta'}>{strip.upper ? <GlassPiece color={strip.upper} small/> : <i className="sg-kept-empty"/>}</span>
+      <span className="sg-kept-slot" title={strip.lower ? 'Dolna ozdoba: szkło ułożone' : 'Dolna ozdoba: pusta'}>{strip.lower ? <GlassPiece color={strip.lower} small/> : <i className="sg-kept-empty"/>}</span>
     </span><b>{WINDOW_POINTS[index]} <small>PKT</small></b></span>
   </button>
 }
