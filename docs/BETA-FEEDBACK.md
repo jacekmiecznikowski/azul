@@ -10,8 +10,7 @@ renderowania z modyfikacją zasad bez testu wykazującego błąd.
 - [x] v37: wyróżnić rzeczywistą pozycję witrażysty strzałką i obwódką.
 - [?] v38: zgłoszone niedokładne rozkładanie warsztatów po skończeniu woreczka.
   Kod ma recykling wieży, konieczny test skrajnego przypadku.
-- [ ] v38: większy środek, większe szkła i wygodniejsze kliknięcia; wielkość tafli
-  ze środka ma być porównywalna z taflami w warsztatach.
+- [x] v41 (UI): większy, proporcjonalny środek oraz dwukolumnowy wybór do 5 kolorów; jednolity szlif tafli we wszystkich położeniach. Obszary dotykowe nie zostały zwężone, ale wymagają dalszej praktycznej oceny mobilnej.
 - [ ] v38: oznaczenie aktualnie premiowanego koloru bliżej planszy gracza
   bez zastępowania sześciorundowego toru premii.
 - [ ] v39: po zakończeniu partii dostęp do planszy i historii, bez nachodzącej
@@ -30,3 +29,5 @@ zastępują wizualnego sprawdzenia na laptopie i telefonie.
 - [x] v39 (UI): puste i ułożone pola mają wspólną ramkę i kolor; wypełnia się tylko centralny diament. Rezygnacja z dwóch konkurencyjnych stylów z v37/v38. Wymaga zatwierdzenia wizualnego.
 
 - [x] v40: zgłoszenie wizualne — ciemniejszy niebieski, słomkowy żółty, rombowe szkło na warsztatach i środku. Dopieszczona oprawa okien bez zmiany układu; wymaga oceny na docelowym ekranie.
+
+- [x] v41: poprawiono rozbieżność wyglądu luźnej i ułożonej tafli poprzez współdzielony `CutGlassDiamond`; przeorganizowano wnętrze warsztatów dla maksymalnie pięciu barw.

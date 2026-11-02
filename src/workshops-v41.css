@@ -1,0 +1,181 @@
+/* Sintra Glass v41: a physical tile is the SAME cut diamond in the
+   workshops, the center pile and the window once set. This overrides v40's
+   workshop-only rotation, without changing the original button hit boxes.
+   The center is sized relative to the workshop ring and its colors are kept
+   inside a two-column layout at every viewport size. */
+.sg .sg-cut-diamond {
+  box-sizing:border-box;
+  display:block;
+  position:relative;
+  flex:none;
+  transform:rotate(45deg) scale(.70);
+  clip-path:none;
+  border-radius:2px;
+  overflow:hidden;
+  background:linear-gradient(142deg,#fff4 0%,transparent 40%,#081f302e 100%),var(--v39-color,var(--shine));
+  border:1px solid color-mix(in srgb,var(--v39-color,var(--shine)),#e8e7d5 30%);
+  box-shadow:inset 0 0 0 1px #ffffff63,inset -2px -2px 3px #08233566,0 1px 3px #0006;
+  filter:none;opacity:1;
+}
+.sg .sg-cut-diamond .sg-glass-inner,
+.sg .sg-factory-grid .sg-market-token .sg-cut-diamond .sg-glass-inner,
+.sg .sg-center-tokens .sg-center-choice .sg-cut-diamond .sg-glass-inner{
+  position:absolute;inset:18%;
+  transform:none;
+  border:1px solid #f4f1e58f;
+  background:linear-gradient(140deg,#ffffff37,transparent 67%);
+  box-shadow:none;
+}
+/* On the player window, fit the exact same tile to its lead-lined mount.
+   An occupied mount retains only a muted frame: it no longer draws a second,
+   visually competing colored filled diamond underneath the placed piece. */
+.sg .sg-stained-pane.sg-stained-pane-filled {
+  border-color:color-mix(in srgb,var(--v39-color),#7799a0 46%);
+  background:linear-gradient(145deg,#193b49,#0d2836 65%,#0a2533);
+}
+.sg .sg-stained-pane.sg-stained-pane-filled > .sg-socket-shard{opacity:.17;}
+.sg .sg-stained-pane.sg-stained-pane-filled > .sg-socket-core{opacity:.11;}
+.sg .sg-stained-pane.sg-stained-pane-filled > .sg-cut-diamond{
+  position:absolute;inset:0;margin:auto;
+  width:100%;height:100%;aspect-ratio:1;
+  transform:rotate(45deg) scale(.70);
+  z-index:3;
+}
+.sg .sg-market-token .sg-cut-diamond,
+.sg .sg-center-choice .sg-cut-diamond {
+  transform:rotate(45deg) scale(.70);
+}
+.sg .sg-market-token,.sg .sg-center-choice {
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.sg .sg-market-token:not(:disabled),.sg .sg-center-choice:not(:disabled){
+  cursor:pointer;
+}
+.sg .sg-market-token:focus-visible,
+.sg .sg-center-choice:focus-visible {
+  outline:2px solid #f2d49a;
+  outline-offset:2px;
+}
+/* A quiet glass-turntable instead of isolated bubbles on empty felt. */
+.sg .sg-market-circle-v41 .sg-market-ring-v41 {
+  inset:11.5%;
+  border:1px solid #80a8a24c;
+  background:radial-gradient(circle,#1338447b 0%,#14374335 54%,transparent 80%);
+  box-shadow:0 0 0 1px #4a80781a, inset 0 0 20px #071f2b36;
+}
+.sg .sg-market-circle-v41 .sg-market-ring-v41::after{
+  opacity:.23;
+}
+.sg .sg-market-circle-v41 .sg-factory {
+  border-color:#69918e94;
+  background:radial-gradient(circle at 35% 30%,#315560,#102d3b 86%);
+  box-shadow:inset 0 1px 1px #dfebe229,0 3px 6px #0007;
+}
+.sg .sg-market-circle-v41 .sg-factory-empty {
+  opacity:.35;
+  filter:saturate(.6);
+}
+.sg .sg-market-circle-v41 .sg-factory-grid{
+  width:87%;height:87%;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:repeat(2,minmax(0,1fr));
+  gap:1px;
+}
+.sg .sg-market-circle-v41 .sg-market-token{
+  width:100%;height:100%;
+  display:grid;place-items:center;min-width:0;min-height:0;
+  padding:0;border:0;
+}
+.sg .sg-market-circle-v41 .sg-market-token .sg-cut-diamond{
+  width:100%;height:100%;aspect-ratio:1;
+}
+/* The 39%-radius factory ring leaves room for a 48%-diameter center.
+   cqi is measured against .sg-market-circle (a size container), so this
+   scales with monitor size without colliding with the surrounding workshops. */
+.sg .sg-market-circle-v41 .sg-center-pile-v41 {
+  width:48cqi;height:48cqi;
+  min-width:0;min-height:0;
+  max-width:205px;max-height:205px;
+  box-sizing:border-box;
+  border:2px solid #a69b73;
+  border-radius:50%;
+  padding:clamp(4px,1.1cqi,10px);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:clamp(1px,.55cqi,4px);
+  background:radial-gradient(circle at 48% 38%,#25505a,#0d2f3b 81%);
+  box-shadow:inset 0 0 0 2px #7ba3a12b,0 3px 11px #0009;
+  overflow:hidden;
+}
+.sg .sg-market-circle-v41 .sg-center-pile-v41 > span:first-child {
+  flex:0 0 auto;
+  line-height:1.1;
+  font-size:clamp(7px,2.4cqi,12px);
+  letter-spacing:.5px;
+  color:#f0dfb5;
+}
+.sg .sg-market-circle-v41 .sg-center-tokens-v41 {
+  width:100%;max-width:100%;
+  min-width:0;min-height:0;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  justify-items:stretch;align-items:center;
+  gap:clamp(1px,.55cqi,4px);
+  margin:0;
+  overflow:hidden;
+}
+.sg .sg-market-circle-v41 .sg-center-choice{
+  box-sizing:border-box;min-width:0;width:100%;height:clamp(17px,6.5cqi,33px);
+  padding:1px 3px;
+  display:flex;align-items:center;justify-content:center;gap:2px;
+  border:1px solid #71979392;border-radius:5px;
+  background:#102f3bc9;color:#e4ebde;
+}
+.sg .sg-market-circle-v41 .sg-center-choice:hover:not(:disabled) {
+  background:#285260;
+  border-color:#d1bb81;
+}
+.sg .sg-market-circle-v41 .sg-center-choice .sg-cut-diamond {
+  box-sizing:border-box;width:clamp(13px,5.2cqi,24px);
+  height:clamp(13px,5.2cqi,24px);max-height:100%;
+  min-width:0;aspect-ratio:1;
+}
+.sg .sg-market-circle-v41 .sg-center-choice b{
+  font-size:clamp(9px,2.7cqi,13px);
+  line-height:1;z-index:1;
+  font-variant-numeric:tabular-nums;
+}
+.sg .sg-market-circle-v41 .sg-center-quiet{
+  grid-column:1/-1;
+  font-size:clamp(14px,4cqi,25px);
+}
+.sg .sg-market-circle-v41 .sg-center-penalty {
+  flex:0 0 auto;font-size:clamp(7px,2cqi,10px);
+  line-height:1;white-space:nowrap;
+}
+/* In portrait / short landscape, keep the two-column grid and let tile size
+   adapt to the ring, rather than stacking 4+ colors outside the circle.
+   The original full-screen board layout is not changed. */
+@media (max-width:1100px), (max-height:620px){
+  .sg .sg-mobile-market .sg-market-circle-v41 .sg-center-pile-v41 {
+    width:48cqi;height:48cqi;
+    max-width:165px;max-height:165px;
+    padding:clamp(2px,1cqi,6px);
+  }
+  .sg .sg-mobile-market .sg-market-circle-v41 .sg-center-choice {
+    height:clamp(14px,6.5cqi,27px);
+    padding:0 2px;gap:1px;
+  }
+  .sg .sg-mobile-market .sg-market-circle-v41 .sg-center-choice .sg-cut-diamond {
+    width:clamp(11px,5cqi,19px);
+    height:clamp(11px,5cqi,19px);
+  }
+}
+@container (max-width:185px){
+  .sg .sg-market-circle-v41 .sg-center-pile-v41 > span:first-child{
+    font-size:7px;
+  }
+  .sg .sg-market-circle-v41 .sg-center-penalty{font-size:7px;}
+  .sg .sg-market-circle-v41 .sg-center-choice{border-radius:3px;}
+}

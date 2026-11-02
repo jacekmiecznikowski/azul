@@ -701,3 +701,11 @@ na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian
 - Tafle wybierane z warsztatów oraz środka są teraz prawdziwymi **rombami**, nie kwadratami z rombem wewnątrz. Rotowana grafika mieści się w dotychczasowym przycisku, więc pole kliknięcia nie maleje.
 - Minimalne wygładzenie oprawy okien: cieńsze obramowania i spokojniejsze tło. Bez zmiany wysokości paneli, numeracji, witrażysty, ułożenia graczy i systemu punktacji.
 - Weryfikacja renderowania i funkcji wyboru odbywa się testami v40; ocena finalnej estetyki wymaga zrzutu od użytkownika.
+
+
+### v41 — jednakowy romb po pobraniu; większy środek stołu
+
+- Ułożone szkło **jest tym samym komponentem** `CutGlassDiamond` co luźna tafla warsztatowa. Witraże zachowują ołowianą ramkę, lecz diament nie zmienia wyglądu po przełożeniu. Puste pola nadal pokazują barwną lukę.
+- Środek warsztatów powiększono proporcjonalnie do obręczy (48% jej średnicy) i uporządkowano w dwie kolumny. Przy pięciu dostępnych barwach przyciski już nie ustawiają się w długą kolumnę poza okręgiem; mają własne liczniki i czytelne podpisy dla czytników ekranu.
+- Warsztaty mają łagodniejszą oprawę, a szklane romby zajmują dostępne pola; obszary kliknięcia pozostają na pełnej powierzchni przycisków.
+- Zachowano pulę 100 tafli, działanie woreczka, interfejs 2–4 graczy, silnik i zapis partii. Pozostałe uwagi testerów w `docs/BETA-FEEDBACK.md`.

@@ -42,6 +42,7 @@ import './ui-refinement-v36.css'
 import './glass-legibility-v37.css'
 import './glass-panes-v39.css'
 import './glass-polish-v40.css'
+import './workshops-v41.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
@@ -94,15 +95,16 @@ export function Market({ game, selection, disabled, onPick }: {
   const inventory = glassInventory(game)
   return <section className="sg-market sg-center-card" aria-label="Warsztaty szkła">
     <div className="sg-panel-title"><span>WARSZTATY SZKŁA</span><span className="sg-market-title-meta"><small>{game.factories.filter(f => f.length).length} aktywnych</small>{!game.firstCenterTaken && <span className="sg-start-tile sg-market-first-badge" aria-label="Żeton pierwszego gracza jest na środku stołu" title="Żeton pierwszego gracza jest na środku stołu">1</span>}</span></div>
-    <div className="sg-market-circle">
-      <div className="sg-market-ring"/>
+    <div className="sg-market-circle sg-market-circle-v41">
+      <div className="sg-market-ring sg-market-ring-v41"/>
       {game.factories.map((tiles, i) => <Factory key={i} tiles={tiles} index={i} count={game.factories.length} selected={selection} disabled={disabled} onPick={onPick}/>)}
-      <div className="sg-center-pile">
+      <div className="sg-center-pile sg-center-pile-v41">
         <span>ŚRODEK</span>
-        <div className="sg-center-tokens">{center.length ? center.map(({ color, count }) =>
+        <div className="sg-center-tokens sg-center-tokens-v41">{center.length ? center.map(({ color, count }) =>
           <button type="button" disabled={disabled} key={color} title={`Zabierz ${count} × ${COLORS_PL[color]}`} onClick={() => onPick({ type: 'center' }, color)}
+            aria-label={`Środek stołu: ${count} × ${COLORS_PL[color].toLowerCase()} tafle. Wybierz kolor.`}
             className={`sg-center-choice${selection?.source.type === 'center' && selection.color === color ? ' sg-token-selected' : ''}`}>
-            <GlassPiece color={color} small/><b>{count}</b>
+            <GlassPiece color={color}/><b aria-hidden="true">{count}</b>
           </button>) : <span className="sg-center-quiet">✧</span>}</div>
         {!game.firstCenterTaken && <small className="sg-center-penalty">+1 stłuczenie</small>}
       </div>

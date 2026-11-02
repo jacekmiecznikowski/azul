@@ -1,11 +1,9 @@
 import { Gem, RotateCcw, Sparkles } from 'lucide-react'
 import { patternFor, WINDOW_POINTS } from '../game/engine'
-import type { GlassColor, Player, SlotColor, WindowStrip } from '../game/engine'
+import type { Player, SlotColor, WindowStrip } from '../game/engine'
 import { EmptyGlassSocket, StainedGlassPane } from './EmptyGlassSocket'
+import { CutGlassDiamond } from './CutGlassDiamond'
 
-const colors: Record<GlassColor, string> = {
-  rose: 'czerwony', citrine: 'żółty', cyan: 'niebieski', amber: 'pomarańczowy', slate: 'biały',
-}
 const ORNAMENT_PAIRS = [[0, 1], [2, 3], [4, 5], [6, 7]] as const
 
 /** In Palace A, 2 / 3 / 4 completed sides in a pair score 3 / 6 / 10 points. */
@@ -18,10 +16,7 @@ export function GlassPiece({ color, placed = true, small = false, boardPane = fa
 }) {
   if (boardPane) return <StainedGlassPane color={color} filled={placed} small={small}/>
   if (!placed) return <EmptyGlassSocket color={color} small={small}/>
-  return <span className={`sg-glass sg-glass-${color} sg-glass-placed${small ? ' sg-glass-small' : ''}`}
-    title={color === 'wild' ? 'Joker' : `Ułożona tafla: ${colors[color]}`}>
-    <span className="sg-glass-inner"/>
-  </span>
+  return <CutGlassDiamond color={color} small={small}/>
 }
 
 function Window({ strip, index, glazier, target, selected, isHumanTurn, onTarget }: {

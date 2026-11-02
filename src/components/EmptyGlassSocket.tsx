@@ -1,4 +1,5 @@
 import type { SlotColor } from '../game/engine'
+import { CutGlassDiamond } from './CutGlassDiamond'
 
 export const EMPTY_SLOT_LABELS: Record<SlotColor, string> = {
   rose: 'czerwone', citrine: 'żółte', cyan: 'niebieskie',
@@ -26,6 +27,7 @@ export function StainedGlassPane({ color, filled, small = false }: {
     <i className="sg-socket-shard sg-socket-shard-se" aria-hidden="true"/>
     <i className="sg-socket-shard sg-socket-shard-sw" aria-hidden="true"/>
     <span className="sg-socket-core" aria-hidden="true"><span className="sg-stained-facet"/></span>
+    {filled && <CutGlassDiamond color={color} small={small}/>}
   </span>
 }
 
