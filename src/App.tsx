@@ -14,6 +14,7 @@ import { useGameAudio } from './hooks/useGameAudio'
 import { GlassVisualEffects, useVisualEffects } from './components/GlassVisualEffects'
 import { useAmbientMusic } from './hooks/useAmbientMusic'
 import { GameBoard, GlassPiece } from './components/GameBoard'
+import { useSharedGlassGeometry } from './hooks/useSharedGlassGeometry'
 import { GlassResources } from './components/GlassResources'
 import { GLASS_COLOR_LABELS_PL as COLORS_PL } from './game/colorLabels'
 import { ManualPlacementDialog } from './components/ManualPlacementDialog'
@@ -48,6 +49,7 @@ import './market-layout-v47.css'
 import './market-layout-v48.css'
 import './market-glass-v49.css'
 import './glass-geometry-v50.css'
+import './unified-glass-v51.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const PLAYER_AVATARS = ['✦', '✧', '✳', '❖']
@@ -305,6 +307,11 @@ export default function App() {
     : game.phase === 'finished' ? `Koniec gry — wygrywa ${best[0].name}.`
     : humanTurn ? `${current.name === 'Ty' ? 'Twój ruch' : `Ruch gracza ${current.name}`}: wybierz tafle z warsztatu lub środka stołu.`
     : `${current.name} wybiera ruch…`
+
+  useSharedGlassGeometry(
+    screen === 'game',
+    `${game.players.length}-${viewerIndex}-${mobileBoardIndex}-${game.currentPlayer}-${viewport.width}x${viewport.height}`,
+  )
 
   useEffect(() => {
     const onResize = () => setViewport({ width: window.innerWidth, height: window.innerHeight })
