@@ -1,21 +1,29 @@
+import { GlassPiece } from './GameBoard'
 import type { GlassColor } from '../game/engine'
 import { GLASS_COLOR_LABELS_PL } from '../game/colorLabels'
 
-
-/** Shared presentation; round colors and scoring remain owned by game/engine. */
+/** The bonus colors are actual faceted GlassPiece gems, not CSS-colored squares. */
 export function RoundTracker({ round, colors }: { round: number; colors: GlassColor[] }) {
-  const active = colors[round - 1]
-  return <section className="sg-header-round sg-round-tracker-v34"
-    aria-label={`Runda ${round} z 6. Premia teraz: ${active ? GLASS_COLOR_LABELS_PL[active] : 'brak'} szkło.`}>
-    <div className="sg-round-v34-current"><span>RUNDA</span><strong>{round}<small>/6</small></strong></div>
-    <div className="sg-round-v34-sequence" role="group" aria-label="Premie szkła w kolejnych sześciu rundach">
-      {colors.map((color, i) => <span key={i}
-        className={`sg-round-v34-step${i+1===round?' sg-round-v34-active':i+1<round?' sg-round-v34-past':''}`}
-        aria-label={`Runda ${i+1}: ${GLASS_COLOR_LABELS_PL[color]}${i+1===round?', aktualna premia':''}`}
-        aria-current={i+1===round?'step':undefined}
-        title={`Runda ${i+1}: ${GLASS_COLOR_LABELS_PL[color].toLowerCase()} szkło`}>
-        <span className="sg-round-v34-number">{i+1}</span><i className={`sg-color-dot sg-color-dot-${color}`} aria-hidden="true"/>
-      </span>)}
+  return <section className="sg-header-round sg-round-tracker-v52"
+    aria-label={`Runda ${round} z 6. Aktualna premia: ${colors[round - 1] ? GLASS_COLOR_LABELS_PL[colors[round - 1]] : 'brak'} szkło.`}>
+    <div className="sg-round-v52-current">
+      <span className="sg-round-v52-caption">RUNDA</span>
+      <span className="sg-round-v52-count">{round}<small>/6</small></span>
     </div>
+    <ol className="sg-round-v52-steps" aria-label="Kolory premii w kolejnych rundach">
+      {colors.map((color, i) => {
+        const number = i + 1
+        const current = number === round
+        const past = number < round
+        return <li key={i}
+          className={`sg-round-v52-step${current ? ' sg-round-v52-active' : past ? ' sg-round-v52-past' : ' sg-round-v52-future'}`}
+          aria-current={current ? 'step' : undefined}
+          aria-label={`Runda ${number}: ${GLASS_COLOR_LABELS_PL[color]}${current ? ', aktualna' : past ? ', zakończona' : ''}`}
+          title={`Runda ${number}: ${GLASS_COLOR_LABELS_PL[color]}`}>
+          <span className="sg-round-v52-index" aria-hidden="true">{number}</span>
+          <span className="sg-round-v52-gem" aria-hidden="true"><GlassPiece color={color}/></span>
+        </li>
+      })}
+    </ol>
   </section>
 }
