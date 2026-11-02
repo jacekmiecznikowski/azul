@@ -14,6 +14,8 @@ import { useGameAudio } from './hooks/useGameAudio'
 import { GlassVisualEffects, useVisualEffects } from './components/GlassVisualEffects'
 import { useAmbientMusic } from './hooks/useAmbientMusic'
 import { GameBoard, GlassPiece } from './components/GameBoard'
+import { GlassResources } from './components/GlassResources'
+import { GLASS_COLOR_LABELS_PL as COLORS_PL } from './game/colorLabels'
 import { ManualPlacementDialog } from './components/ManualPlacementDialog'
 import { GameMenu } from './components/GameMenu'
 import { HomeScreen } from './components/HomeScreen'
@@ -42,9 +44,9 @@ import './ui-refinement-v36.css'
 import './stained-glass-v44.css'
 import './market-gems-v45.css'
 import './market-orbit-v46.css'
+import './market-layout-v47.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
-const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
 const PLAYER_AVATARS = ['✦', '✧', '✳', '❖']
 interface Settings { opponents: number; difficulties: Difficulty[]; controllers: Controller[]; names: string[]; palaceSide: PalaceSide }
 const DEFAULT_OPTIONS: Settings = {
@@ -98,7 +100,6 @@ export function Market({ game, selection, disabled, onPick }: {
   onPick: (source: Source, color: GlassColor) => void
 }) {
   const center = COLORS.map(color => ({ color, count: game.center.filter(x => x === color).length })).filter(item => item.count > 0)
-  const inventory = glassInventory(game)
   return <section className="sg-market sg-center-card" aria-label="Warsztaty szkła">
     <div className="sg-panel-title"><span>WARSZTATY SZKŁA</span><span className="sg-market-title-meta"><small>{game.factories.filter(f => f.length).length} aktywnych</small>{!game.firstCenterTaken && <span className="sg-start-tile sg-market-first-badge" aria-label="Żeton pierwszego gracza jest na środku stołu" title="Żeton pierwszego gracza jest na środku stołu">1</span>}</span></div>
     <div className="sg-market-layout-v45">
@@ -129,21 +130,6 @@ export function Market({ game, selection, disabled, onPick }: {
         </div>
       </div>
     </div>
-    <div className="sg-inventory sg-inventory-v33 sg-inventory-v34" role="group" aria-label={`Zasoby szkła: wieża ${inventory.tower}; warsztaty i środek ${inventory.table}; witraże ${inventory.playerBoards}; szkła premii ${inventory.roundTrack}; woreczek ${inventory.bag}. Razem ${inventory.total} tafli.`}>
-      <div className="sg-stock-ledger">
-        <span className="sg-stock-place sg-stock-tower" title={`Tafle w wieży: ${inventory.tower}`}>
-          <svg viewBox="0 0 21 29" fill="none" aria-hidden="true"><path d="M7 2H14L18 23L14 27H7L3 23Z" fill="#174451" stroke="#d1c394" strokeWidth="1.4"/><path d="M8 5H13L15 22L12 24H9L6 22Z" fill="#5ac9dc" fillOpacity=".38" stroke="#a7e5e4" strokeWidth=".6"/><path d="M8 6L6.5 21" stroke="#e6ffff" strokeOpacity=".75" strokeWidth="1.4"/><path d="M5 24H16" stroke="#e5c98e" strokeWidth="1.4"/></svg>
-          <small>Wieża</small><strong>{inventory.tower}</strong>
-        </span>
-        <span className="sg-stock-place" title={`Warsztaty i środek stołu: ${inventory.table}`}><small>Warsztat</small><strong>{inventory.table}</strong></span>
-        <span className="sg-stock-place" title={`Tafle w witrażach: ${inventory.playerBoards}`}><small>Witraże</small><strong>{inventory.playerBoards}</strong></span>
-        <span className="sg-stock-place sg-stock-rounds" title={`Szkła niezużytych premii rund: ${inventory.roundTrack}`}><small>Szkła premii</small><strong>{inventory.roundTrack}</strong></span>
-        <span className="sg-stock-place" title={`Tafle w woreczku: ${inventory.bag}`}><small>Woreczek</small><strong>{inventory.bag}</strong></span>
-      </div>
-    </div>
-    <div className="sg-first-token">{game.firstCenterTaken
-      ? <>Żeton zdobył(a): <strong>{game.players[game.nextStartingPlayer ?? game.startingPlayer].name}</strong> · start w następnej rundzie</>
-      : <>Rundę rozpoczął(a) <strong>{game.players[game.startingPlayer].name}</strong> · żeton na środku</>}</div>
   </section>
 }
 
@@ -438,6 +424,7 @@ export default function App() {
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span></div>
       <RoundTracker round={game.round} colors={game.roundColors}/>
       <div className="sg-header-actions">
+        <GlassResources game={game}/>
         <GameMenu effectsEnabled={effectsEnabled} reducedMotion={reducedMotion} toggleEffects={toggleEffects}
           musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}
           soundEnabled={soundEnabled} toggleSound={toggleSound}
