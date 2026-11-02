@@ -1,17 +1,13 @@
 import { chromium } from 'playwright'
-import { spawn } from 'node:child_process'
+import { createServer } from 'vite'
 import { mkdir, writeFile } from 'node:fs/promises'
 import assert from 'node:assert/strict'
 
-const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', '5179'], { stdio: 'pipe' })
+const server = await createServer({ server: { host: '127.0.0.1', port: 5179, strictPort: true } })
 let browser
 const results = []
 try {
-  await new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('Vite did not start')), 30000)
-    server.stdout.on('data', data => { if (data.toString().includes('127.0.0.1:5179')) { clearTimeout(timer); resolve() } })
-    server.on('error', reject)
-  })
+  await server.listen()
   browser = await chromium.launch()
   await mkdir('reports/ui', { recursive: true })
   for (const [width, height] of [[1920,1080],[1440,900],[1280,720],[1101,621],[1024,768],[844,390],[667,375],[390,844],[320,568]]) {
@@ -59,5 +55,5 @@ try {
   }
 } finally {
   await browser?.close()
-  server.kill()
+  await server.close()
 }
