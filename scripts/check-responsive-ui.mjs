@@ -64,6 +64,33 @@ try {
         const gap=Math.hypot(a.x+a.width/2-b.x-b.width/2, a.y+a.height/2-b.y-b.height/2)
         assert(gap >= (a.width+b.width)/2 + 2, `${label}: factories ${i} and ${j} overlap`)
       }
+      // The open socket's dark diamond is the physical size reference.
+      // ALL loose factory glass and center glass must match it in rendered pixels.
+      const unified = await page.locator(root).evaluate(root => {
+        const r = node => {
+          const b = node.getBoundingClientRect()
+          return {x:b.x, y:b.y, width:b.width, height:b.height,
+            cx:b.x + b.width/2, cy:b.y + b.height/2}
+        }
+        const open = root.querySelector('.sg-pane-empty-diamond')
+        const factoryGem = root.querySelector('.sg-market-token .sg-glass.sg-gem-faceted')
+        const placed = root.querySelector('.sg-pane-socket .sg-glass.sg-gem-faceted')
+        const parent = open?.closest('.sg-pane-socket')
+        const style = getComputedStyle(root.querySelector('.sg-market-orbit-v46'))
+        return {open:open?r(open):null, factory:factoryGem?r(factoryGem):null,
+          installed:placed?r(placed):null, socket:parent?r(parent):null,
+          cssValue:getComputedStyle(root).getPropertyValue('--sg-unified-gem-size')?.trim(),
+          orbitSize:style.getPropertyValue('--sg-disc-size')?.trim()}
+      })
+      if (unified.open && unified.factory) {
+        assert(Math.abs(unified.open.width - unified.factory.width) <= 1.2,
+          `${label}: market gem does not match empty window diamond: ${JSON.stringify(unified)}`)
+        assert(Math.abs(unified.open.height - unified.factory.height) <= 1.2,
+          `${label}: market gem height differs from empty window diamond`)
+        assert(Math.abs(unified.open.width - unified.open.height) <= 1,
+          `${label}: empty socket isn't square`)
+      }
+      assert(unified.cssValue?.endsWith('px'), `${label}: no canonical measured diamond size`)
       metrics.gems.forEach((gem, i) => {
         assert(gem.width >= 12 && gem.height >= 12, `${label}: invisible/tiny gem ${i}: ${JSON.stringify(gem)}`)
         assert(Math.abs(gem.width-gem.height) < 1, `${label}: distorted gem ${i}`)
@@ -141,6 +168,11 @@ try {
               gem.x + gem.width <= button.x + button.width + 1 &&
               gem.y + gem.height <= button.y + button.height + 1,
               `${label}: center gem escapes button with ${count} colors`)
+            if (width >= 1101) {
+              const emptyWidth = await page.locator(`${root} .sg-pane-empty-diamond`).first().evaluate(el => el.getBoundingClientRect().width)
+              assert(Math.abs(gem.width - emptyWidth) <= 1.2,
+                `${label}: center diamond differs from empty window by ${Math.abs(gem.width-emptyWidth)}px`)
+            }
             assert(Math.abs(gem.width - sizes.gems[0].width) < 1,
               `${label}: different gem sizes within same center`)
             if (referenceSize !== null) {
