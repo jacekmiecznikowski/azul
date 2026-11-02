@@ -1,0 +1,250 @@
+/* Sintra Glass v45 — a gem's size and material are the SAME on the
+   player window, in every workshop and on the center table.
+   All existing game interactions, history and 100 real pieces are untouched.
+   The wide rectangular market is deliberately limited to the market panel:
+   it never changes the player's eight window columns or the outer table. */
+.sg {
+  --sg-play-gem:28px;
+}
+/* Give the original stained-glass rows their full height right up to
+   the gold arch and foot. The colored floors no longer float inside a
+   2–3px dark gap at the top and bottom of the window. */
+.sg .sg-window-lancet {
+  padding:0 1px;
+  gap:0;
+}
+.sg .sg-window-reverse {
+  margin-bottom:0;
+}
+.sg .sg-mobile-board .sg-window-lancet {
+  padding:0 1px;
+  gap:0;
+}
+.sg .sg-window-lancet > .sg-pane:first-child {border-radius:12px 12px 1px 1px;}
+.sg .sg-window-lancet > .sg-pane:last-child {border-radius:1px 1px 3px 3px;}
+/* Both locations use the exact faceted .sg-gem-faceted markup and the
+   same --sg-play-gem measurement. Only layout constraints may scale it
+   down when the entire game window is physically smaller. */
+.sg .sg-pane-socket {
+  width:min(calc(var(--sg-play-gem) + 7px),93cqb,92cqi);
+}
+.sg .sg-pane-socket .sg-glass.sg-gem-faceted {
+  width:min(var(--sg-play-gem),88%);
+  height:auto;
+  aspect-ratio:1;
+  max-width:none;
+  max-height:none;
+}
+/* Market fits left workshops + right, separate middle pile. This uses the
+   currently empty horizontal area instead of miniaturizing 2x2 tiles around
+   a circle. 5/7/9 workshops all retain the original source index. */
+.sg .sg-market .sg-market-layout-v45 {
+  position:absolute;
+  inset:27px 7px 65px;
+  display:grid;
+  grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);
+  gap:6px;
+  min-width:0;min-height:0;
+  overflow:hidden;
+}
+.sg .sg-market .sg-market-factories-v45 {
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:4px;
+  min-height:0;min-width:0;
+}
+.sg .sg-market .sg-market-factories-v45 > .sg-factory-v45 {
+  position:relative;
+  left:auto;top:auto;
+  transform:none;
+  display:grid;place-items:center;
+  width:100%;height:100%;
+  min-width:0;min-height:0;
+  box-sizing:border-box;
+  padding:3px;
+  border:1px solid #8aa6a17d;
+  border-radius:9px;
+  background:linear-gradient(145deg,#244752,#112e3c 85%);
+  box-shadow:inset 0 1px 1px #e5eacc29,0 2px 3px #010b1399;
+}
+.sg .sg-market .sg-factory-v45 .sg-factory-num {
+  top:-1px;right:-1px;left:auto;
+  transform:none;
+  padding:1px 3px;
+  font-size:9px;line-height:1;
+  z-index:3;
+  border-radius:0 7px 0 5px;
+  color:#d0e4df;background:#163944e8;
+  pointer-events:none;
+}
+.sg .sg-market .sg-factory-v45 .sg-factory-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:repeat(2,minmax(0,1fr));
+  width:100%;height:100%;
+  min-width:0;min-height:0;
+  max-width:none;max-height:none;
+  gap:0;
+}
+.sg .sg-market .sg-factory-v45 .sg-market-token {
+  position:relative;
+  display:grid;place-items:center;
+  width:100%;height:100%;
+  min-width:0;min-height:0;
+  padding:0;border:0;border-radius:3px;
+  background:transparent;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+.sg .sg-market .sg-factory-v45 .sg-market-token .sg-glass.sg-gem-faceted {
+  width:min(var(--sg-play-gem),92%);
+  height:auto;aspect-ratio:1;
+  max-width:100%;max-height:100%;
+  margin:auto;
+  flex:none;
+}
+/* No tiny 11px center tokens or labels covering the colored gems. */
+.sg .sg-market .sg-center-pile.sg-center-v45{
+  position:relative;left:auto;top:auto;
+  transform:none;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:stretch;
+  width:100%;height:100%;
+  min-width:0;min-height:0;
+  padding:9px 5px;
+  gap:5px;
+  box-sizing:border-box;
+  border-radius:12px;
+  border:1px solid #bc9d70;
+  background:linear-gradient(155deg,#214955,#0c2d3b 80%);
+  box-shadow:inset 0 0 0 1px #f2d6a32d,0 2px 6px #0008;
+  overflow:hidden;
+}
+.sg .sg-market .sg-center-pile.sg-center-v45 > span:first-child {
+  flex:0 0 auto;
+  font-size:11px;line-height:1.1;
+  color:#f2dfb7;
+  letter-spacing:1px;
+  text-align:center;
+}
+.sg .sg-market .sg-center-tokens.sg-center-tokens-v45 {
+  display:grid;
+  width:100%;max-width:none;
+  min-height:0;min-width:0;
+  flex:0 1 auto;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-auto-rows:minmax(35px,1fr);
+  gap:4px;
+  align-items:center;
+  justify-items:stretch;
+  overflow-y:auto;overflow-x:hidden;
+  scrollbar-width:thin;
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice {
+  display:flex;align-items:center;justify-content:center;
+  box-sizing:border-box;
+  min-width:0;min-height:35px;
+  width:100%;height:100%;
+  padding:2px;gap:3px;
+  border:1px solid #688d8d;
+  border-radius:6px;
+  background:linear-gradient(#20424c,#102e3e);
+  touch-action:manipulation;
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice .sg-glass.sg-gem-faceted {
+  width:min(var(--sg-play-gem),70%);
+  height:auto;aspect-ratio:1;
+  max-width:100%;max-height:95%;
+  margin:0;
+  flex:none;
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice b{
+  position:relative;z-index:1;
+  font-size:12px;
+  line-height:1;
+  color:#f5eee1;
+  font-variant-numeric:tabular-nums;
+  flex:none;
+}
+.sg .sg-market .sg-center-v45 .sg-center-penalty{
+  flex:0 0 auto;
+  line-height:1.2;
+  font-size:9px;
+  text-align:center;
+  white-space:normal;
+}
+.sg .sg-market .sg-center-v45 .sg-center-quiet{
+  grid-column:1/-1;
+  display:grid;place-items:center;
+  min-height:40px;
+  font-size:22px;
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice:not(:disabled):hover,
+.sg .sg-market .sg-market-token:not(:disabled):hover{
+  outline:2px solid #f6d994;outline-offset:1px;
+  z-index:4;
+}
+.sg .sg-market .sg-center-choice:focus-visible,
+.sg .sg-market .sg-market-token:focus-visible{
+  outline:3px solid #f8dba5;
+  outline-offset:1px;
+  z-index:4;
+}
+/* The mobile board and market share exactly one gem token too. */
+.sg .sg-mobile-layout{
+  --sg-play-gem:24px;
+}
+.sg .sg-mobile-market .sg-market .sg-market-layout-v45 {
+  inset:21px 5px 21px;
+  gap:5px;
+}
+.sg .sg-mobile-market .sg-market-factories-v45{gap:3px;}
+.sg .sg-mobile-market .sg-factory-v45 {padding:2px;}
+.sg .sg-mobile-market .sg-center-pile.sg-center-v45{
+  padding:5px 3px;gap:3px;
+}
+.sg .sg-mobile-market .sg-center-v45 .sg-center-choice{
+  min-height:30px;padding:1px;gap:1px;
+}
+.sg .sg-mobile-market .sg-center-v45 .sg-center-choice b{font-size:10px;}
+.sg .sg-mobile-market .sg-center-v45 .sg-center-choice .sg-glass.sg-gem-faceted{
+  width:min(var(--sg-play-gem),70%);
+}
+.sg .sg-mobile-market .sg-center-v45 .sg-center-penalty{font-size:8px;}
+/* When an Android screen provides a very narrow market card, its workshops
+   get their own scrollable vertical space. The gems are never shrunk to
+   10px just to keep a decorative ring that the rules do not require. */
+@container (max-width:300px){
+  .sg .sg-market-layout-v45{
+    display:flex!important;
+    flex-direction:column;
+    overflow-y:auto!important;
+    scrollbar-width:thin;
+  }
+  .sg .sg-market-factories-v45{
+    flex:0 0 195px;min-height:195px;
+    grid-auto-rows:minmax(55px,1fr);
+    overflow:visible;
+  }
+  .sg .sg-market .sg-center-pile.sg-center-v45{
+    flex:0 0 130px;
+    min-height:130px;
+    height:auto;
+    overflow:hidden;
+  }
+  .sg .sg-market .sg-center-tokens.sg-center-tokens-v45{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-auto-rows:minmax(31px,1fr);
+  }
+}
+/* Short desktop windows keep their fixed left and right panels and reserve
+   slightly more height for the market by using its existing status space. */
+@media (min-width:1101px) and (min-height:621px){
+  .sg .sg-center .sg-market .sg-market-layout-v45{
+    bottom:64px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .sg .sg-market .sg-gem-faceted{animation:none;transition:none;}
+}
