@@ -671,3 +671,11 @@ na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian
 - Wszystkie pola kar START, −1, −2, −4, −6, −8, −11, −14, −18 są czytelne i pokazują kolorowe znaczniki graczy; kliknięcie nadal otwiera wyniki.
 - Zwiększono czytelność tafli i środkowego okręgu warsztatów tam, gdzie jest miejsce.
 - Układ wieloosobowego pełnego stołu na desktopie, dotychczasowy układ telefonu w poziomie (niski viewport) i pionowy pozostawiono bez zmian. Silnik gry i pula 100 szkieł bez zmian.
+
+
+### v44 — pełnokolorowe piętra i diamenty (restart po v36)
+
+- Przywróconą bazą pozostaje v36. W v44 zmieniono wyłącznie wygląd witraży: każde z pięciu pięter ma pełną, niezmienną barwę wzoru, niezależnie od tego, czy środkowe gniazdo jest puste, czy zajęte. Gniazda mają złoto-mosiężny obrys, a tafle — wspólne, szlifowane romby z czterema fasetami.
+- Paleta: czerwony #b82731 (mniej różowy), granatowy #17548b, biały #f3f6f4, słomkowy #dec06b, pomarańczowy #d77b2f. Wzornik 'wild' zachowuje osobne oznaczenie. Fizycznych kolorów nadal jest dokładnie 5 po 20 tafli.
+- Dwa gniazda bonusów na stopce okna są większe, przesunięte w lewo i zachowują działanie upper/lower; wynik pozostaje po prawej. Design inspirowany zatwierdzoną wizualizacją, odtwarzany kodem CSS dla wszystkich bieżących wzorów i rozmiarów.
+- Bez zmian silnika gry, zapisów partii, AI i architektury stołu. Testy prezentacji: src/ui/v44-stained-glass.test.tsx.

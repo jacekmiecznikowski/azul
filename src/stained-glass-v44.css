@@ -232,7 +232,7 @@
   clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
 }
 .sg .sg-window-kept .sg-kept-empty{
-  position:absolute;inset:22%;transform:none;
+  position:absolute;inset:22%;width:auto;height:auto;transform:none;
   clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
   background:#061f2e;border:0;opacity:1;
 }
