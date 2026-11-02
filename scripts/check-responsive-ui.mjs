@@ -114,13 +114,57 @@ try {
       assert(selectedShape.clip.includes('polygon('), `${label}: selected target is not a diamond`)
       assert(selectedShape.shadow === 'none', `${label}: rectangular selected highlight`)
       assert(await page.locator(`${root} .sg-window-target`).count() > 0, `${label}: no placement targets`)
+      // All six rounds use the *real* faceted glass component; no CSS dots.
+      const roundUI = await page.locator('.sg-header .sg-round-tracker-v52').evaluate(el => {
+        const rect = node => { const r = node.getBoundingClientRect()
+          return {x:r.x,y:r.y,width:r.width,height:r.height}
+        }
+        const steps = [...el.querySelectorAll('.sg-round-v52-step')]
+        const gems = [...el.querySelectorAll('.sg-round-v52-gem .sg-glass.sg-gem-faceted')]
+        const all = [el, ...steps, ...gems]
+        const head = el.closest('.sg-header')
+        const headBox = rect(head)
+        const over = all.some(node => {
+          const r = rect(node)
+          return r.width < 5 || r.height < 5 ||
+            r.x < headBox.x - 1 || r.x+r.width > headBox.x+headBox.width+1 ||
+            r.y < headBox.y - 1 || r.y+r.height > headBox.y+headBox.height+1
+        })
+        return {steps:steps.length,gems:gems.map(rect),over,
+          active:steps.filter(x=>x.getAttribute('aria-current')==='step').length,
+          header:headBox}
+      })
+      assert.equal(roundUI.steps,6,`${label}: round step count`)
+      assert.equal(roundUI.gems.length,6,`${label}: expected 6 physical gems`)
+      assert.equal(roundUI.active,1,`${label}: exactly one active round`)
+      assert(!roundUI.over,`${label}: round tracker clipped/overflowed: ${JSON.stringify(roundUI)}`)
+      for(const [i,g] of roundUI.gems.entries()) {
+        assert(Math.abs(g.width - g.height) < 1,`${label}: distorted round diamond ${i}`)
+      }
+
       const resources = page.locator('.sg-header .sg-resource-trigger')
-      await resources.click()
-      assert.equal(await resources.getAttribute('aria-expanded'), 'true', `${label}: resources disclosure failed`)
-      assert.equal(await page.getByRole('region', { name: 'Zasoby szkła' }).count(), 1,
-        `${label}: resources missing`)
-      await page.getByRole('button', { name: 'Zamknij zasoby' }).click()
-      assert.equal(await resources.getAttribute('aria-expanded'), 'false', `${label}: resources did not close`)
+      const ribbon = page.locator('.sg-header .sg-resource-ribbon')
+      if (width >= 1700 && height >= 650) {
+        assert(await ribbon.isVisible(), `${label}: stock counters hidden on full resolution`)
+        assert.equal(await ribbon.locator('.sg-resource-ribbon-item').count(),5,
+          `${label}: missing stock location(s)`)
+        assert(!(await resources.isVisible()), `${label}: redundant resources button on full screen`)
+        const ribbonGeom = await ribbon.evaluate(el => {
+          const a=el.getBoundingClientRect(), h=el.closest('.sg-header').getBoundingClientRect()
+          return {left:a.left,right:a.right,top:a.top,bottom:a.bottom,hleft:h.left,hright:h.right,htop:h.top,hbottom:h.bottom}
+        })
+        assert(ribbonGeom.left >= ribbonGeom.hleft && ribbonGeom.right <= ribbonGeom.hright &&
+          ribbonGeom.top >= ribbonGeom.htop && ribbonGeom.bottom <= ribbonGeom.hbottom,
+          `${label}: resource ribbon escapes header`)
+      } else {
+        assert(!(await ribbon.isVisible()), `${label}: compact screen has oversized resource ribbon`)
+        await resources.click()
+        assert.equal(await resources.getAttribute('aria-expanded'), 'true', `${label}: resources disclosure failed`)
+        assert.equal(await page.getByRole('region', { name: 'Zasoby szkła' }).count(), 1,
+          `${label}: resources missing`)
+        await page.getByRole('button', { name: 'Zamknij zasoby' }).click()
+        assert.equal(await resources.getAttribute('aria-expanded'), 'false', `${label}: resources did not close`)
+      }
       // A real layout regression: one shared color must not be magnified, and
       // five shared colors must not be flattened or squeezed by grid row count.
       if ((width === 1440 && opponents === 2) ||
