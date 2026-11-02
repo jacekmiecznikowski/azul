@@ -92,6 +92,75 @@ try {
         `${label}: resources missing`)
       await page.getByRole('button', { name: 'Zamknij zasoby' }).click()
       assert.equal(await resources.getAttribute('aria-expanded'), 'false', `${label}: resources did not close`)
+      // A real layout regression: one shared color must not be magnified, and
+      // five shared colors must not be flattened or squeezed by grid row count.
+      if ((width === 1440 && opponents === 2) ||
+          (width === 844 && opponents === 1) ||
+          (width === 390 && opponents === 3)) {
+        let referenceSize = null
+        for (const count of [1, 2, 3, 4, 5]) {
+          await page.evaluate(async ({ count, opponents }) => {
+            const { newGame, COLORS } = await import('/src/game/engine.ts')
+            const state = newGame({
+              opponents, seed: 145, playerControllers: ['human', 'human', 'human', 'human'],
+            })
+            for (const color of COLORS.slice(0, count)) {
+              const index = state.bag.indexOf(color)
+              if (index < 0) throw new Error('Seed missing target center color')
+              state.center.push(...state.bag.splice(index, 1))
+            }
+            localStorage.setItem('sintra-glass-save-v1', JSON.stringify(state))
+          }, { count, opponents })
+          await page.reload()
+          await page.getByRole('button', { name: 'Kontynuuj partię' }).click()
+          await page.evaluate(() => document.fonts.ready)
+          const sizes = await page.locator(root).evaluate(root => {
+            const rect = el => { const r = el.getBoundingClientRect(); return {
+              x:r.x,y:r.y,width:r.width,height:r.height,
+            } }
+            const center = root.querySelector('.sg-center-pile.sg-center-v45')
+            return {
+              pile: rect(center),
+              gems: [...center.querySelectorAll('.sg-center-choice .sg-glass.sg-gem-faceted')].map(rect),
+              buttons: [...center.querySelectorAll('.sg-center-choice')].map(rect),
+              factoryGem: rect(root.querySelector('.sg-factory-v45 .sg-market-token .sg-glass.sg-gem-faceted')),
+            }
+          })
+          assert.equal(sizes.gems.length, count, `${label}: missing center color(s) at ${count}`)
+          sizes.gems.forEach((gem, i) => {
+            assert(Math.abs(gem.width - gem.height) < 1,
+              `${label}: center color ${i} distorted at ${count} colors: ${JSON.stringify(gem)}`)
+            assert(gem.width >= (width >= 1101 ? 16 : 9),
+              `${label}: center color ${i} too small at ${count} colors`)
+            assert(gem.x >= sizes.pile.x - 1 && gem.y >= sizes.pile.y - 1 &&
+              gem.x + gem.width <= sizes.pile.x + sizes.pile.width + 1 &&
+              gem.y + gem.height <= sizes.pile.y + sizes.pile.height + 1,
+              `${label}: center gem escapes pile with ${count} colors`)
+            const button = sizes.buttons[i]
+            assert(gem.x >= button.x - 1 && gem.y >= button.y - 1 &&
+              gem.x + gem.width <= button.x + button.width + 1 &&
+              gem.y + gem.height <= button.y + button.height + 1,
+              `${label}: center gem escapes button with ${count} colors`)
+            assert(Math.abs(gem.width - sizes.gems[0].width) < 1,
+              `${label}: different gem sizes within same center`)
+            if (referenceSize !== null) {
+              assert(Math.abs(gem.width - referenceSize) < 1,
+                `${label}: gem size changes with center count (1:${referenceSize}, ${count}:${gem.width})`)
+            }
+          })
+          if (referenceSize === null) referenceSize = sizes.gems[0].width
+          if (width >= 1101) {
+            assert(Math.abs(referenceSize - sizes.factoryGem.width) <= 4,
+              `${label}: center gems have a different scale from workshop gems`)
+          }
+          if (count === 2 || count === 5) {
+            await page.locator(root).screenshot({
+              path:`reports/ui/${label}-center-${count}-colors.png`,
+            })
+          }
+        }
+        console.log(`PASS ${label}: square, consistent center gems with 1–5 colors`)
+      }
       assert.deepEqual(errors, [], label)
       console.log(`PASS ${label}: ${metrics.gems.length} visible gems, selection works`)
       await page.close()
