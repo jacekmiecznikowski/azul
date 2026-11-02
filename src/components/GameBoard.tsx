@@ -1,9 +1,10 @@
 import { Gem, RotateCcw, Sparkles } from 'lucide-react'
 import { patternFor, WINDOW_POINTS } from '../game/engine'
-import type { Player, SlotColor, WindowStrip } from '../game/engine'
-import { EmptyGlassSocket, StainedGlassPane } from './EmptyGlassSocket'
-import { CutGlassDiamond } from './CutGlassDiamond'
+import type { GlassColor, Player, SlotColor, WindowStrip } from '../game/engine'
 
+const colors: Record<GlassColor, string> = {
+  rose: 'czerwony', citrine: 'żółty', cyan: 'niebieski', amber: 'pomarańczowy', slate: 'biały',
+}
 const ORNAMENT_PAIRS = [[0, 1], [2, 3], [4, 5], [6, 7]] as const
 
 /** In Palace A, 2 / 3 / 4 completed sides in a pair score 3 / 6 / 10 points. */
@@ -11,12 +12,13 @@ export function ornamentBonus(completedSides: number): number {
   return completedSides >= 4 ? 10 : completedSides === 3 ? 6 : completedSides === 2 ? 3 : 0
 }
 
-export function GlassPiece({ color, placed = true, small = false, boardPane = false }: {
-  color: SlotColor; placed?: boolean; small?: boolean; boardPane?: boolean
+export function GlassPiece({ color, placed = true, small = false }: {
+  color: SlotColor; placed?: boolean; small?: boolean
 }) {
-  if (boardPane) return <StainedGlassPane color={color} filled={placed} small={small}/>
-  if (!placed) return <EmptyGlassSocket color={color} small={small}/>
-  return <CutGlassDiamond color={color} small={small}/>
+  return <span className={`sg-glass sg-glass-${color}${placed ? ' sg-glass-placed' : ' sg-glass-guide'}${small ? ' sg-glass-small' : ''}`}
+    title={color === 'wild' ? 'Dowolny kolor' : `${placed ? 'Tafla' : 'Potrzebny kolor'}: ${colors[color]}`}>
+    <span className="sg-glass-inner"/>
+  </span>
 }
 
 function Window({ strip, index, glazier, target, selected, isHumanTurn, onTarget }: {
@@ -28,9 +30,9 @@ function Window({ strip, index, glazier, target, selected, isHumanTurn, onTarget
   const canPick = isHumanTurn && target
   return <button type="button" disabled={!canPick} onClick={() => onTarget?.(index)}
     data-sg-window={index} className={`sg-window${complete ? ' sg-window-completed' : ''}${canPick ? ' sg-window-target' : ''}${glazier === index ? ' sg-window-active' : ''}${selected ? ' sg-window-selecting' : ''}`}
-    title={`Kwatera ${index + 1}; ${WINDOW_POINTS[index]} pkt${glazier === index ? '; tu stoi witrażysta' : ''}${canPick ? '; kliknij, aby ułożyć tafle' : ''}`}>
+    title={`Kwatera ${index + 1}; ${WINDOW_POINTS[index]} pkt${canPick ? '; kliknij, aby ułożyć tafle' : ''}`}>
     <span className="sg-window-head"><span>{String(index + 1).padStart(2, '0')}</span>
-      <span className="sg-window-glazier">{glazier === index ? <><Gem size={12}/><span className="sg-glazier-arrow" aria-hidden="true">▼</span></> : null}</span>
+      <span className="sg-window-glazier">{glazier === index ? <Gem size={12}/> : null}</span>
       <span>{complete ? '✓' : strip.side === 0 ? 'A' : 'B'}</span></span>
     {!complete && <span className="sg-window-reverse" aria-label="Podgląd drugiej strony">
       {reverse.map((color, i) => <i key={i} className={`sg-color-dot sg-color-dot-${color}`}/>)}</span>}
@@ -38,7 +40,7 @@ function Window({ strip, index, glazier, target, selected, isHumanTurn, onTarget
       {complete ? <span className="sg-finished"><Sparkles size={20}/><b>GOTOWE</b></span>
         : patternFor(strip).map((color, i) =>
           <span key={i} data-sg-pane={i} className={`sg-pane${strip.panes[i] ? ' sg-pane-filled' : ''}`}>
-            <GlassPiece color={strip.panes[i] ?? color} placed={!!strip.panes[i]} boardPane/>
+            <GlassPiece color={strip.panes[i] ?? color} placed={!!strip.panes[i]}/>
           </span>)}
     </span>
     <span className="sg-window-foot"><span className="sg-window-kept">

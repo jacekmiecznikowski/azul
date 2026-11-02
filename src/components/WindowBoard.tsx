@@ -1,19 +1,16 @@
 import { Gem, Sparkles } from 'lucide-react'
 import { patternFor, WINDOW_POINTS } from '../game/engine'
 import type { GlassColor, WindowStrip } from '../game/engine'
-import { EmptyGlassSocket, StainedGlassPane } from './EmptyGlassSocket'
 
 const COLORS_PL: Record<GlassColor, string> = {
   rose: 'Róż', citrine: 'Złoto', cyan: 'Turkus', amber: 'Bursztyn', slate: 'Srebro',
 }
 
-export function Glass({ color, small = false, ghost = false, pane = false, onClick, selected = false, label }: {
-  color: GlassColor | 'wild'; small?: boolean; ghost?: boolean; pane?: boolean; selected?: boolean
+export function Glass({ color, small = false, ghost = false, onClick, selected = false, label }: {
+  color: GlassColor | 'wild'; small?: boolean; ghost?: boolean; selected?: boolean
   onClick?: () => void; label?: string
 }) {
-  if (ghost) return <EmptyGlassSocket color={color} small={small}/>
-  if (pane) return <StainedGlassPane color={color} filled small={small}/>
-  const className = `glass glass-${color}${small ? ' glass-sm' : ''}${selected ? ' glass-selected' : ''}`
+  const className = `glass glass-${color}${small ? ' glass-sm' : ''}${ghost ? ' glass-ghost' : ''}${selected ? ' glass-selected' : ''}`
   const content = <><span className="glass-facet" /><span className="glass-spark">✦</span></>
   return onClick ? <button className={className} onClick={onClick} title={label || (color === 'wild' ? 'Joker' : COLORS_PL[color])} aria-label={label || (color === 'wild' ? 'Joker' : COLORS_PL[color])}>{content}</button>
     : <span className={className} title={label || (color === 'wild' ? 'Dowolny kolor' : COLORS_PL[color])}>{content}</span>
@@ -29,7 +26,7 @@ export function WindowCard({ strip, index, glazier, highlighted, active, onClick
     onClick={onClick} disabled={!canClick} aria-label={`Kwatera ${index + 1}${highlighted ? ', można ułożyć tafle' : ''}`}>
     <div className="window-head">
       <span className="window-n">{String(index + 1).padStart(2, '0')}</span>
-      {glazier === index && <span className="artisan" title="Tu stoi witrażysta"><Gem size={14} strokeWidth={2.6} /><span className="artisan-arrow" aria-hidden="true">▼</span></span>}
+      {glazier === index && <span className="artisan" title="Witrażysta"><Gem size={14} strokeWidth={2.6} /></span>}
       <span className="window-side">{complete ? '✓' : strip.side === 0 ? 'A' : 'B'}</span>
     </div>
     <div className={`reverse-preview${complete ? ' reverse-finished' : ''}`} title="Ściągawka: kolor pól po drugiej stronie kwatery">
@@ -40,7 +37,7 @@ export function WindowCard({ strip, index, glazier, highlighted, active, onClick
     <div className="pattern-frame">
       {complete ? <div className="pattern-finished"><Sparkles size={20} /><small>UKOŃCZONO</small></div> : pattern.map((slot, slotIndex) =>
         <div key={slotIndex} className={`pattern-cell${strip.panes[slotIndex] ? ' filled' : ''}`}>
-          {strip.panes[slotIndex] ? <Glass color={strip.panes[slotIndex]} pane /> : <Glass color={slot} ghost />}
+          {strip.panes[slotIndex] ? <Glass color={strip.panes[slotIndex]} /> : <Glass color={slot} ghost />}
         </div>)}
     </div>
     <div className="palace-window">
