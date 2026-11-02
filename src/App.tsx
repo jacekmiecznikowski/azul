@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowRight, BookOpen, Check, Gem, House, Info, RotateCcw, Settings2, X } from 'lucide-react'
-import { applyMove, availableSources, BROKEN_TRACK, COLORS, glassInventory, legalMoves, newGame, standings } from './game/engine'
+import { applyMove, availableSources, BROKEN_TRACK, COLORS, legalMoves, newGame, standings } from './game/engine'
 import type { Controller, Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
 import { LiveHistory } from './components/LiveHistory'
