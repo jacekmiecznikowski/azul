@@ -45,7 +45,7 @@ describe('v46 circular workshops and genuine shared center', () => {
     expect(positions).toHaveLength(n)
     const width = 570
     const height = 310
-    const diameter = Math.min(92, .22 * height, .15 * width)
+    const diameter = Math.min(92, .23 * height, .19 * width)
     const rects = positions.map(([px, py]) => ({
       x: px / 100 * width, y: py / 100 * height,
     }))
