@@ -53,7 +53,7 @@ jobs:
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: SintraGlass-Android-v36
+          name: SintraGlass-Android-v37
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
@@ -62,14 +62,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk SintraGlass-Android-v36.apk
-          if gh release view android-v36-preview --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload android-v36-preview SintraGlass-Android-v36.apk --clobber --repo "$GITHUB_REPOSITORY"
+          cp android/app/build/outputs/apk/debug/app-debug.apk SintraGlass-Android-v37.apk
+          if gh release view android-v37-preview --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload android-v37-preview SintraGlass-Android-v37.apk --clobber --repo "$GITHUB_REPOSITORY"
           else
-            gh release create android-v36-preview SintraGlass-Android-v36.apk \
+            gh release create android-v37-preview SintraGlass-Android-v37.apk \
               --repo "$GITHUB_REPOSITORY" \
               --target "$GITHUB_SHA" \
-              --title "Sintra Glass Android v36 — test" \
+              --title "Sintra Glass Android v37 — test" \
               --notes "Publiczny APK debug do testow na telefonie (bez logowania i bez rozpakowywania)." \
               --prerelease
           fi

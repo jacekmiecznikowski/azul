@@ -671,3 +671,11 @@ na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian
 - Wszystkie pola kar START, −1, −2, −4, −6, −8, −11, −14, −18 są czytelne i pokazują kolorowe znaczniki graczy; kliknięcie nadal otwiera wyniki.
 - Zwiększono czytelność tafli i środkowego okręgu warsztatów tam, gdzie jest miejsce.
 - Układ wieloosobowego pełnego stołu na desktopie, dotychczasowy układ telefonu w poziomie (niski viewport) i pionowy pozostawiono bez zmian. Silnik gry i pula 100 szkieł bez zmian.
+
+
+### v37 — kolory i diamentowe luki po betatestach
+
+- Pięć tafli: czerwony #C6283D, żółty #FFD60A, niebieski #1FB6FF, pomarańczowy #F35B04 i biały #F4F7FB. Fiolet #B81FFF to **joker pola**, a nie szósta fizyczna barwa.
+- Nowy komponent EmptyGlassSocket: duże kolorowe narożniki i ciemny pusty diament. Po wypełnieniu pojawia się pełna, nasycona tafla. Wspólne dla obu rendererów i wyboru pozycji.
+- Wyraźna krawędź i strzałka pokazują, na której kwaterze stoi witrażysta.
+- Zgłoszenia testerów i dalsze zadania: docs/BETA-FEEDBACK.md. Silnik gry niezmieniony.
