@@ -47,6 +47,7 @@ import './market-orbit-v46.css'
 import './market-layout-v47.css'
 import './market-layout-v48.css'
 import './market-glass-v49.css'
+import './glass-geometry-v50.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const PLAYER_AVATARS = ['✦', '✧', '✳', '❖']
