@@ -679,3 +679,11 @@ na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian
 - Paleta: czerwony #b82731 (mniej różowy), granatowy #17548b, biały #f3f6f4, słomkowy #dec06b, pomarańczowy #d77b2f. Wzornik 'wild' zachowuje osobne oznaczenie. Fizycznych kolorów nadal jest dokładnie 5 po 20 tafli.
 - Dwa gniazda bonusów na stopce okna są większe, przesunięte w lewo i zachowują działanie upper/lower; wynik pozostaje po prawej. Design inspirowany zatwierdzoną wizualizacją, odtwarzany kodem CSS dla wszystkich bieżących wzorów i rozmiarów.
 - Bez zmian silnika gry, zapisów partii, AI i architektury stołu. Testy prezentacji: src/ui/v44-stained-glass.test.tsx.
+
+
+### v45 — pełnowymiarowe szlifowane romby również w warsztatach
+
+- Tafle na warsztatach i na środku renderowane są tym samym `GlassPiece` (fasety, materiały, paleta) co szkła układane w witrażach. Rozmiar określa wspólne `--sg-play-gem` (28px desktop, 24px mobile; tylko całe mniejsze okna mogą proporcjonalnie ograniczyć kafelek).
+- Wewnątrz istniejącego panelu warsztatów zamiast miniaturowego koła mieści się siatka 3 kolumn dla 5/7/9 warsztatów oraz osobny, szeroki środek z szkiełkami i licznikami. Pozostałe obszary stołu pozostają nietknięte. Przy bardzo wąskim panelu przewija się sama sekcja warsztatów.
+- Usunięto cienkie, ciemne przerwy nad pierwszym i pod ostatnim piętrem witraża, nie zmieniając wysokości plansz, kolorów ani punktacji.
+- Silnik gry, 100 fizycznych szkieł, AI i zapis rozgrywki bez zmian. Regresje: `src/ui/v45-market.test.tsx`.
