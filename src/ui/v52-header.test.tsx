@@ -30,7 +30,7 @@ describe('v52 – premium physical glass round tracker and responsive stock', ()
       expect(html).toContain(`sg-resource-ribbon-value">${value}`)
     expect(html).not.toContain('100 / 100')
     expect(html).toContain('Pokaż zasoby szkła')
-    expect(html).toContain('sg-resource-popover')
+    expect(html).toContain('aria-controls="sg-resources-popover"')
   })
 
   it('reserves the full ribbon only for large screens, with a mobile dropdown', () => {
