@@ -1,0 +1,76 @@
+/* v39: One leaded-glass frame in BOTH states. Filling installs the
+ * SAME color in the central diamond. No black holes or glossy buttons.
+ * Old v37 CSS is overridden intentionally; game rules are unchanged. */
+.sg{--sg-red:#A94452;--sg-yellow:#D7BE63;--sg-blue:#4B90AE;--sg-orange:#B96E4E;--sg-white:#DCE5E3;--sg-wild:#8E6BAF}
+.sg .sg-glass-rose,.sg .sg-stained-pane-rose,.sg .glass-rose{--v39-color:#A94452;--v39-shadow:#6A3340;--v37-glass:#A94452;--v37-shadow:#6A3340;--shine:#A94452;--glass-base:#A94452;--glass-deep:#6A3340}
+.sg .sg-color-dot-rose,.sg .tile-rose{--piece:#A94452;background:#A94452}
+.sg .sg-glass-citrine,.sg .sg-stained-pane-citrine,.sg .glass-citrine{--v39-color:#D7BE63;--v39-shadow:#806C37;--v37-glass:#D7BE63;--v37-shadow:#806C37;--shine:#D7BE63;--glass-base:#D7BE63;--glass-deep:#806C37}
+.sg .sg-color-dot-citrine,.sg .tile-citrine{--piece:#D7BE63;background:#D7BE63}
+.sg .sg-glass-cyan,.sg .sg-stained-pane-cyan,.sg .glass-cyan{--v39-color:#4B90AE;--v39-shadow:#29536D;--v37-glass:#4B90AE;--v37-shadow:#29536D;--shine:#4B90AE;--glass-base:#4B90AE;--glass-deep:#29536D}
+.sg .sg-color-dot-cyan,.sg .tile-cyan{--piece:#4B90AE;background:#4B90AE}
+.sg .sg-glass-amber,.sg .sg-stained-pane-amber,.sg .glass-amber{--v39-color:#B96E4E;--v39-shadow:#6F3E32;--v37-glass:#B96E4E;--v37-shadow:#6F3E32;--shine:#B96E4E;--glass-base:#B96E4E;--glass-deep:#6F3E32}
+.sg .sg-color-dot-amber,.sg .tile-amber{--piece:#B96E4E;background:#B96E4E}
+.sg .sg-glass-slate,.sg .sg-stained-pane-slate,.sg .glass-slate{--v39-color:#DCE5E3;--v39-shadow:#83969B;--v37-glass:#DCE5E3;--v37-shadow:#83969B;--shine:#DCE5E3;--glass-base:#DCE5E3;--glass-deep:#83969B}
+.sg .sg-color-dot-slate,.sg .tile-slate{--piece:#DCE5E3;background:#DCE5E3}
+.sg .sg-glass-wild,.sg .sg-stained-pane-wild,.sg .glass-wild{--v39-color:#8E6BAF;--v39-shadow:#58436D;--v37-glass:#8E6BAF;--v37-shadow:#58436D;--shine:#8E6BAF;--glass-base:#8E6BAF;--glass-deep:#58436D}
+.sg .sg-color-dot-wild,.sg .tile-wild{--piece:#8E6BAF;background:#8E6BAF}
+.sg .sg-color-dot{border-color:#dbe6d59a;box-shadow:0 1px 3px #0008}
+/* Loose glass tiles in workshops retain their recognisable shape, but lose
+   the former plastic highlights and use the same calm hue. */
+.sg .sg-glass.sg-glass-placed{
+  opacity:1;filter:none;
+  border:1px solid color-mix(in srgb,var(--v39-color,#96bac0),#d5e4df 20%);
+  background:linear-gradient(145deg,#fff5,transparent 43%,#09283942),var(--v39-color,#96bac0);
+  box-shadow:inset 0 0 0 1px #ffffff45,inset -2px -2px 5px #09263869,0 2px 3px #0005;
+}
+.sg .sg-glass.sg-glass-placed .sg-glass-inner{border:1px solid #ffffff87;background:transparent;box-shadow:none}
+/* The only geometric definition for empty and occupied WINDOW cells. */
+.sg .sg-stained-pane {
+  position:relative;display:block;flex:none;isolation:isolate;overflow:hidden;
+  box-sizing:border-box;width:min(92cqi,90cqb,38px);height:auto;
+  aspect-ratio:1;max-width:100%;max-height:100%;
+  border-radius:5px;border:1px solid color-mix(in srgb,var(--v39-color),#718f94 42%);
+  background:linear-gradient(145deg,#1c3c47,#112b38 58%,#0c2231);
+  opacity:1;filter:none;
+  box-shadow:inset 0 0 0 1px #e4f1e528,inset 0 1px 3px #0006,0 1px 3px #0005;
+}
+.sg .sg-stained-pane .sg-stained-frame{position:absolute;inset:5%;border:1px solid #cbdad133;border-radius:3px;pointer-events:none}
+.sg .sg-stained-pane .sg-socket-shard{
+  position:absolute;inset:6%;display:block;border:0;
+  background:linear-gradient(145deg,#fff3,transparent 42%,#09233839 100%),var(--v39-color);
+  filter:none;opacity:.93;box-shadow:none;
+}
+/* Four broad facets; one coherent mounting frame with a central opening. */
+.sg .sg-stained-pane .sg-socket-shard-nw{clip-path:polygon(0 0,48% 0,48% 20%,20% 48%,0 48%)}
+.sg .sg-stained-pane .sg-socket-shard-ne{clip-path:polygon(52% 0,100% 0,100% 48%,80% 48%,52% 20%)}
+.sg .sg-stained-pane .sg-socket-shard-se{clip-path:polygon(100% 52%,100% 100%,52% 100%,52% 80%,80% 52%)}
+.sg .sg-stained-pane .sg-socket-shard-sw{clip-path:polygon(48% 100%,0 100%,0 52%,20% 52%,48% 80%)}
+/* Only this central diamond changes on placement; surrounding colors,
+   number of facets, borders and size are preserved. */
+.sg .sg-stained-pane .sg-socket-core{
+  position:absolute;inset:25%;transform:rotate(45deg);z-index:1;
+  display:block;border-radius:1px;
+  border:1px solid color-mix(in srgb,var(--v39-color),#a3babb 28%);
+  background:#173644;
+  box-shadow:inset 0 0 0 1px #ffffff16,inset 0 1px 2px #06172389;
+}
+.sg .sg-stained-pane.sg-stained-pane-filled .sg-socket-core{
+  background:linear-gradient(145deg,#ffffff2c,transparent 43%,#071b2927),var(--v39-color);
+  border-color:color-mix(in srgb,var(--v39-color),#d7e2de 34%);
+  box-shadow:inset 0 0 0 1px #ffffff35,inset -2px -2px 3px #0825383b;
+}
+.sg .sg-stained-pane .sg-stained-facet{
+  display:block;position:absolute;inset:12%;
+  border-top:1px solid #ffffff20;border-left:1px solid #ffffff1b;
+}
+.sg .sg-stained-pane.sg-stained-pane-filled .sg-stained-facet{
+  border-top-color:#ffffff77;border-left-color:#ffffff5c;
+}
+.sg .sg-stained-pane-wild .sg-socket-core{border-style:dashed}
+.sg .sg-stained-pane-small{width:12px;height:12px}
+.sg .sg-pane .sg-stained-pane{width:min(92cqi,90cqb,38px)}
+.sg .sg-manual-pane .sg-stained-pane{width:40px;height:40px;max-width:80%}
+.sg .sg-placement-slot .sg-stained-pane{width:18px;height:18px}
+.sg .tabletop-grid .pattern-cell .sg-stained-pane{width:min(84cqi,84cqb,31px)}
+.sg .tabletop-human .pattern-cell .sg-stained-pane{width:min(88cqi,88cqb,34px)}
+@media(max-width:560px){.sg .sg-manual-pane .sg-stained-pane{width:27px;height:27px}}
