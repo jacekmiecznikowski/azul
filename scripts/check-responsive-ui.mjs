@@ -151,6 +151,7 @@ try {
               gems: [...center.querySelectorAll('.sg-center-choice .sg-glass.sg-gem-faceted')].map(rect),
               buttons: [...center.querySelectorAll('.sg-center-choice')].map(rect),
               factoryGem: rect(root.querySelector('.sg-factory-v45 .sg-market-token .sg-glass.sg-gem-faceted')),
+              emptyWidth: root.querySelector('.sg-pane-empty-diamond')?.getBoundingClientRect().width ?? null,
             }
           })
           assert.equal(sizes.gems.length, count, `${label}: missing center color(s) at ${count}`)
@@ -169,7 +170,7 @@ try {
               gem.y + gem.height <= button.y + button.height + 1,
               `${label}: center gem escapes button with ${count} colors`)
             if (width >= 1101) {
-              const emptyWidth = await page.locator(`${root} .sg-pane-empty-diamond`).first().evaluate(el => el.getBoundingClientRect().width)
+              const emptyWidth = sizes.emptyWidth
               assert(Math.abs(gem.width - emptyWidth) <= 1.2,
                 `${label}: center diamond differs from empty window by ${Math.abs(gem.width-emptyWidth)}px`)
             }
