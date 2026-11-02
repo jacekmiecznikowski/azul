@@ -158,7 +158,14 @@ export function TurnSummary({ game }: { game: GameState }) {
 
     <div className="sg-scores">{game.players.map((p, i) => <div key={p.id} className={`sg-score-line${game.currentPlayer === i && game.phase === 'playing' ? ' sg-score-current' : ''}`}>
       <i className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`}/><span>{p.name}</span><b>{p.score}</b></div>)}</div>
-
+    <div className="sg-turn-first-token" aria-label={game.firstCenterTaken
+      ? `Żeton pierwszego gracza ma ${game.players[game.nextStartingPlayer ?? game.startingPlayer].name}`
+      : 'Żeton pierwszego gracza jest na środku stołu'}>
+      <span className="sg-turn-token-icon" aria-hidden="true">1</span>
+      {game.firstCenterTaken
+        ? <span>Żeton: <strong>{game.players[game.nextStartingPlayer ?? game.startingPlayer].name}</strong> · następna runda</span>
+        : <span>Żeton: <strong>na środku</strong> · start: {game.players[game.startingPlayer].name}</span>}
+    </div>
   </section>
 }
 function SetupModal({ settings, onClose, onStart }: {
