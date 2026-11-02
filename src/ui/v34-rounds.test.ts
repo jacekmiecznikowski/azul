@@ -8,7 +8,7 @@ describe('v34 round-bonus widget shared by all screen sizes', () => {
   const {roundColors} = newGame({opponents:3,seed:21034})
   it('shows six numbered colors with exactly one active bonus', () => {
     const html = renderToStaticMarkup(createElement(RoundTracker,{round:1,colors:roundColors}))
-    expect((html.match(/class="sg-round-v52-step/g) || [])).toHaveLength(6)
+    expect((html.match(/class="sg-round-v52-step(?:\s|")/g) || [])).toHaveLength(6)
     expect((html.match(/aria-current="step"/g) || [])).toHaveLength(1)
     expect(html).not.toContain('PREMIA TERAZ')
     expect(html).not.toContain('sg-round-v34-bonus')
