@@ -1,0 +1,102 @@
+/* v37: vivid single-source glass palette.
+ * 5 physical colors, plus violet for wild/JOKER slots only.
+ * No engine values or saved-game representation are changed. */
+.sg{
+  --sg-red:#C6283D;--sg-blue:#1FB6FF;--sg-yellow:#FFD60A;
+  --sg-orange:#F35B04;--sg-white:#F4F7FB;--sg-wild:#B81FFF;
+}
+.sg .sg-glass-rose,.sg .sg-empty-socket-rose,.sg .glass-rose{--v37-glass:#C6283D;--v37-shadow:#6A1020;--shine:#C6283D;--glass-base:#C6283D;--glass-deep:#6A1020}
+.sg .sg-glass-citrine,.sg .sg-empty-socket-citrine,.sg .glass-citrine{--v37-glass:#FFD60A;--v37-shadow:#A86E00;--shine:#FFD60A;--glass-base:#FFD60A;--glass-deep:#A86E00}
+.sg .sg-glass-cyan,.sg .sg-empty-socket-cyan,.sg .glass-cyan{--v37-glass:#1FB6FF;--v37-shadow:#0D5C8B;--shine:#1FB6FF;--glass-base:#1FB6FF;--glass-deep:#0D5C8B}
+.sg .sg-glass-amber,.sg .sg-empty-socket-amber,.sg .glass-amber{--v37-glass:#F35B04;--v37-shadow:#8A2D04;--shine:#F35B04;--glass-base:#F35B04;--glass-deep:#8A2D04}
+.sg .sg-glass-slate,.sg .sg-empty-socket-slate,.sg .glass-slate{--v37-glass:#F4F7FB;--v37-shadow:#B8C6D6;--shine:#F4F7FB;--glass-base:#F4F7FB;--glass-deep:#B8C6D6}
+.sg .sg-glass-wild,.sg .sg-empty-socket-wild,.sg .glass-wild{--v37-glass:#B81FFF;--v37-shadow:#6E1AA6;--shine:#B81FFF;--glass-base:#B81FFF;--glass-deep:#6E1AA6}
+.sg .sg-color-dot-rose,.sg .tile-rose{--piece:#C6283D;background-color:#C6283D}
+.sg .sg-color-dot-citrine,.sg .tile-citrine{--piece:#FFD60A;background-color:#FFD60A}
+.sg .sg-color-dot-cyan,.sg .tile-cyan{--piece:#1FB6FF;background-color:#1FB6FF}
+.sg .sg-color-dot-amber,.sg .tile-amber{--piece:#F35B04;background-color:#F35B04}
+.sg .sg-color-dot-slate,.sg .tile-slate{--piece:#F4F7FB;background-color:#F4F7FB}
+.sg .sg-color-dot-wild,.sg .tile-wild{--piece:#B81FFF;background-color:#B81FFF}
+.sg .sg-color-dot{background:var(--piece);border-color:#ffffffb8}
+/* Placed pieces: full color, beveled gemstone, high contrast. */
+.sg .sg-glass.sg-glass-placed {
+  opacity:1;filter:none;
+  border:1px solid color-mix(in srgb,var(--v37-glass),white 18%);
+  background:linear-gradient(145deg,#ffffff79 0%,transparent 35%,#071c2859 100%),var(--v37-glass);
+  clip-path:polygon(14% 0,86% 0,100% 14%,100% 86%,86% 100%,14% 100%,0 86%,0 14%);
+  box-shadow:inset 0 0 0 2px #ffffff6b,inset -4px -4px 8px var(--v37-shadow),0 2px 5px #000a;
+}
+.sg .sg-glass.sg-glass-placed .sg-glass-inner{
+  inset:20%;border:2px solid #ffffffe0;
+  background:linear-gradient(140deg,#fff7,transparent 62%);
+  box-shadow:0 0 7px #ffffff65;
+}
+.sg .glass:not(.glass-ghost){opacity:1;filter:none}
+/* EMPTY SOCKET: 4 saturated shards surrounding a dark hole.
+ * More than half the visible square is chromatic; not a faded tile or a
+ * thin ambiguous outline. Each fragment has a distinct angular edge. */
+.sg .sg-empty-socket{
+  display:block;position:relative;flex:none;isolation:isolate;overflow:hidden;
+  box-sizing:border-box;
+  width:min(92cqi,90cqb,38px);height:auto;aspect-ratio:1;
+  max-width:100%;max-height:100%;
+  border-radius:5px;border:1px solid var(--v37-glass);
+  background:linear-gradient(145deg,#071d2a,#061522);
+  opacity:1;filter:none;
+  box-shadow:inset 0 0 0 1px #ffffff25,0 2px 4px #0009;
+}
+.sg .sg-empty-socket .sg-socket-shard {
+  position:absolute;inset:4%;display:block;
+  border:0;
+  background:linear-gradient(145deg,#ffffff57 0%,transparent 34%,#06172324 100%),var(--v37-glass);
+  filter:drop-shadow(0 0 1px var(--v37-glass));
+}
+.sg .sg-empty-socket .sg-socket-shard-nw{clip-path:polygon(0 0,47% 0,49% 18%,18% 49%,0 47%)}
+.sg .sg-empty-socket .sg-socket-shard-ne{clip-path:polygon(53% 0,100% 0,100% 47%,82% 49%,51% 18%)}
+.sg .sg-empty-socket .sg-socket-shard-se{clip-path:polygon(100% 53%,100% 100%,53% 100%,51% 82%,82% 51%)}
+.sg .sg-empty-socket .sg-socket-shard-sw{clip-path:polygon(47% 100%,0 100%,0 53%,18% 51%,49% 82%)}
+.sg .sg-empty-socket .sg-socket-core{
+  position:absolute;inset:23%;transform:rotate(45deg);
+  border:2px solid var(--v37-glass);background:#061925;
+  box-shadow:inset 0 0 0 1px #000b,0 0 5px var(--v37-glass);
+}
+.sg .sg-empty-socket-wild .sg-socket-core{border-style:dashed}
+.sg .sg-empty-socket-small{width:12px;height:12px}
+.sg .sg-pane .sg-empty-socket{width:min(92cqi,90cqb,38px)}
+.sg .sg-manual-pane .sg-empty-socket{width:40px;height:40px;max-width:80%}
+.sg .sg-placement-slot .sg-empty-socket{width:18px;height:18px}
+.sg .tabletop-grid .pattern-cell .sg-empty-socket{width:min(84cqi,84cqb,31px);border-radius:4px}
+.sg .tabletop-human .pattern-cell .sg-empty-socket{width:min(88cqi,88cqb,34px)}
+/* Visible worker: outlined strip, vertical highlight and diamond-arrow badge. */
+.sg .sg-window.sg-window-active {
+  border-color:#f1d995!important;
+  box-shadow:inset 0 0 0 2px #f4d28c99,0 0 12px #ffdf8273,0 2px 2px #0007;
+}
+.sg .sg-window.sg-window-active::before {
+  content:'';position:absolute;left:0;top:18px;bottom:21px;width:4px;
+  background:#ffe09c;border-radius:4px;box-shadow:0 0 7px #ffe8a0;
+  pointer-events:none;z-index:2;
+}
+.sg .sg-window .sg-window-glazier {display:flex;align-items:center;justify-content:center;gap:2px;min-width:18px;height:14px}
+.sg .sg-window.sg-window-active .sg-window-glazier {
+  background:#f4daa0;color:#092938;filter:none;border:1px solid #fff1d0;
+  border-radius:4px;box-shadow:0 0 8px #ead492bf;
+}
+.sg .sg-window-glazier .sg-glazier-arrow{font-size:9px;font-weight:900;line-height:1;color:#102b36}
+.sg .tabletop-grid .window-strip.window-glazier {
+  border:2px solid #f1d995;
+  box-shadow:inset 0 0 0 1px #f1d995,0 0 9px #edd69b75;
+}
+.sg .tabletop-grid .artisan {
+  display:flex;align-items:center;justify-content:center;gap:1px;
+  width:22px;min-width:22px;background:#f3da9f;color:#102d37;
+  box-shadow:0 0 8px #efd89eab;
+}
+.sg .tabletop-grid .artisan-arrow {font-size:8px;color:#112c36}
+@media(max-width:560px){
+  .sg .sg-manual-pane .sg-empty-socket{width:27px;height:27px}
+  .sg .sg-empty-socket .sg-socket-core{border-width:1px}
+}
+@media(prefers-reduced-motion:reduce){
+  .sg .sg-window.sg-window-active {animation:none}
+}
