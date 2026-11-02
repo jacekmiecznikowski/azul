@@ -313,16 +313,36 @@ export default function App() {
     const difficulty = game.players[game.currentPlayer].difficulty ?? 'normal'
     const base = difficulty === 'easy' ? 1100 : difficulty === 'normal' ? 1500 : difficulty === 'expert' ? 2200 : difficulty === 'master' ? 2250 : 1900
     const delay = base + Math.round(Math.random() * 450)
-    const timer = window.setTimeout(() => {
-      const move = chooseAIMove(game, difficulty)
+    let cancelled = false
+    let worker: Worker | undefined
+    const finish = (move: Move | null) => {
+      if (cancelled) return
+      worker?.terminate()
       if (move) {
         const next = applyMove(game, move)
         emitEffects(game, next, move)
         setGame(next)
         play(moveAudioCue(game, next))
       }
+    }
+    const timer = window.setTimeout(() => {
+      try {
+        worker = new Worker(new URL('./game/ai.worker.ts', import.meta.url), { type: 'module' })
+        worker.onmessage = (event: MessageEvent<Move | null>) => finish(event.data)
+        worker.onerror = () => {
+          worker?.terminate()
+          if (!cancelled) finish(chooseAIMove(game, difficulty))
+        }
+        worker.postMessage({ state: game, difficulty })
+      } catch {
+        finish(chooseAIMove(game, difficulty))
+      }
     }, delay)
-    return () => window.clearTimeout(timer)
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+      worker?.terminate()
+    }
   }, [game, screen, finishing, play, emitEffects])
   useEffect(() => { if (!humanTurn) { setSelection(null); setFinishing(null); setPlacementOptions(null) } }, [humanTurn])
 
