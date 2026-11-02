@@ -13,7 +13,7 @@
 .sg .sg-market .sg-market-orbit-v46 {
   position:relative;
   display:block;
-  width:min(100%, calc(100cqb - 92px));
+  width:min(100%, calc(100cqb - 20px));
   height:auto;
   aspect-ratio:1;
   min-width:0;
@@ -64,7 +64,7 @@
   place-items:center;
   grid-template-columns:minmax(0,1fr);
   grid-template-rows:minmax(0,1fr);
-  padding:7%;
+  padding:clamp(2px, .7cqb, 5px);
   box-sizing:border-box;
   border:2px solid #b99a68;
   border-radius:50%;
@@ -314,7 +314,7 @@
   overflow:visible;
 }
 .sg .sg-mobile-market .sg-market .sg-market-orbit-v46 {
-  width:min(100%, calc(100cqb - 50px));
+  width:min(100%, calc(100cqb - 10px));
 }
 .sg .sg-mobile-market .sg-center-pile.sg-center-v45 {
   padding:4.5%;
