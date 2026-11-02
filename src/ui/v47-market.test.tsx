@@ -19,6 +19,8 @@ describe('v47 workshop space, diamond selection and names', () => {
     expect(market).not.toContain('sg-first-token')
     expect(resources).toContain('sg-resource-trigger')
     expect(resources).toContain('aria-expanded="false"')
+    expect(resources).not.toContain('100 / 100')
+    expect(resources).not.toContain('Żeton pierwszego gracza')
     expect(css).toContain('inset:28px 7px 7px')
   })
   it('has a diamond-shaped hit area and no rectangular selected background', () => {
