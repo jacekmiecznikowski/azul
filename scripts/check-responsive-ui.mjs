@@ -79,7 +79,7 @@ try {
         const style = getComputedStyle(root.querySelector('.sg-market-orbit-v46'))
         return {open:open?r(open):null, factory:factoryGem?r(factoryGem):null,
           installed:placed?r(placed):null, socket:parent?r(parent):null,
-          cssValue:getComputedStyle(root).getPropertyValue('--sg-unified-gem-size')?.trim(),
+          cssValue:getComputedStyle(root.querySelector('.sg-felt') ?? root).getPropertyValue('--sg-unified-gem-size')?.trim(),
           orbitSize:style.getPropertyValue('--sg-disc-size')?.trim()}
       })
       if (unified.open && unified.factory) {
