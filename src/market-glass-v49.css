@@ -3,6 +3,11 @@
  * No grid-auto-rows based on item count; no width/height:auto distortion.
  * All faceted diamonds remain strictly square and centered.
  */
+.sg .sg-market .sg-market-orbit-v46 {
+  /* A single measurement for EVERY loose gem, whether it is in a round
+     workshop or in the shared oval. The playable glass markup is identical. */
+  --sg-shared-gem: min(var(--sg-play-gem), calc(var(--sg-disc-size) * 0.37));
+}
 .sg .sg-market .sg-center-pile.sg-center-v45 {
   width:41%;
   height:39%;
@@ -50,8 +55,8 @@
   box-sizing:border-box;
   flex:0 0 auto;
   display:block;
-  width:min(var(--sg-play-gem), 77cqb, 49cqi);
-  height:min(var(--sg-play-gem), 77cqb, 49cqi);
+  width:min(var(--sg-shared-gem), 77cqb, 49cqi);
+  height:min(var(--sg-shared-gem), 77cqb, 49cqi);
   aspect-ratio:1;
   max-width:none;
   max-height:none;
@@ -67,8 +72,8 @@
   line-height:1;
 }
 .sg .sg-market .sg-factory-v45 .sg-market-token .sg-glass.sg-gem-faceted {
-  width:min(var(--sg-play-gem), 91cqi, 91cqb);
-  height:min(var(--sg-play-gem), 91cqi, 91cqb);
+  width:min(var(--sg-shared-gem), 91cqi, 91cqb);
+  height:min(var(--sg-shared-gem), 91cqi, 91cqb);
   min-width:0;
   min-height:0;
   max-width:none;
@@ -96,8 +101,8 @@
   padding:1px 2px;
 }
 .sg .sg-mobile-market .sg-center-v45 .sg-center-choice .sg-glass.sg-gem-faceted {
-  width:min(var(--sg-play-gem), 77cqb, 49cqi);
-  height:min(var(--sg-play-gem), 77cqb, 49cqi);
+  width:min(var(--sg-shared-gem), 77cqb, 49cqi);
+  height:min(var(--sg-shared-gem), 77cqb, 49cqi);
   max-width:none;
   max-height:none;
 }
