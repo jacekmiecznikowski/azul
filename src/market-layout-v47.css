@@ -176,7 +176,7 @@
   .sg .sg-resource-trigger span { display:none; }
   .sg .sg-resource-trigger strong { font-size:10px; }
   .sg .sg-market .sg-market-orbit-v46 {
-    --sg-disc-size:clamp(35px, min(26cqb, 17cqi), 90px);
+    --sg-disc-size:clamp(40px, min(27cqb, 18cqi), 90px);
   }
 }
 @media (max-width:360px) {
