@@ -94,7 +94,7 @@
 @media (min-width:1101px) and (min-height:621px) {
   .sg .sg-center .sg-market-orbit-v46 {
     --sg-disc-size:clamp(50px,min(25cqb,19cqi),110px);
-    --sg-shared-gem:min(var(--sg-play-gem),calc(var(--sg-disc-size) * .39));
+    --sg-shared-gem:min(var(--sg-play-gem),calc(var(--sg-disc-size) * .55));
   }
 }
 
