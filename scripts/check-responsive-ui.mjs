@@ -30,7 +30,11 @@ try {
         const gems = [...root.querySelectorAll('.sg-market-token > .sg-glass')].map(rect)
         const tokens = [...root.querySelectorAll('.sg-market-token')].map(rect)
         const market = root.querySelector('.sg-market-layout-v45')
-        return { gems, tokens, market:rect(market), documentWidth:document.documentElement.scrollWidth, viewport:innerWidth }
+        const orbit = root.querySelector('.sg-market-orbit-v46')
+        const factories = [...orbit.querySelectorAll('.sg-factory-v45')].map(rect)
+        const gemDiscs = [...root.querySelectorAll('.sg-market-token')].map(el => rect(el.closest('.sg-factory-v45')))
+        return { gems, tokens, market:rect(market), orbit:rect(orbit),
+          factories, gemDiscs, documentWidth:document.documentElement.scrollWidth, viewport:innerWidth }
       })
       const label = `${width}x${height}-${opponents+1}players`
       await page.screenshot({ path:`reports/ui/${label}.png`, fullPage:true })
@@ -38,9 +42,28 @@ try {
       await writeFile('reports/ui/metrics.json', JSON.stringify(results, null, 2))
       assert.equal(metrics.gems.length, (2 * (opponents+1) + 1) * 4, label)
       assert(metrics.documentWidth <= width + 1, `${label}: page overflow`)
+      assert(metrics.orbit.width >= metrics.market.width - 1, `${label}: orbit does not fill panel width`)
+      assert(metrics.orbit.height >= metrics.market.height - 1, `${label}: orbit does not fill panel height`)
+      assert.equal(metrics.factories.length, 2 * (opponents+1) + 1, label)
+      metrics.factories.forEach((f, i) => {
+        assert(f.x >= metrics.market.x - 1 && f.y >= metrics.market.y - 1 &&
+          f.x + f.width <= metrics.market.x + metrics.market.width + 1 &&
+          f.y + f.height <= metrics.market.y + metrics.market.height + 1,
+          `${label}: factory ${i} is clipped`)
+      })
+      for (let i=0;i<metrics.factories.length;i++) for(let j=i+1;j<metrics.factories.length;j++) {
+        const a=metrics.factories[i], b=metrics.factories[j]
+        const gap=Math.hypot(a.x+a.width/2-b.x-b.width/2, a.y+a.height/2-b.y-b.height/2)
+        assert(gap >= (a.width+b.width)/2 + 2, `${label}: factories ${i} and ${j} overlap`)
+      }
       metrics.gems.forEach((gem, i) => {
         assert(gem.width >= 12 && gem.height >= 12, `${label}: invisible/tiny gem ${i}: ${JSON.stringify(gem)}`)
         assert(Math.abs(gem.width-gem.height) < 1, `${label}: distorted gem ${i}`)
+        const disc = metrics.gemDiscs[i]
+        assert(gem.x >= disc.x - 1 && gem.y >= disc.y - 1 &&
+          gem.x + gem.width <= disc.x + disc.width + 1 &&
+          gem.y + gem.height <= disc.y + disc.height + 1,
+          `${label}: gem ${i} escapes its circular workshop`)
         const token = metrics.tokens[i]
         assert(gem.x >= token.x-1 && gem.y >= token.y-1 && gem.x+gem.width <= token.x+token.width+1 && gem.y+gem.height <= token.y+token.height+1, `${label}: gem outside button ${i}`)
       })
