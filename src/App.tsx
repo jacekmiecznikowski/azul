@@ -43,7 +43,6 @@ import './glass-legibility-v37.css'
 import './glass-panes-v39.css'
 import './glass-polish-v40.css'
 import './workshops-v41.css'
-import './workshops-v42.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const COLORS_PL: Record<GlassColor, string> = { rose: 'Czerwone', citrine: 'Żółte', cyan: 'Niebieskie', amber: 'Pomarańczowe', slate: 'Białe' }
@@ -71,19 +70,20 @@ function restore(): GameState | null {
   return null
 }
 
-function Factory({ tiles, index, selected, disabled, onPick }: {
-  tiles: GlassColor[]; index: number; selected: Selection | null;
+function Factory({ tiles, index, count, selected, disabled, onPick }: {
+  tiles: GlassColor[]; index: number; count: number; selected: Selection | null;
   disabled: boolean; onPick: (source: Source, color: GlassColor) => void
 }) {
-  return <div className={`sg-factory sg-factory-v42${tiles.length ? '' : ' sg-factory-empty'}`}
-    role="group" aria-label={`Warsztat ${index + 1}`}>
+  const a = (-90 + 360 * index / count) * Math.PI / 180
+  const x = 50 + 39 * Math.cos(a)
+  const y = 50 + 39 * Math.sin(a)
+  return <div className={`sg-factory${tiles.length ? '' : ' sg-factory-empty'}`} style={{ left: `${x}%`, top: `${y}%` }}>
     <span className="sg-factory-num">{String(index + 1).padStart(2, '0')}</span>
     <div className="sg-factory-grid">{tiles.length ? tiles.map((color, i) =>
-      <button type="button" key={`${i}-${color}`} disabled={disabled}
-        onClick={() => onPick({ type: 'factory', index }, color)}
+      <button type="button" key={`${i}-${color}`} disabled={disabled} onClick={() => onPick({ type: 'factory', index }, color)}
         className={`sg-market-token sg-market-token-${color}${selected?.source.type === 'factory' && selected.source.index === index && selected.color === color ? ' sg-token-selected' : ''}`}
         aria-label={`Warsztat ${index + 1}, ${COLORS_PL[color]}`} title={`Weź wszystkie ${COLORS_PL[color].toLowerCase()} tafle z warsztatu ${index + 1}`}>
-        <GlassPiece color={color}/></button>) : <span className="sg-factory-empty-mark" aria-label="Pusty warsztat">✥</span>}
+        <GlassPiece color={color}/></button>) : <span className="sg-factory-empty-mark">✥</span>}
     </div>
   </div>
 }
@@ -95,24 +95,18 @@ export function Market({ game, selection, disabled, onPick }: {
   const inventory = glassInventory(game)
   return <section className="sg-market sg-center-card" aria-label="Warsztaty szkła">
     <div className="sg-panel-title"><span>WARSZTATY SZKŁA</span><span className="sg-market-title-meta"><small>{game.factories.filter(f => f.length).length} aktywnych</small>{!game.firstCenterTaken && <span className="sg-start-tile sg-market-first-badge" aria-label="Żeton pierwszego gracza jest na środku stołu" title="Żeton pierwszego gracza jest na środku stołu">1</span>}</span></div>
-    <div className="sg-market-workspace-v42">
-      <div className="sg-market-factories-v42" role="group"
-        aria-label={`Warsztaty szkła, ${game.factories.length} miejsc`}
-        style={{gridTemplateRows:`repeat(${Math.ceil(game.factories.length / 3)},minmax(0,1fr))`}}>
-        {game.factories.map((tiles, i) => <Factory key={i} tiles={tiles} index={i}
-          selected={selection} disabled={disabled} onPick={onPick}/>)}
-      </div>
-      <div className="sg-center-pile sg-center-pile-v42" role="group" aria-label="Środek stołu">
-        <span className="sg-center-heading-v42">ŚRODEK</span>
-        <div className="sg-center-tokens sg-center-tokens-v42">{center.length ? center.map(({ color, count }) =>
-          <button type="button" disabled={disabled} key={color}
-            title={`Zabierz ${count} × ${COLORS_PL[color]}`}
+    <div className="sg-market-circle sg-market-circle-v41">
+      <div className="sg-market-ring sg-market-ring-v41"/>
+      {game.factories.map((tiles, i) => <Factory key={i} tiles={tiles} index={i} count={game.factories.length} selected={selection} disabled={disabled} onPick={onPick}/>)}
+      <div className="sg-center-pile sg-center-pile-v41">
+        <span>ŚRODEK</span>
+        <div className="sg-center-tokens sg-center-tokens-v41">{center.length ? center.map(({ color, count }) =>
+          <button type="button" disabled={disabled} key={color} title={`Zabierz ${count} × ${COLORS_PL[color]}`} onClick={() => onPick({ type: 'center' }, color)}
             aria-label={`Środek stołu: ${count} × ${COLORS_PL[color].toLowerCase()} tafle. Wybierz kolor.`}
-            onClick={() => onPick({ type: 'center' }, color)}
             className={`sg-center-choice${selection?.source.type === 'center' && selection.color === color ? ' sg-token-selected' : ''}`}>
             <GlassPiece color={color}/><b aria-hidden="true">{count}</b>
-          </button>) : <span className="sg-center-quiet" aria-label="Brak tafli na środku">✧</span>}</div>
-        {!game.firstCenterTaken && <small className="sg-center-penalty">+1 stłuczenie za pierwszy pobór</small>}
+          </button>) : <span className="sg-center-quiet">✧</span>}</div>
+        {!game.firstCenterTaken && <small className="sg-center-penalty">+1 stłuczenie</small>}
       </div>
     </div>
     <div className="sg-inventory sg-inventory-v33 sg-inventory-v34" role="group" aria-label={`Zasoby szkła: wieża ${inventory.tower}; warsztaty i środek ${inventory.table}; witraże ${inventory.playerBoards}; szkła premii ${inventory.roundTrack}; woreczek ${inventory.bag}. Razem ${inventory.total} tafli.`}>

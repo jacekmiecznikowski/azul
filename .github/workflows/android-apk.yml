@@ -53,7 +53,7 @@ jobs:
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: SintraGlass-Android-v42
+          name: SintraGlass-Android-v43-rollback
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
@@ -62,14 +62,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk SintraGlass-Android-v42.apk
-          if gh release view android-v42-preview --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload android-v42-preview SintraGlass-Android-v42.apk --clobber --repo "$GITHUB_REPOSITORY"
+          cp android/app/build/outputs/apk/debug/app-debug.apk SintraGlass-Android-v43-rollback.apk
+          if gh release view android-v43-rollback --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload android-v43-rollback SintraGlass-Android-v43-rollback.apk --clobber --repo "$GITHUB_REPOSITORY"
           else
-            gh release create android-v42-preview SintraGlass-Android-v42.apk \
+            gh release create android-v43-rollback SintraGlass-Android-v43-rollback.apk \
               --repo "$GITHUB_REPOSITORY" \
               --target "$GITHUB_SHA" \
-              --title "Sintra Glass Android v42 — test" \
+              --title "Sintra Glass Android v43 — powrót do poprzedniego UI" \
               --notes "Publiczny APK debug do testow na telefonie (bez logowania i bez rozpakowywania)." \
               --prerelease
           fi

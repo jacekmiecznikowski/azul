@@ -9,7 +9,7 @@ import { Market } from '../App'
 import { COLORS, newGame } from '../game/engine'
 
 describe('v41: physically identical glass and larger, contained workshop center',()=>{
-  const css=readFileSync(new URL('../workshops-v42.css',import.meta.url),'utf8')
+  const css=readFileSync(new URL('../workshops-v41.css',import.meta.url),'utf8')
   it('reuses the exact same physical diamond in workshops and filled windows',()=>{
     for(const color of COLORS){
       const diamond=renderToStaticMarkup(createElement(CutGlassDiamond,{color}))
@@ -21,7 +21,7 @@ describe('v41: physically identical glass and larger, contained workshop center'
       expect(empty).not.toContain('sg-cut-diamond')
       expect(empty).toContain('sg-socket-core')
     }
-    expect(css).toContain('sg-glass-diamond-v42')
+    expect(css).toContain('sg-stained-pane-filled > .sg-cut-diamond')
   })
   it('shows up to all FIVE center choices in a two-column grid, not a spilling list',()=>{
     const game=newGame({opponents:3,seed:41})
@@ -34,12 +34,12 @@ describe('v41: physically identical glass and larger, contained workshop center'
       game.center.push(c)
     })
     const html=renderToStaticMarkup(createElement(Market,{game,selection:null,disabled:false,onPick:()=>{}}))
-    expect(html).toContain('sg-center-tokens-v42')
+    expect(html).toContain('sg-center-tokens-v41')
     expect((html.match(/class="sg-center-choice/g)||[])).toHaveLength(5)
     const names=['czerwone','żółte','niebieskie','pomarańczowe','białe']
     for (const name of names) expect(html).toContain(`Środek stołu: 2 × ${name} tafle`)
     expect(css).toContain('grid-template-columns:repeat(2,minmax(0,1fr))')
-    expect(css).toContain('sg-center-pile-v42')
+    expect(css).toContain('width:48cqi')
   })
   it('preserves 100 glass pieces in the engine',()=>{
     const g=newGame({opponents:3,seed:41})

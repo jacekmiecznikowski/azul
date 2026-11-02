@@ -711,9 +711,6 @@ na Vite, EXE i Androidzie. Ekran startowy oraz zapis partii pozostają bez zmian
 - Zachowano pulę 100 tafli, działanie woreczka, interfejs 2–4 graczy, silnik i zapis partii. Pozostałe uwagi testerów w `docs/BETA-FEEDBACK.md`.
 
 
-### v42 — spójny kształt szkła i prostokątne warsztaty
+### v43 (rollback) — wycofanie nieudanego layoutu warsztatów v42
 
-- Pola puste, ułożone tafle oraz wolne szkło korzystają z tego samego StainedGlassPane. Jeden romb ma jednolitą geometrię, odcień, krawędzie i rozmiar; zmienia się wyłącznie kolor wnętrza, gdy luka zostaje uzupełniona. Nie nakładamy kolejnego elementu na witraż.
-- Warsztaty ułożono w prostokątnej siatce 3 kolumn dla 5/7/9 miejsc (zależnie od liczby graczy); osobna, szeroka sekcja ŚRODEK ma duże tafle, liczniki i miejsce na wszystkie pięć barw.
-- Zmienna --sg-pane-size określa wielkość tej samej tafli na planszy i w warsztacie; przy ciasnym ekranie dopasowanie dotyczy całego interfejsu mobilnego. Przyciski wyboru nie tracą powierzchni klikania; w ciasnych wariantach przewija się wnętrze warsztatów, nie cała plansza.
-- Bez zmian w silniku, 100 taflach, zapisach i AI. Testy regresji: src/ui/v42-workshops.test.ts.
+Ze względu na regresję wyglądu cofnęliśmy eksperymentalny układ prostokątny v42 i jego renderowanie szkła. Interfejs wrócił do kodu v41; zachowano mechanikę, zapis gry i historię commitów. v42 pozostaje w historii repozytorium jako materiał do analizy, lecz nie jest już aktywne.

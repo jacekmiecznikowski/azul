@@ -32,4 +32,4 @@ zastępują wizualnego sprawdzenia na laptopie i telefonie.
 
 - [x] v41: poprawiono rozbieżność wyglądu luźnej i ułożonej tafli poprzez współdzielony `CutGlassDiamond`; przeorganizowano wnętrze warsztatów dla maksymalnie pięciu barw.
 
-- [x] v42 (projekt do oceny wizualnej): identyczny element w pustej luce, wypełnionym witrażu i warsztacie; układ prostokątny 3 kolumn + duży środek, wspólny token rozmiaru, klikalne przyciski, bez zmian silnika.
+- [ ] **Priorytet: po regresji v42.** Wycofano eksperymentalną przebudowę UI. Nie wdrażać ponownie bez wizualnego testu na docelowych rozdzielczościach, także z 5 kolorami na środku; zgodność szkieł pustych i ułożonych musi zostać oceniona na prawdziwym obrazie, nie tylko w DOM.
