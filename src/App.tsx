@@ -55,6 +55,7 @@ import './unified-glass-v51.css'
 import './header-premium-v52.css'
 import './experience-polish-v53.css'
 import './header-ceremony-glazier-v54.css'
+import './turn-feedback-v55.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const PLAYER_AVATARS = ['✦', '✧', '✳', '❖']
@@ -518,7 +519,7 @@ export default function App() {
     <div className="sg-mobile-layout" aria-label="Mobilny stół Sintra Glass">
       <nav className="sg-mobile-players" aria-label="Wybierz planszę gracza">
         {game.players.map((p,i) => <button type="button" key={p.id}
-          className={`sg-mobile-player sg-palace-${p.palaceColor ?? 'red'}${mobileBoardIndex === i ? ' sg-mobile-player-selected' : ''}`}
+          className={`sg-mobile-player sg-palace-${p.palaceColor ?? 'red'}${mobileBoardIndex === i ? ' sg-mobile-player-selected' : ''}${humanCanPlay && game.currentPlayer === i ? ' sg-mobile-player-current-human' : ''}`}
           aria-pressed={mobileBoardIndex === i}
           onClick={() => setMobileBoard(i)}>
           <span className="sg-mobile-palace-chip" aria-hidden="true" title={`Pałac: ${p.palaceColor ?? 'red'}`}/>
