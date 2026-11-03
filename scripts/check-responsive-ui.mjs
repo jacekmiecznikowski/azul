@@ -523,7 +523,10 @@ try {
       await page.reload()
       await page.getByRole('button',{name:'Kontynuuj partię'}).click()
       if(mobile) await page.getByRole('button',{name:'Wyniki'}).click()
-      assert.equal(await page.locator('.sg-physical-scores').count(),1,
+      const restored=page.locator(mobile
+        ? '.sg-mobile-stats.sg-score-mode-board .sg-physical-scores'
+        : '.sg-stage .sg-side-left.sg-score-mode-board .sg-physical-scores')
+      assert(await restored.isVisible(),
         'Physical scoring preference not restored after page reload')
       if(mobile) await page.getByRole('button',{name:'Zamknij ×'}).click()
       await page.getByRole('button',{name:'Otwórz menu gry'}).click()
