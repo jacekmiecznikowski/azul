@@ -67,6 +67,9 @@ export function ManualPlacementDialog({ strip, candidates, picked, onClose, onCo
         <span>Zaznaczone pola</span>
         <strong>{selected.length} / {required}</strong>
       </div>
+      <div className="sg-manual-progress-track" aria-hidden="true">
+        <span style={{ width: `${required ? selected.length / required * 100 : 100}%` }}/>
+      </div>
       <div className="sg-manual-panes" role="group" aria-label="Wybierz miejsca ułożenia szkła">
         {pattern.map((base, index) => {
           const occupied = strip.panes[index] !== null
@@ -75,15 +78,20 @@ export function ManualPlacementDialog({ strip, candidates, picked, onClose, onCo
           const possible = selectableField && !active && selected.length < required &&
             variants.some(variant => [...selected, index].every(slot => variant.includes(slot)))
           return <button key={index} type="button"
-            className={`sg-manual-pane${base === 'wild' ? ' sg-manual-joker' : ''}${active ? ' sg-manual-active' : ''}`}
+            className={`sg-manual-pane${base === 'wild' ? ' sg-manual-joker' : ''}${active ? ' sg-manual-active' : ''}${occupied ? ' sg-manual-occupied' : ''}${!possible && !active ? ' sg-manual-unavailable' : ''}`}
             aria-label={`Pole ${index + 1}, ${occupied ? 'już zajęte' : base === 'wild' ? 'joker' : PANE_NAMES[base].toLowerCase()}, ${active ? 'zaznaczone' : selectableField ? 'możliwe do wyboru' : 'niedostępne'}`}
             aria-pressed={selectableField ? active : undefined}
             disabled={!selectableField || (!active && !possible)}
             onClick={() => toggle(index)}>
             <span className="sg-manual-pane-index">{String(index + 1).padStart(2, '0')}</span>
-            <GlassPiece color={active ? color : strip.panes[index] ?? base}
-              placed={occupied || active}/>
-            <span className="sg-manual-pane-type">{occupied ? 'ZAŁOŻONE' : base === 'wild' ? 'JOKER ★' : PANE_NAMES[base]}</span>
+            <span className={`sg-manual-pane-field sg-pane-${base}`} aria-hidden="true">
+              <span className="sg-manual-pane-socket">
+                {occupied || active
+                  ? <GlassPiece color={active ? color : strip.panes[index]!}/>
+                  : <span className="sg-manual-pane-empty-diamond"/>}
+              </span>
+            </span>
+            <span className="sg-manual-pane-type">{occupied ? 'ZAŁOŻONE' : base === 'wild' ? '✦ JOKER' : PANE_NAMES[base]}</span>
             <span className="sg-manual-check">{active ? <Check size={15}/> : occupied ? '●' : '＋'}</span>
           </button>
         })}
