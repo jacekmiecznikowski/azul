@@ -55,7 +55,7 @@ import './unified-glass-v51.css'
 import './header-premium-v52.css'
 import './experience-polish-v53.css'
 import './header-ceremony-glazier-v54.css'
-import './turn-feedback-v55.css'
+import './turn-market-v56.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const PLAYER_AVATARS = ['✦', '✧', '✳', '❖']
@@ -354,7 +354,7 @@ export default function App() {
   }, [showTurnPopup, game.round, game.turn, game.currentPlayer, game.players])
   useEffect(() => {
     if (!turnNotice) return
-    const timer = window.setTimeout(() => setTurnNotice(null), 1900)
+    const timer = window.setTimeout(() => setTurnNotice(null), 2700)
     return () => window.clearTimeout(timer)
   }, [turnNotice])
 
@@ -598,7 +598,7 @@ export default function App() {
     {screen === 'game' && roundAnnouncement && <RoundAnnouncement key={roundAnnouncement.round} round={roundAnnouncement.round} color={roundAnnouncement.color} minimal={!roundTiming.cinematic}/>}
     {screen === 'game' && showTurnPopup && turnNotice && <div className="sg-human-turn-notice" role="status" aria-live="polite" key={turnNotice.key}>
       <span className="sg-human-turn-notice-icon" aria-hidden="true">✦</span>
-      <span><strong>{turnNotice.name === 'Ty' ? 'TWOJA TURA' : `TURA: ${turnNotice.name.toLocaleUpperCase('pl-PL')}`}</strong><small>Wybierz szkło z warsztatu lub środka</small></span>
+      <span><strong>TWOJA TURA</strong><small>{turnNotice.name === 'Ty' ? 'Wybierz szkło z warsztatu lub środka' : `${turnNotice.name} — wybierz szkło`}</small></span>
     </div>}
     {screen === 'game' && finishOverlay.banner && <FinishCelebration state={game} onResults={() => setShowResults(true)} onNewGame={() => setShowSetup(true)}/>}
     {screen === 'game' && finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
