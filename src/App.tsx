@@ -331,14 +331,15 @@ export default function App() {
     setRoundReady(null)
     setTurnNotice(null)
     setRoundAnnouncement({ round: game.round, color })
+    const releasingRound = game.round
+    const unlock = window.setTimeout(() => setRoundReady(releasingRound), 3050)
+    return () => window.clearTimeout(unlock)
   }, [screen, game.round, game.roundColors, game.phase])
   useEffect(() => {
     if (!roundAnnouncement) return
-    const announced = roundAnnouncement.round
     // The CSS exit ends at 2700ms; do not unlock gameplay until 350ms later.
     const hide = window.setTimeout(() => setRoundAnnouncement(null), 2700)
-    const unlock = window.setTimeout(() => setRoundReady(announced), 3050)
-    return () => { window.clearTimeout(hide); window.clearTimeout(unlock) }
+    return () => window.clearTimeout(hide)
   }, [roundAnnouncement])
   useEffect(() => {
     if (!humanCanPlay) { setTurnNotice(null); return }
