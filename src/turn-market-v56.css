@@ -218,7 +218,7 @@
    Seven circles grow moderately; nine keep their previously tested safe scale. */
 @media(min-width:1101px) and (min-height:621px) {
   .sg .sg-center .sg-market .sg-market-orbit-v46[data-sg-orbit-count="5"] {
-    --sg-disc-size:clamp(78px,min(38cqb,30cqi),150px);
+    --sg-disc-size:clamp(96px,min(40cqb,31cqi),150px);
   }
   .sg .sg-center .sg-market .sg-market-orbit-v46[data-sg-orbit-count="7"] {
     --sg-disc-size:clamp(64px,min(30cqb,25cqi),118px);
@@ -226,11 +226,11 @@
   /* Move disc centers inward to accommodate the larger physical circles.
      Percentages describe centers; with the count-specific diameter they keep
      all discs visible and maintain a spacious, centered oval. */
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(1) {left:50%!important;top:21%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(2) {left:84%!important;top:37%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(3) {left:70%!important;top:77%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(4) {left:30%!important;top:77%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(5) {left:16%!important;top:37%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(1) {left:50%!important;top:28%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(2) {left:87%!important;top:43%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(3) {left:64%!important;top:73%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(4) {left:36%!important;top:73%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(5) {left:13%!important;top:43%!important;}
   .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(1) {left:50%!important;top:18%!important;}
   .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(2) {left:77%!important;top:29%!important;}
   .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(3) {left:83%!important;top:60%!important;}
