@@ -45,7 +45,7 @@ describe('v56 – gold outer frame, 1v1 markets and reliable human-turn notices'
     }))
     expect(html).toContain('sg-board-your-turn')
     expect(html).toContain('TWOJA TURA')
-    expect((html.match(/class="sg-window/g)??[])).toHaveLength(8)
+    expect((html.match(/data-sg-window=/g)??[])).toHaveLength(8)
     expect(css).toContain('.sg .sg-board.sg-board-your-turn')
     expect(css).toContain('@keyframes sg-v56-palace-ripple')
     expect(css).not.toContain('opacity:.42')
