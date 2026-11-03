@@ -203,6 +203,21 @@
   .sg .sg-center .sg-market .sg-market-orbit-v46[data-sg-orbit-count="7"] {
     --sg-disc-size:clamp(64px,min(30cqb,25cqi),118px);
   }
+  /* Move disc centers inward to accommodate the larger physical circles.
+     Percentages describe centers; with the count-specific diameter they keep
+     all discs visible and maintain a spacious, centered oval. */
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(1) {left:50%!important;top:22%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(2) {left:79%!important;top:43%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(3) {left:71%!important;top:77%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(4) {left:29%!important;top:77%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(5) {left:21%!important;top:43%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(1) {left:50%!important;top:18%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(2) {left:77%!important;top:29%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(3) {left:83%!important;top:60%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(4) {left:65%!important;top:82%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(5) {left:35%!important;top:82%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(6) {left:17%!important;top:60%!important;}
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(7) {left:23%!important;top:29%!important;}
   .sg .sg-center .sg-market .sg-factory-v45 .sg-factory-grid {
     width:94%;
     height:94%;
