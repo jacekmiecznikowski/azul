@@ -1,0 +1,209 @@
+/* v55 — explicit visual-effects preference applies to all new turn cues.
+   The round cue always gates gameplay; its appearance follows the user's choice. */
+.sg.sg-effects-cinematic .sg-seat.sg-seat-active-human .sg-board,
+.sg.sg-effects-cinematic .sg-mobile-board .sg-board.sg-board-current.sg-board-human {
+  outline:2px solid #92f6de;
+  outline-offset:1px;
+  border-color:#e6e6bf;
+  animation:sg-human-palace-pulse 3.1s ease-in-out 1 both;
+}
+@keyframes sg-human-palace-pulse {
+  0%,100% {box-shadow:0 0 0 2px #69e2c854,0 0 15px #4fd8bd69,inset 0 0 0 2px #95f1d23d;}
+  25%,60% {box-shadow:0 0 0 4px #b2ffe5c4,0 0 25px #9bfde3e8,0 0 39px #5bc9b1ad,inset 0 0 0 3px #c0ffe5a6;}
+}
+.sg.sg-effects-minimal .sg-seat.sg-seat-active-human .sg-board,
+.sg.sg-effects-minimal .sg-mobile-board .sg-board.sg-board-current.sg-board-human {
+  animation:none!important;
+  outline:2px solid #80cfba;
+  outline-offset:0;
+  box-shadow:0 0 0 1px #7abda871,inset 0 0 0 1px #a4dcc74b;
+}
+.sg .sg-mobile-player.sg-mobile-player-current-human {
+  border-color:#c1f7dc;
+  box-shadow:inset 0 0 0 1px #a5e8d1,0 0 9px #48ba9b79;
+}
+
+/* One unobtrusive notification, only when cinematic effects are enabled. */
+.sg .sg-human-turn-notice {
+  position:fixed;
+  z-index:89;
+  top:clamp(84px,16vh,175px);
+  left:50%;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  min-width:235px;
+  max-width:min(91vw,485px);
+  padding:13px 21px;
+  color:#effbf5;
+  border:1px solid #efd39a;
+  border-radius:13px;
+  background:linear-gradient(150deg,#205255f9,#10323ff9);
+  box-shadow:inset 0 1px 0 #fbf2d040,0 11px 30px #041724a6,0 0 16px #62e7c46b;
+  transform:translateX(-50%);
+  pointer-events:none;
+  animation:sg-human-turn-cue 1.9s ease-in-out both;
+}
+.sg .sg-human-turn-notice-icon {
+  font-size:23px;
+  color:#ffdc9b;
+  text-shadow:0 0 8px #dbb975a3;
+}
+.sg .sg-human-turn-notice > span:last-child {
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  align-items:flex-start;
+  min-width:0;
+}
+.sg .sg-human-turn-notice strong {
+  font:800 16px/1.2 'DM Sans',sans-serif;
+  letter-spacing:.7px;
+}
+.sg .sg-human-turn-notice small {
+  font:600 10px/1.3 'DM Sans',sans-serif;
+  color:#b7dacf;
+}
+@keyframes sg-human-turn-cue {
+  0% {opacity:0;transform:translate(-50%,-11px) scale(.96);}
+  18%,68% {opacity:1;transform:translate(-50%,0) scale(1);}
+  100% {opacity:0;transform:translate(-50%,-5px) scale(.98);}
+}
+
+/* Effects OFF/reduced motion: no blur, blackout, sparkles or popup animation.
+   A small, static 700ms label still communicates the new round and bonus. */
+.sg .sg-round-announcement.sg-round-announcement--minimal {
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:clamp(74px,11vh,110px) 8px 0;
+  z-index:90;
+  background:transparent;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+  pointer-events:none;
+  animation:none!important;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-card {
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  width:min(370px,94vw);
+  min-width:0;
+  min-height:0;
+  max-height:none;
+  padding:9px 15px;
+  gap:10px;
+  border:1px solid #bca373;
+  border-radius:11px;
+  background:#153640f5;
+  box-shadow:0 4px 13px #06182395;
+  animation:none!important;
+  transform:none!important;
+  opacity:1!important;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-card::before,
+.sg .sg-round-announcement--minimal .sg-round-announcement-card::after,
+.sg .sg-round-announcement--minimal .sg-round-announcement-kicker,
+.sg .sg-round-announcement--minimal .sg-round-announcement-separator,
+.sg .sg-round-announcement--minimal .sg-round-announcement-label {display:none;}
+.sg .sg-round-announcement--minimal .sg-round-announcement-heading {
+  margin:0;
+  gap:4px;
+  flex:0 0 auto;
+  white-space:nowrap;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-heading span {
+  font-size:13px;
+  letter-spacing:0;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-heading strong {
+  font-size:22px;
+  line-height:1;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-bonus {
+  margin:0;
+  gap:5px;
+  font-size:10px;
+  letter-spacing:0;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-gem,
+.sg .sg-round-announcement--minimal .sg-round-announcement-gem .sg-glass.sg-glass-placed.sg-gem-faceted {
+  width:25px;
+  height:25px;
+  min-width:25px;
+  min-height:25px;
+  filter:none;
+  animation:none!important;
+}
+@media(max-height:460px) {
+  .sg .sg-round-announcement--minimal {padding-top:52px;}
+  .sg .sg-round-announcement--minimal .sg-round-announcement-card {padding:5px 12px;}
+}
+@media (prefers-reduced-motion:reduce) {
+  .sg .sg-seat.sg-seat-active-human .sg-board,
+  .sg .sg-mobile-board .sg-board.sg-board-current.sg-board-human,
+  .sg .sg-human-turn-notice {animation:none!important;}
+}
+
+/* Big desktops: larger workshop discs on a slightly wider orbit.
+   Explicitly limit this to wide/tall displays, preserving laptop/mobile sizes.
+   All factory, shared and socket diamonds still derive from the ONE JS-measured
+   --sg-unified-gem-size variable. */
+@media (min-width:1700px) and (min-height:880px) {
+  .sg .sg-center .sg-market .sg-market-layout-v45 {
+    left:2px;
+    right:2px;
+    top:24px;
+    bottom:4px;
+  }
+  .sg .sg-center .sg-market .sg-market-orbit-v46 {
+    --sg-disc-size:clamp(54px,min(30cqb,22cqi),122px);
+  }
+  .sg .sg-center .sg-market .sg-center-pile.sg-center-v45 {
+    width:64%;
+    height:69%;
+  }
+  .sg .sg-center .sg-market .sg-factory-v45 .sg-factory-grid {
+    width:94%;
+    height:94%;
+  }
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(1),
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(1),
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(1) {
+    top:15%!important;
+  }
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(2) {
+    top:18%!important;
+  }
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(3) {
+    left:88%!important;
+  }
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(8) {
+    left:12%!important;
+  }
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(9) {
+    top:18%!important;
+  }
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(5),
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(6),
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(4),
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(5),
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(3),
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(4) {
+    top:85%!important;
+  }
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(3),
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(2) {
+    left:88%!important;
+  }
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(6),
+  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(5) {
+    left:12%!important;
+  }
+}
