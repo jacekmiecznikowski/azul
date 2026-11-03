@@ -175,6 +175,7 @@ try {
         assert(gem.x >= token.x-1 && gem.y >= token.y-1 && gem.x+gem.width <= token.x+token.width+1 && gem.y+gem.height <= token.y+token.height+1, `${label}: gem outside button ${i}; gem=${JSON.stringify(gem)} button=${JSON.stringify(token)} disc=${JSON.stringify(metrics.gemDiscs[i])}`)
       })
       const first = page.locator(`${root} .sg-market-token`).first()
+      const originalGem = await first.locator('.sg-glass').boundingBox()
       await first.click()
       assert(await page.locator(`${root} .sg-token-selected`).count() > 0, `${label}: source selection failed`)
       const selectedShape = await page.locator(`${root} .sg-market-token.sg-token-selected`).first().evaluate(button => {
@@ -187,8 +188,10 @@ try {
       assert(selectedShape.shadow === 'none', `${label}: rectangular selected highlight`)
       assert(selectedShape.ring.includes('linear-gradient'),
         `${label}: selected diamond has no visible gold ring`)
-      assert(selectedShape.gemTransform !== 'none',
-        `${label}: selected gemstone does not expose the shaped gold ring`)
+      const selectedGem = await first.locator('.sg-glass').boundingBox()
+      assert(selectedGem && originalGem && Math.abs(selectedGem.width-originalGem.width)<1.2 &&
+        Math.abs(selectedGem.height-originalGem.height)<1.2,
+        `${label}: selection changes physical gemstone size`)
       assert(await page.locator(`${root} .sg-window-target`).count() > 0, `${label}: no placement targets`)
       // All six rounds use the *real* faceted glass component; no CSS dots.
       const roundUI = await page.locator('.sg-header .sg-round-tracker-v52').evaluate(el => {
