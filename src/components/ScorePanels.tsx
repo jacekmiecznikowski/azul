@@ -14,12 +14,23 @@ export function scoreTrackPosition(score: number): number {
   return score <= 0 ? 0 : Math.trunc(score) % 100
 }
 
+/** A continuous, 100-square double rectangular orbit around the original
+ * central broken-glass ladder: 54 outer squares + 46 inner squares. */
+export function scoreTrackCoordinates(): ReadonlyArray<readonly [number,number]> {
+  const coordinates: Array<readonly [number,number]> = []
+  for (let col=0;col<16;col++) coordinates.push([0,col])
+  for (let row=1;row<13;row++) coordinates.push([row,15])
+  for (let col=14;col>=0;col--) coordinates.push([12,col])
+  for (let row=11;row>=1;row--) coordinates.push([row,0])
+  for (let col=1;col<15;col++) coordinates.push([1,col])
+  for (let row=2;row<12;row++) coordinates.push([row,14])
+  for (let col=13;col>=1;col--) coordinates.push([11,col])
+  for (let row=10;row>=2;row--) coordinates.push([row,1])
+  return coordinates
+}
+
 export function scoreTrackCells(): number[] {
-  return Array.from({ length: 100 }, (_, index) => {
-    const row = Math.floor(index / 10)
-    const column = index % 10
-    return row * 10 + (row % 2 === 0 ? column : 9 - column)
-  })
+  return scoreTrackCoordinates().map((_,score)=>score)
 }
 
 function PlayerMarker({ player, compact = false }: { player: Player; compact?: boolean }) {
@@ -77,13 +88,14 @@ export function DigitalBrokenGlass({ game }: { game: GameState }) {
 }
 
 function PhysicalTrack({game}:{game:GameState}) {
-  const cells = scoreTrackCells()
+  const cells = scoreTrackCoordinates()
   return <div className="sg-boardscore-engraved" role="group"
     aria-label="Tor punktów od 0 do 99, wiersze prowadzone na przemian w prawo i w lewo">
     <div className="sg-boardscore-mosaic" aria-hidden="true">
-      {cells.map(value => {
+      {cells.map(([row,col],value) => {
         const markers = game.players.filter(p => scoreTrackPosition(p.score) === value)
         return <span key={value}
+          style={{gridRow:row + 1,gridColumn:col + 1}}
           className={`sg-boardscore-cell${value % 5 === 0 ? ' sg-boardscore-milestone' : ''}${markers.length ? ' sg-boardscore-occupied' : ''}`}
           title={`Pole ${value}`}>
           {value % 5 === 0 && <b>{value}</b>}
@@ -92,6 +104,7 @@ function PhysicalTrack({game}:{game:GameState}) {
           </span>}
         </span>
       })}
+      <div className="sg-boardscore-core"><PhysicalBrokenTrack game={game}/></div>
     </div>
     <div className="sg-boardscore-legend" aria-label="Dokładne wyniki graczy">
       {game.players.map(p => <div className="sg-boardscore-legend-item" key={p.id}>
@@ -123,7 +136,6 @@ function PhysicalBrokenTrack({game}:{game:GameState}) {
 function PhysicalScoreContents({game}:{game:GameState}) {
   return <>
     <PhysicalTrack game={game}/>
-    <PhysicalBrokenTrack game={game}/>
     <ScoreRoundBonuses game={game}/>
   </>
 }
