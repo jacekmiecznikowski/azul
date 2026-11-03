@@ -198,6 +198,21 @@
   .sg .sg-round-announcement--minimal .sg-round-announcement-card {padding:5px 12px;}
 }
 
+/* 1v1 desktop: the two palaces previously shared only 245px of logical
+   depth and each floor was 24px tall. That forced EVERY factory/center gem
+   down to 14–15 physical pixels at 1366×768. Give the north and south
+   boards more depth while preserving the MARKET WIDTH and the 1700×1000
+   logical stage. Unlike arbitrary gem scaling this keeps every socket real. */
+@media(min-width:1101px) and (min-height:621px) {
+  .sg .sg-felt[data-sg-player-count="2"] {
+    grid-template-rows:330px minmax(0,1fr) 330px;
+  }
+  .sg .sg-felt[data-sg-player-count="2"] .sg-seat-north .sg-seat-rotation,
+  .sg .sg-felt[data-sg-player-count="2"] .sg-seat-south .sg-seat-rotation {
+    height:330px;
+  }
+}
+
 /* Factory layout: count-sensitive, not a >=1700px-only override.
    A 1v1 game has five circles and therefore far more clearance for large discs.
    Seven circles grow moderately; nine keep their previously tested safe scale. */
