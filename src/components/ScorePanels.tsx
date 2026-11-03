@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Maximize2, X } from 'lucide-react'
 import { BROKEN_TRACK } from '../game/engine'
@@ -43,6 +43,7 @@ export function ScoreRoundBonuses({ game }: { game: GameState }) {
   return <div className="sg-score-rounds" role="group"
     aria-label={`Runda ${game.round} z 6. Premia: ${GLASS_COLOR_LABELS_PL[game.roundColors[game.round - 1]] ?? 'brak'}`}>
     <div className="sg-score-rounds-heading"><b>RUNDY I PREMIE</b><strong>{game.round}<small>/6</small></strong></div>
+    <p className="sg-score-bonus-label">Kolor premii: <strong>{GLASS_COLOR_LABELS_PL[game.roundColors[game.round - 1]]}</strong></p>
     <div className="sg-score-rounds-row">
       {game.roundColors.map((color, index) =>
         <div key={index}
@@ -83,6 +84,7 @@ export function DigitalBrokenGlass({ game }: { game: GameState }) {
         </div>
       })}
     </div>
+    <p className="sg-score-rule">−18: odejmij 18 pkt i wróć na START. Pozostała kara na koniec gry.</p>
     <ScoreRoundBonuses game={game}/>
   </section>
 }
@@ -90,8 +92,8 @@ export function DigitalBrokenGlass({ game }: { game: GameState }) {
 function PhysicalTrack({game}:{game:GameState}) {
   const cells = scoreTrackCoordinates()
   return <div className="sg-boardscore-engraved" role="group"
-    aria-label="Tor punktów od 0 do 99, wiersze prowadzone na przemian w prawo i w lewo">
-    <div className="sg-boardscore-mosaic" aria-hidden="true">
+    aria-label="Tor punktów od 0 do 99, dwa połączone obwody">
+    <div className="sg-boardscore-mosaic">
       {cells.map(([row,col],value) => {
         const markers = game.players.filter(p => scoreTrackPosition(p.score) === value)
         return <span key={value}
@@ -108,7 +110,7 @@ function PhysicalTrack({game}:{game:GameState}) {
     </div>
     <div className="sg-boardscore-legend" aria-label="Dokładne wyniki graczy">
       {game.players.map(p => <div className="sg-boardscore-legend-item" key={p.id}>
-        <PlayerMarker player={p}/><span>{p.name}</span><strong>{p.score}</strong>
+        <PlayerMarker player={p}/><span title={p.name}>{p.name}</span><strong>{p.score}<small> pkt</small></strong>
       </div>)}
     </div>
   </div>
@@ -136,19 +138,24 @@ function PhysicalBrokenTrack({game}:{game:GameState}) {
 function PhysicalScoreContents({game}:{game:GameState}) {
   return <>
     <PhysicalTrack game={game}/>
+    <p className="sg-score-rule">−18: odejmij 18 pkt i wróć na START. Pozostała kara na koniec gry.</p>
     <ScoreRoundBonuses game={game}/>
   </>
 }
 
 export function BoardScoringPanel({game}:{game:GameState}) {
   const [expanded,setExpanded] = useState(false)
+  const closeButton = useRef<HTMLButtonElement>(null)
   useEffect(() => {
     if (!expanded) return
+    const previousFocus = document.activeElement as HTMLElement | null
+    closeButton.current?.focus()
     const onEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') { event.preventDefault(); closeButton.current?.focus() }
       if (event.key === 'Escape') setExpanded(false)
     }
     document.addEventListener('keydown',onEscape)
-    return () => document.removeEventListener('keydown',onEscape)
+    return () => { document.removeEventListener('keydown',onEscape); previousFocus?.focus() }
   },[expanded])
   const current = game.players[game.currentPlayer]
   return <>
@@ -173,7 +180,7 @@ export function BoardScoringPanel({game}:{game:GameState}) {
         <div className="sg-boardscore-modal" role="dialog" aria-modal="true"
           aria-label="Powiększona plansza punktacji" onMouseDown={event=>event.stopPropagation()}>
           <div className="sg-boardscore-modal-header"><strong>PUNKTACJA · WITRAŻE SINTRY</strong>
-            <button type="button" onClick={()=>setExpanded(false)} aria-label="Zamknij powiększoną punktację"><X size={18}/></button>
+            <button ref={closeButton} type="button" onClick={()=>setExpanded(false)} aria-label="Zamknij powiększoną punktację"><X size={18}/></button>
           </div>
           <PhysicalScoreContents game={game}/>
         </div>

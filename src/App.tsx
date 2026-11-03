@@ -148,19 +148,6 @@ export function Market({ game, selection, disabled, onPick }: {
   </section>
 }
 
-export function PenaltyTrack({ game }: { game: GameState }) {
-  return <section className="sg-track sg-center-card" aria-label="Tor stłuczonego szkła">
-    <div className="sg-panel-title"><span>STŁUCZONE SZKŁO</span></div>
-    <div className="sg-track-cells" role="group" aria-label="Dziewięć pól toru stłuczonego szkła">{BROKEN_TRACK.map((value, i) =>
-      <div key={i} className={`sg-track-step${i === 8 ? ' sg-track-last' : ''}${game.players.some(p => p.brokenSteps === i) ? ' sg-track-occupied' : ''}`}
-        title={`Pole ${i} z 8, kara ${value} pkt; ${game.players.filter(p => p.brokenSteps === i).map(p => p.name).join(', ') || 'puste'}`}>
-        <span className="sg-track-step-number">{i === 0 ? 'START' : String(i).padStart(2, '0')}</span>
-        <strong>{value === 0 ? '0' : `−${value}`}</strong>
-        <div className="sg-track-pawns">{game.players.map(p => p.brokenSteps === i && <i key={p.id} className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`} title={`${p.name}: pole ${i}`}/>)}</div>
-      </div>)}</div>
-  </section>
-}
-
 export function TurnSummary({ game }: { game: GameState }) {
   const current = game.players[game.currentPlayer]
   return <section className="sg-turn sg-center-card" aria-label="Tura i wyniki">
