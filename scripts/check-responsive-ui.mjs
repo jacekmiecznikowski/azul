@@ -161,6 +161,34 @@ try {
           active:steps.filter(x=>x.getAttribute('aria-current')==='step').length,
           header:headBox}
       })
+      const headerLayout = await page.locator('.sg-header').evaluate(head => {
+        const r = node => { const b=node.getBoundingClientRect()
+          return {left:b.left,right:b.right,top:b.top,bottom:b.bottom,
+            width:b.width,height:b.height,center:b.left+b.width/2}
+        }
+        return {
+          header:r(head),
+          brand:r(head.querySelector('.sg-brand')),
+          tracker:r(head.querySelector('.sg-round-tracker-v52')),
+          actions:r(head.querySelector('.sg-header-actions')),
+          bonus:r(head.querySelector('.sg-round-v54-bonus')),
+          bonusGem:r(head.querySelector('.sg-round-v54-featured-gem .sg-glass')),
+        }
+      })
+      assert(headerLayout.bonusGem.width >= 14 &&
+        Math.abs(headerLayout.bonusGem.width-headerLayout.bonusGem.height) < 1,
+        `${label}: featured bonus isn't a clear square glass`)
+      assert(headerLayout.bonus.left >= headerLayout.tracker.left - 1 &&
+        headerLayout.bonus.right <= headerLayout.tracker.right + 1,
+        `${label}: featured bonus spills out of header tracker`)
+      if (width > 1100 && height > 620) {
+        assert(Math.abs(headerLayout.header.center-headerLayout.tracker.center) < 1.25,
+          `${label}: round tracker not exactly centered: ${JSON.stringify(headerLayout)}`)
+        assert(headerLayout.header.height >= 74, `${label}: desktop header too short`)
+        assert(headerLayout.brand.right + 4 <= headerLayout.tracker.left &&
+          headerLayout.tracker.right + 4 <= headerLayout.actions.left,
+          `${label}: desktop header elements overlap: ${JSON.stringify(headerLayout)}`)
+      }
       assert.equal(roundUI.steps,6,`${label}: round step count`)
       assert.equal(roundUI.gems.length,6,`${label}: expected 6 physical gems`)
       assert.equal(roundUI.active,1,`${label}: exactly one active round`)
