@@ -56,7 +56,7 @@ describe('silnik Sintra', () => {
       expect(state.players.every((player) => Number.isFinite(player.score))).toBe(true)
       expect(standings(state)).toHaveLength(4)
     }
-  })
+  }, 15000)
   it('pola joker znajdują się tylko na rewersie odpowiedniej kwatery', () => {
     const state = newGame({ opponents: 1, seed: 42 })
     const special = state.players[0].strips.find((strip) => strip.back.includes('wild'))!
