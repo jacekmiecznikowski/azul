@@ -23,6 +23,19 @@ try {
       }, opponents)
       await page.reload()
       await page.getByRole('button', { name: 'Kontynuuj partię' }).click()
+      if (width === 1920 && height === 1080 && opponents === 3) {
+        const announcement = page.locator('.sg-round-announcement')
+        await announcement.waitFor({ state:'visible', timeout:2500 })
+        assert.equal(await announcement.locator('.sg-glass.sg-gem-faceted').count(),1,
+          'New-round ceremony must display one real faceted glass')
+        await page.waitForTimeout(850)
+        const opacity = await announcement.evaluate(el => Number(getComputedStyle(el).opacity))
+        assert(opacity > .75, `Round ceremony not visible during animation (opacity=${opacity})`)
+        await announcement.screenshot({
+          path:'reports/ui/round-announcement-v53.png', animations:'allow',
+        })
+        await announcement.waitFor({ state:'hidden', timeout:5000 })
+      }
       await page.evaluate(() => document.fonts.ready)
       const root = width > 1100 && height > 620 ? '.sg-stage' : '.sg-mobile-layout'
       // Every visible player has precisely one strongly marked glazier window.
@@ -38,15 +51,7 @@ try {
         assert.deepEqual(mark,{active:1,marked:1,jewel:1},
           `${width}x${height}: incorrect glazier highlight on player ${i+1}`)
       })
-      if (width === 1920 && height === 1080 && opponents === 3) {
-        await page.locator('.sg-round-announcement').waitFor({ state:'visible', timeout:2500 })
-        assert.equal(await page.locator('.sg-round-announcement .sg-glass.sg-gem-faceted').count(),1,
-          'The round entrance must use one real diamond')
-        await page.locator('.sg-round-announcement').screenshot({
-          path:'reports/ui/round-announcement-v53.png',
-          animations:'disabled',
-        })
-      }
+
       const metrics = await page.locator(root).evaluate(root => {
         const rect = el => { const r = el.getBoundingClientRect(); return { x:r.x, y:r.y, width:r.width, height:r.height } }
         const gems = [...root.querySelectorAll('.sg-market-token > .sg-glass')].map(rect)
