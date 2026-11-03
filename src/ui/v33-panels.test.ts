@@ -30,6 +30,6 @@ describe('v33 compact central panels', () => {
     expect((turn.match(/class="sg-score-line/g) || [])).toHaveLength(4)
     expect(glass).not.toContain('sg-track-legend')
     expect((glass.match(/class="sg-boardscore-broken-step(?=[ "])/g) || [])).toHaveLength(9)
-    expect(glass).toContain('sg-boardscore-broken-pawns')
+    expect(glass).toContain('sg-art-break-list')
   })
 })
