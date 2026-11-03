@@ -106,7 +106,14 @@ try {
           const grid=stage.querySelector('.sg-factory-grid')
           const center=stage.querySelector('.sg-center-pile.sg-center-v45')
           return {pane:[pane.clientWidth,pane.clientHeight],grid:[grid.clientWidth,grid.clientHeight],
-            center:[center.clientWidth,center.clientHeight],canonical:getComputedStyle(stage.querySelector('.sg-felt')??stage).getPropertyValue('--sg-unified-gem-size')}
+            center:[center.clientWidth,center.clientHeight],
+            boards:[...stage.querySelectorAll('.sg-board')].map(board=>({
+              name:board.querySelector('.sg-board-name')?.textContent?.trim(),
+              size:[board.clientWidth,board.clientHeight],
+              pane:[board.querySelector('.sg-pane')?.clientWidth,board.querySelector('.sg-pane')?.clientHeight],
+              className:board.className,
+            })),
+            canonical:getComputedStyle(stage.querySelector('.sg-felt')??stage).getPropertyValue('--sg-unified-gem-size')}
         })
         console.log(`SIZE laptop 1v1: factory=${metrics.factories[0].width.toFixed(1)}px, diamond=${metrics.gems[0].width.toFixed(1)}px, geometry=${JSON.stringify(sizing)}`)
         assert(metrics.factories[0].width >= 65,
