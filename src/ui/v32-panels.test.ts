@@ -19,7 +19,7 @@ describe('v32 middle-panel presentation', () => {
     expect((markup.match(/class="sg-boardscore-broken-step(?=[ "])/g) ?? [])).toHaveLength(BROKEN_TRACK.length)
     expect(markup).toContain('−18')
     expect(markup).not.toContain('tor kar')
-    expect(markup).toContain('sg-boardscore-broken-pawns')
+    expect(markup).toContain('sg-art-break-list')
     expect(markup).not.toContain('sg-track-legend')
     expect(markup).not.toContain('/8</b>')
   })
