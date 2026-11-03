@@ -354,7 +354,7 @@ export default function App() {
   }, [showTurnPopup, game.round, game.turn, game.currentPlayer, game.players])
   useEffect(() => {
     if (!turnNotice) return
-    const timer = window.setTimeout(() => setTurnNotice(null), 2700)
+    const timer = window.setTimeout(() => setTurnNotice(null), 2000)
     return () => window.clearTimeout(timer)
   }, [turnNotice])
 
