@@ -10,7 +10,7 @@ try {
   await server.listen()
   browser = await chromium.launch()
   await mkdir('reports/ui', { recursive: true })
-  for (const [width, height] of [[1920,1080],[1440,900],[1280,720],[1101,621],[1024,768],[844,390],[667,375],[390,844],[320,568]]) {
+  for (const [width, height] of [[1920,1080],[1440,900],[1366,768],[1280,720],[1101,621],[1024,768],[844,390],[667,375],[390,844],[320,568]]) {
     for (const opponents of [1,2,3]) {
       const page = await browser.newPage({ viewport: { width, height } })
       const errors = []
@@ -38,6 +38,25 @@ try {
       }
       await page.evaluate(() => document.fonts.ready)
       const root = width > 1100 && height > 620 ? '.sg-stage' : '.sg-mobile-layout'
+      if (width === 1366 && height === 768 && opponents === 1) {
+        await page.locator('.sg-round-announcement').waitFor({state:'hidden',timeout:5000})
+        const active = page.locator(`${root} .sg-board.sg-board-your-turn`)
+        await active.waitFor({state:'visible',timeout:3500})
+        assert.match(await active.locator('.sg-board-label').innerText(),/TWOJA TURA/,
+          'Human turn must remain explicitly labelled ON the full palace')
+        const border = await active.evaluate(el=>({
+          animation:getComputedStyle(el).animationName,
+          border:getComputedStyle(el).borderTopColor,
+          opacity:getComputedStyle(el).opacity,
+        }))
+        assert(border.animation.includes('sg-v56-palace-ripple'),
+          'Gold outer palace frame should pulse, not the screen itself')
+        assert.equal(border.opacity,'1','Whole board must remain fully visible during its turn')
+        const cue=page.locator('.sg-human-turn-notice')
+        await cue.waitFor({state:'visible',timeout:3500})
+        assert.match(await cue.innerText(),/TWOJA TURA/,'The player turn toast must be readable')
+        await page.screenshot({path:'reports/ui/1366x768-1v1-your-turn.png',animations:'allow'})
+      }
       // Every visible player has precisely one strongly marked glazier window.
       const glazierMarks = await page.locator(root).evaluate(layout => {
         return [...layout.querySelectorAll('.sg-board')].map(board => ({
@@ -76,6 +95,13 @@ try {
               `${width}x${height}: full-HD workshops ${i+1} and ${j+1} overlap by ${touchingDistance-distance}px`)
           }
         }
+      }
+      if (width === 1366 && height === 768 && opponents === 1) {
+        console.log(`SIZE laptop 1v1: factory=${metrics.factories[0].width.toFixed(1)}px, diamond=${metrics.gems[0].width.toFixed(1)}px`)
+        assert(metrics.factories[0].width >= 65,
+          'Larger laptop 1v1 workshops must use the room around the five-circle orbit')
+        assert(metrics.gems[0].width >= 23,
+          'Laptop 1v1 gemstones should be enlarged with empty pane sockets')
       }
       const label = `${width}x${height}-${opponents+1}players`
       await page.screenshot({ path:`reports/ui/${label}.png`, fullPage:true })
@@ -149,10 +175,16 @@ try {
       assert(await page.locator(`${root} .sg-token-selected`).count() > 0, `${label}: source selection failed`)
       const selectedShape = await page.locator(`${root} .sg-market-token.sg-token-selected`).first().evaluate(button => {
         const style = getComputedStyle(button)
-        return {clip:style.clipPath, shadow:style.boxShadow, background:style.backgroundColor}
+        return {clip:style.clipPath, shadow:style.boxShadow, background:style.backgroundColor,
+          ring:getComputedStyle(button,'::before').backgroundImage,
+          gemTransform:getComputedStyle(button.querySelector('.sg-glass')).transform}
       })
       assert(selectedShape.clip.includes('polygon('), `${label}: selected target is not a diamond`)
       assert(selectedShape.shadow === 'none', `${label}: rectangular selected highlight`)
+      assert(selectedShape.ring.includes('linear-gradient'),
+        `${label}: selected diamond has no visible gold ring`)
+      assert(selectedShape.gemTransform !== 'none',
+        `${label}: selected gemstone does not expose the shaped gold ring`)
       assert(await page.locator(`${root} .sg-window-target`).count() > 0, `${label}: no placement targets`)
       // All six rounds use the *real* faceted glass component; no CSS dots.
       const roundUI = await page.locator('.sg-header .sg-round-tracker-v52').evaluate(el => {
