@@ -172,6 +172,8 @@ try {
           tracker:r(head.querySelector('.sg-round-tracker-v52')),
           actions:r(head.querySelector('.sg-header-actions')),
           bonus:r(head.querySelector('.sg-round-v54-bonus')),
+          steps:r(head.querySelector('.sg-round-v52-steps')),
+          roundLayout:getComputedStyle(head.querySelector('.sg-round-tracker-v52')).display,
           bonusGem:r(head.querySelector('.sg-round-v54-featured-gem .sg-glass')),
         }
       })
@@ -181,6 +183,11 @@ try {
       assert(headerLayout.bonus.left >= headerLayout.tracker.left - 1 &&
         headerLayout.bonus.right <= headerLayout.tracker.right + 1,
         `${label}: featured bonus spills out of header tracker`)
+      if (width <= 1100 && height >= width) {
+        assert.equal(headerLayout.roundLayout,'grid',`${label}: portrait round bar is not a grid`)
+        assert(headerLayout.bonus.bottom <= headerLayout.steps.top + 1,
+          `${label}: bonus label overlaps six-round timeline: ${JSON.stringify(headerLayout)}`)
+      }
       if (width > 1100 && height > 620) {
         assert(Math.abs(headerLayout.header.center-headerLayout.tracker.center) < 1.25,
           `${label}: round tracker not exactly centered: ${JSON.stringify(headerLayout)}`)
