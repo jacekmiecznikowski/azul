@@ -261,6 +261,11 @@
     padding:0 8px 3px;
     border-bottom-color:#ad976c65;
   }
+  .sg .sg-header .sg-round-tracker-v52 {
+    /* v32 declared display:flex!important on the old tracker.
+       Explicitly restore the two-row grid in portrait. */
+    display:grid!important;
+  }
   .sg .sg-header .sg-brand-symbol {width:30px;height:30px;}
   .sg .sg-header .sg-header-actions button {height:32px;}
 }
@@ -285,6 +290,18 @@
   .sg .sg-header .sg-round-v54-color-name {font-size:8px;}
   .sg .sg-header .sg-round-v54-featured-gem,
   .sg .sg-header .sg-round-v54-featured-gem .sg-glass.sg-glass-placed.sg-gem-faceted {width:16px;height:16px;flex-basis:16px;}
+}
+@media (max-width:520px) and (orientation:portrait) {
+  .sg .sg-header .sg-round-v54-bonus-label {font-size:0;letter-spacing:0;flex:0 0 auto;}
+  .sg .sg-header .sg-round-v54-bonus-label::before {
+    content:'PREMIA';
+    font:800 8px/1 'DM Sans',sans-serif;
+    letter-spacing:.4px;
+  }
+  .sg .sg-header .sg-round-tracker-v52 .sg-round-v54-color-name {
+    font-size:10px;
+    letter-spacing:0;
+  }
 }
 @media (max-width:380px) and (orientation:portrait) {
   .sg .sg-header .sg-round-v54-bonus-label {display:none;}
