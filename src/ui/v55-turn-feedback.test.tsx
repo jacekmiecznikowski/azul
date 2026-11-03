@@ -65,7 +65,7 @@ describe('v56 – gold outer frame, 1v1 markets and reliable human-turn notices'
 
   it('scales 1v1 discs on LAPTOPS and keeps all gems and open slots synchronized', () => {
     expect(css).toContain('data-sg-orbit-count="5"')
-    expect(css).toContain('--sg-disc-size:clamp(96px,min(40cqb,31cqi),150px)')
+    expect(css).toContain('--sg-disc-size:clamp(110px,min(46cqb,29cqi),118px)')
     expect(css).toContain('data-sg-orbit-count="7"')
     expect(css).toContain('width:calc(var(--sg-unified-gem-size,28px) * 1.064)')
     expect(geometry).toContain('const relaxed = !narrow && factoryCount <= 7')
