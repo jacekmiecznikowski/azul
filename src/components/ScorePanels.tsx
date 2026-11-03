@@ -83,9 +83,18 @@ export function DigitalBrokenGlass({ game }: { game: GameState }) {
         </div>
       })}
     </div>
-    <p className="sg-score-rule">−18: odejmij 18 pkt i wróć na START. Pozostała kara na koniec gry.</p>
     <ScoreRoundBonuses game={game}/>
   </section>
+}
+
+const PAWN_COLORS = {red:'#de777a', yellow:'#e9c769', blue:'#6ac5df', white:'#d7e2e8'}
+
+export function SharedFieldMarker({players}:{players:Player[]}) {
+  if (!players.length) return null
+  const sectors = players.map((p,i) => `${PAWN_COLORS[p.palaceColor ?? 'red']} ${i * 100 / players.length}% ${(i+1) * 100 / players.length}%`)
+  const label = players.map(p=>`${p.name}: ${p.score} pkt, szkło ${p.brokenSteps}/8`).join('; ')
+  return <span className="sg-shared-field-marker" role="img" aria-label={label} title={label}
+    style={{background:players.length === 1 ? PAWN_COLORS[players[0].palaceColor ?? 'red'] : `conic-gradient(${sectors.join(',')})`}}/>
 }
 
 function PhysicalTrack({game}:{game:GameState}) {
@@ -101,17 +110,13 @@ function PhysicalTrack({game}:{game:GameState}) {
           title={`Pole ${value}`}>
           <b>{value}</b>
           {markers.length > 0 && <span className="sg-boardscore-markers">
-            {markers.map(p => <PlayerMarker key={p.id} player={p} compact/>)}
+            <SharedFieldMarker players={markers}/>
           </span>}
         </span>
       })}
       <div className="sg-boardscore-core"><ScoreRoundBonuses game={game}/><PhysicalBrokenTrack game={game}/></div>
     </div>
-    <div className="sg-boardscore-legend" aria-label="Dokładne wyniki graczy">
-      {game.players.map(p => <div className="sg-boardscore-legend-item" key={p.id}>
-        <PlayerMarker player={p}/><span title={p.name}>{p.name}</span><strong>{p.score}<small> pkt</small></strong>
-      </div>)}
-    </div>
+
   </div>
 }
 
@@ -124,9 +129,8 @@ function PhysicalBrokenTrack({game}:{game:GameState}) {
           title={`Pole ${step}: minus ${penalty} punktów`}>
           <small>{step}</small>
           <span>{penalty ? `−${penalty}` : '0'}</span>
-          <div className="sg-boardscore-broken-pawns" aria-hidden="true">
-            {game.players.filter(p=>p.brokenSteps===step).map(p=>
-              <PlayerMarker key={p.id} player={p} compact/>)}
+          <div className="sg-boardscore-broken-pawns">
+            <SharedFieldMarker players={game.players.filter(p=>p.brokenSteps===step)}/>
           </div>
         </div>
       )}
@@ -135,14 +139,7 @@ function PhysicalBrokenTrack({game}:{game:GameState}) {
 }
 
 function PhysicalScoreContents({game}:{game:GameState}) {
-  return <>
-    <PhysicalTrack game={game}/>
-    <div className="sg-boardscore-bonus" aria-label="Punktacja końcowa pałacu">
-      <b>PAŁAC {game.palaceSide}</b>
-      <span>{game.palaceSide === 'A' ? 'Tafle w parze kwater: 0/1 → 0 · 2 → 3 · 3 → 6 · 4 → 10 pkt' : 'Pełne okna × najliczniejszy kolor w pałacu'}</span>
-    </div>
-    <p className="sg-score-rule">−18: odejmij 18 pkt i wróć na START. Pozostała kara na koniec gry.</p>
-  </>
+  return <PhysicalTrack game={game}/>
 }
 
 /** Fit the complete board in both available dimensions, never crop its footer. */
@@ -153,7 +150,7 @@ function FittedPhysicalContents({game}:{game:GameState}) {
     const element = viewport.current
     if (!element) return
     const observer = new ResizeObserver(([entry]) => {
-      setScale(Math.max(0.01,Math.min(entry.contentRect.width / 300,entry.contentRect.height / 380)))
+      setScale(Math.max(0.01,Math.min(entry.contentRect.width / 300,entry.contentRect.height / 250)))
     })
     observer.observe(element)
     return () => observer.disconnect()
@@ -223,6 +220,5 @@ export function CompactScores({game}:{game:GameState}) {
       <strong>{p.score}</strong><span className="sg-compact-break">{p.brokenSteps}/8 <b>−{BROKEN_TRACK[p.brokenSteps]} pkt</b></span>
     </div>)}</div>
     <ScoreRoundBonuses game={game}/>
-    <p className="sg-score-rule">−18: kara i powrót na START. Pozostała kara na koniec gry.</p>
   </section>
 }
