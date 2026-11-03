@@ -35,10 +35,10 @@ function Window({ strip, index, glazier, target, selected, isHumanTurn, onTarget
   const reverse = strip.side === 0 ? strip.back : strip.front
   const canPick = isHumanTurn && target
   return <button type="button" disabled={!canPick} onClick={() => onTarget?.(index)}
-    data-sg-window={index} className={`sg-window${complete ? ' sg-window-completed' : ''}${canPick ? ' sg-window-target' : ''}${glazier === index ? ' sg-window-active' : ''}${selected ? ' sg-window-selecting' : ''}`}
+    data-sg-window={index} data-sg-glazier={glazier === index ? 'true' : undefined} className={`sg-window${complete ? ' sg-window-completed' : ''}${canPick ? ' sg-window-target' : ''}${glazier === index ? ' sg-window-active' : ''}${selected ? ' sg-window-selecting' : ''}`}
     title={`Kwatera ${index + 1}; ${WINDOW_POINTS[index]} pkt${canPick ? '; kliknij, aby ułożyć tafle' : ''}`}>
     <span className="sg-window-head"><span>{String(index + 1).padStart(2, '0')}</span>
-      <span className="sg-window-glazier">{glazier === index ? <Gem size={12}/> : null}</span>
+      <span className="sg-window-glazier" title={glazier === index ? 'Tu stoi witrażysta' : undefined}>{glazier === index ? <Gem size={14} strokeWidth={2.4}/> : null}</span>
       <span>{complete ? '✓' : strip.side === 0 ? 'A' : 'B'}</span></span>
     {!complete && <span className="sg-window-reverse" aria-label="Podgląd drugiej strony">
       {reverse.map((color, i) => <i key={i} className={`sg-color-dot sg-color-dot-${color}`}/>)}</span>}
