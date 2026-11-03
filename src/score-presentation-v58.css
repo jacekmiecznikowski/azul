@@ -183,7 +183,7 @@
   margin:0;transform:none;aspect-ratio:1;filter:none;
 }
 
-/* Physical board: paper, teal leadwork and magenta five-point checkpoints. */
+/* Physical board shares the table palette: teal glass, brass and warm lettering. */
 .sg .sg-physical-scores .sg-panel-title {flex:0 0 25px;}
 .sg .sg-boardscore-expand,
 .sg .sg-boardscore-modal-header button {
@@ -224,14 +224,14 @@
   box-sizing:border-box;
   margin:6px 6px 4px;
   padding:6px;
-  border:3px double #0a7690;
-  outline:1px solid #ccae77;
+  border:1px solid #bca06b;
+  outline:1px solid #d8bb7938;
   outline-offset:-2px;
   border-radius:5px;
   background:
-    radial-gradient(circle at 0 0,#d3f4e1a3,transparent 40%),
-    repeating-linear-gradient(45deg,#dbeef0,#dbeef0 9px,#ebecdf 10px,#ebecdf 19px);
-  box-shadow:0 0 0 2px #41788785,inset 0 0 0 2px #2d7387,inset 0 0 14px #86a6a0;
+    radial-gradient(ellipse at top,#234b50,transparent 75%),
+    linear-gradient(145deg,#143841,#0b2631);
+  box-shadow:inset 0 0 0 2px #c9a56d21,0 2px 6px #0005;
 }
 .sg .sg-boardscore-mosaic {
   display:grid;
@@ -241,8 +241,8 @@
   aspect-ratio:16/13;
   gap:1px;
   padding:1px;
-  background:#24627a;
-  border:1px solid #0a5b76;
+  background:#0b2732;
+  border:1px solid #6c8c7e;
   box-sizing:border-box;
   border-radius:2px;
 }
@@ -252,17 +252,17 @@
   min-height:0;
   display:grid;
   place-items:center;
-  background:linear-gradient(135deg,#fffef6,#e9f2ee);
-  box-shadow:inset 0 0 0 1px #9ab7b5;
-  color:#204e64;
+  background:linear-gradient(135deg,#31535a,#21414b);
+  box-shadow:inset 0 0 0 1px #81a29750;
+  color:#d9e4d6;
 }
 .sg .sg-boardscore-milestone {
-  background:linear-gradient(135deg,#f5d0e3,#de8cbb);
-  box-shadow:inset 0 0 0 1px #985c91;
+  background:linear-gradient(135deg,#796642,#514b38);
+  box-shadow:inset 0 0 0 1px #d6b577a6;
 }
 .sg .sg-boardscore-cell > b {
   font:800 clamp(5px,.65vw,8px)/1 'DM Sans',sans-serif;
-  color:#582a55;
+  color:#ffe3a8;
   font-variant-numeric:tabular-nums;
 }
 .sg .sg-boardscore-markers {
@@ -293,9 +293,9 @@
   min-width:0;
   margin:1px;
   padding:3px;
-  background:linear-gradient(165deg,#dcf0ed,#8bbdc4);
-  border:1px solid #35768a;
-  box-shadow:inset 0 0 0 1px #ecfff2a4;
+  background:linear-gradient(165deg,#193e47,#102f3a);
+  border:1px solid #a68c5d;
+  box-shadow:inset 0 0 0 1px #d8bb7926;
   display:flex;
   flex-direction:column;
 }
@@ -310,7 +310,7 @@
   flex:0 0 auto;
   margin:0 0 2px;
   text-align:center;
-  color:#16465b;
+  color:#ddcfaa;
   font:900 6px/1 'DM Sans',sans-serif;
   letter-spacing:0;
 }
@@ -331,22 +331,22 @@
   min-height:0;
   height:auto;
   padding:0 4px;
-  border:1px solid #85b4bf;
+  border:1px solid #64877c66;
   border-radius:0;
-  background:#d0e6e8;
+  background:#22444c;
 }
 .sg .sg-boardscore-core .sg-boardscore-broken-step small {
   font-size:6px;
-  color:#557988;
+  color:#9ebbb5;
   min-width:6px;
 }
 .sg .sg-boardscore-core .sg-boardscore-broken-step > span {
   font:800 9px/1 'Playfair Display',Georgia,serif;
-  color:#244c63;
+  color:#eddbb6;
 }
 .sg .sg-boardscore-core .sg-boardscore-broken-end {
-  background:#e2bad1;
-  border-color:#af7598;
+  background:#634039;
+  border-color:#c28b68;
 }
 .sg .sg-boardscore-core .sg-boardscore-broken-pawns {
   position:static;
@@ -371,14 +371,14 @@
   gap:4px;
   min-width:0;
   padding:3px;
-  background:#f4f1eac2;
-  color:#153b4f;
-  border:1px solid #93b4b2;
+  background:#183b45;
+  color:#c7ded9;
+  border:1px solid #52766e;
   border-radius:4px;
   font:700 10px/1.1 'DM Sans',sans-serif;
 }
 .sg .sg-boardscore-legend-item > span {flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.sg .sg-boardscore-legend-item > strong {font-variant-numeric:tabular-nums;color:#2d304b;}
+.sg .sg-boardscore-legend-item > strong {font-variant-numeric:tabular-nums;color:#f0dbb2;}
 .sg .sg-boardscore-legend-item .sg-pawn {flex:0 0 9px;width:9px;height:9px;}
 .sg .sg-boardscore-broken {margin:7px 6px 5px;}
 .sg .sg-boardscore-subtitle {
@@ -409,7 +409,7 @@
 .sg .sg-boardscore-broken-end {background:linear-gradient(145deg,#e6d1db,#c77b9d);border-color:#af7c91;}
 .sg .sg-boardscore-broken-pawns {position:absolute;bottom:-2px;left:0;right:0;display:flex;flex-wrap:wrap;justify-content:center;}
 .sg .sg-boardscore-broken-pawns .sg-pawn {width:5px;height:5px;flex:0 0 5px;border:1px solid white;}
-.sg .sg-physical-scores .sg-score-rounds {margin-top:auto;}
+.sg .sg-physical-scores > .sg-score-rounds {margin-top:0;flex:0 0 auto;}
 
 /* Full-size board is a genuine magnification, never stretched game assets. */
 .sg.sg-boardscore-modal-backdrop {
@@ -505,7 +505,10 @@
 
 /* Content determines status height; the scoring card owns any overflow. */
 .sg .sg-center .sg-side-left {gap:7px;overflow:auto;scrollbar-width:thin;}
-.sg .sg-turn, .sg .sg-center .sg-turn {padding-bottom:5px;}
+.sg .sg-turn, .sg .sg-center .sg-turn {
+  display:grid;grid-template-rows:repeat(4,max-content);align-content:start;
+  height:auto;min-height:max-content;max-height:none;padding-bottom:5px;
+}
 .sg .sg-turn > *, .sg .sg-center .sg-turn > * {flex-shrink:0;}
 .sg .sg-turn-player, .sg .sg-center .sg-turn-player {
   height:auto;min-height:43px;padding:6px 8px;box-sizing:border-box;
@@ -513,7 +516,7 @@
 .sg .sg-turn-player > div {flex:1;overflow:hidden;}
 .sg .sg-turn-player strong {overflow:hidden;text-overflow:ellipsis;}
 .sg .sg-scores, .sg .sg-center .sg-scores {
-  grid-template-rows:none;grid-auto-rows:minmax(23px,auto);padding:4px 7px;gap:4px;
+  height:auto;min-height:max-content;grid-template-rows:none;grid-auto-rows:minmax(23px,auto);padding:4px 7px;gap:4px;
 }
 .sg .sg-score-line, .sg .sg-center .sg-score-line {height:auto;min-height:23px;box-sizing:border-box;}
 .sg .sg-turn-first-token {height:auto;min-height:24px;box-sizing:border-box;margin:2px 7px 0;padding:4px 0;}
