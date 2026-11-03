@@ -218,7 +218,7 @@
    Seven circles grow moderately; nine keep their previously tested safe scale. */
 @media(min-width:1101px) and (min-height:621px) {
   .sg .sg-center .sg-market .sg-market-orbit-v46[data-sg-orbit-count="5"] {
-    --sg-disc-size:clamp(96px,min(40cqb,31cqi),150px);
+    --sg-disc-size:clamp(110px,min(46cqb,29cqi),118px);
   }
   .sg .sg-center .sg-market .sg-market-orbit-v46[data-sg-orbit-count="7"] {
     --sg-disc-size:clamp(64px,min(30cqb,25cqi),118px);
