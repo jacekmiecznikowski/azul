@@ -53,6 +53,7 @@ import './glass-geometry-v50.css'
 import './unified-glass-v51.css'
 import './header-premium-v52.css'
 import './experience-polish-v53.css'
+import './header-ceremony-glazier-v54.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const PLAYER_AVATARS = ['✦', '✧', '✳', '❖']
