@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowRight, BookOpen, Check, Gem, House, Info, RotateCcw, Settings2, X } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, legalMoves, newGame, standings } from './game/engine'
 import type { Controller, Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
@@ -21,6 +21,7 @@ import { ManualPlacementDialog } from './components/ManualPlacementDialog'
 import { GameMenu } from './components/GameMenu'
 import { HomeScreen } from './components/HomeScreen'
 import { RoundTracker } from './components/RoundTracker'
+import { RoundAnnouncement } from './components/RoundAnnouncement'
 import { desktopTableMetrics } from './ui/responsiveTable'
 import './match.css'
 import './redesign.css'
@@ -51,6 +52,7 @@ import './market-glass-v49.css'
 import './glass-geometry-v50.css'
 import './unified-glass-v51.css'
 import './header-premium-v52.css'
+import './experience-polish-v53.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
 const PLAYER_AVATARS = ['✦', '✧', '✳', '❖']
@@ -164,13 +166,10 @@ export function TurnSummary({ game }: { game: GameState }) {
 
     <div className="sg-scores">{game.players.map((p, i) => <div key={p.id} className={`sg-score-line${game.currentPlayer === i && game.phase === 'playing' ? ' sg-score-current' : ''}`}>
       <i className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`}/><span>{p.name}</span><b>{p.score}</b></div>)}</div>
-    <div className="sg-turn-first-token" aria-label={game.firstCenterTaken
-      ? `Żeton pierwszego gracza ma ${game.players[game.nextStartingPlayer ?? game.startingPlayer].name}`
-      : 'Żeton pierwszego gracza jest na środku stołu'}>
-      <span className="sg-turn-token-icon" aria-hidden="true">1</span>
+    <div className="sg-turn-first-token" role="status">
       {game.firstCenterTaken
-        ? <span>Żeton: <strong>{game.players[game.nextStartingPlayer ?? game.startingPlayer].name}</strong> · następna runda</span>
-        : <span>Żeton: <strong>na środku</strong> · start: {game.players[game.startingPlayer].name}</span>}
+        ? <span>Następną rundę rozpocznie: <strong>{game.players[game.nextStartingPlayer ?? game.startingPlayer].name}</strong></span>
+        : <span>Rundę rozpoczyna: <strong>{game.players[game.startingPlayer].name}</strong></span>}
     </div>
   </section>
 }
@@ -276,6 +275,8 @@ export default function App() {
   const [finishing, setFinishing] = useState<Move[] | null>(null)
   const [placementOptions, setPlacementOptions] = useState<Move[] | null>(null)
   const [screen, setScreen] = useState<'home' | 'game'>('home')
+  const announcedRound = useRef<number | null>(null)
+  const [roundAnnouncement, setRoundAnnouncement] = useState<{ round: number; color: GlassColor } | null>(null)
   const [hasSave, setHasSave] = useState(() => restore() !== null)
   const [viewport, setViewport] = useState(() => typeof window === 'undefined' ? { width: 1600, height: 900 } : { width: window.innerWidth, height: window.innerHeight })
   const [showSetup, setShowSetup] = useState(false)
@@ -313,6 +314,19 @@ export default function App() {
     screen === 'game',
     `${game.players.length}-${viewerIndex}-${mobileBoardIndex}-${game.currentPlayer}-${viewport.width}x${viewport.height}`,
   )
+
+  useEffect(() => {
+    if (screen !== 'game' || game.phase !== 'playing' || announcedRound.current === game.round) return
+    const color = game.roundColors[game.round - 1]
+    if (!color) return
+    announcedRound.current = game.round
+    setRoundAnnouncement({ round: game.round, color })
+  }, [screen, game.round, game.roundColors, game.phase])
+  useEffect(() => {
+    if (!roundAnnouncement) return
+    const id = window.setTimeout(() => setRoundAnnouncement(null), 2700)
+    return () => window.clearTimeout(id)
+  }, [roundAnnouncement])
 
   useEffect(() => {
     const onResize = () => setViewport({ width: window.innerWidth, height: window.innerHeight })
@@ -404,6 +418,8 @@ export default function App() {
     chooseFinalGlass(candidates)
   }
   function startNew(options: Settings) {
+    announcedRound.current = null
+    setRoundAnnouncement(null)
     clearEffects()
     setSettings(options)
     setGame(newGame({
@@ -545,6 +561,7 @@ export default function App() {
       musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}
       soundEnabled={soundEnabled} toggleSound={toggleSound}/>} 
     {screen === 'game' && <GlassVisualEffects bursts={visualBursts}/>}
+    {screen === 'game' && roundAnnouncement && <RoundAnnouncement key={roundAnnouncement.round} round={roundAnnouncement.round} color={roundAnnouncement.color}/>}
     {screen === 'game' && finishOverlay.banner && <FinishCelebration state={game} onResults={() => setShowResults(true)} onNewGame={() => setShowSetup(true)}/>}
     {screen === 'game' && finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
