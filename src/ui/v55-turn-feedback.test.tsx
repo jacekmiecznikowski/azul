@@ -11,7 +11,7 @@ const css = readFileSync(new URL('../turn-market-v56.css', import.meta.url), 'ut
 const app = readFileSync(new URL('../App.tsx', import.meta.url), 'utf8')
 const geometry = readFileSync(new URL('../hooks/useSharedGlassGeometry.ts', import.meta.url), 'utf8')
 
-describe('v56 – gold outer frame, 1v1 markets and reliable human-turn notices', () => {
+describe('v57 – consistent market geometry, centered cue, short gold border signal', () => {
   it('does not let the AI move during the opening round ceremony', () => {
     const timing = roundPresentationTiming(true,false)
     expect(timing).toEqual({
@@ -47,9 +47,9 @@ describe('v56 – gold outer frame, 1v1 markets and reliable human-turn notices'
     expect(html).toContain('TWOJA TURA')
     expect((html.match(/data-sg-window=/g)??[])).toHaveLength(8)
     expect(css).toContain('.sg .sg-board.sg-board-your-turn')
-    expect(css).toContain('@keyframes sg-v56-palace-ripple')
+    expect(css).toContain('@keyframes sg-v57-turn-glow')
     expect(css).toContain('opacity:1!important')
-    expect(css).toContain('animation:sg-v56-palace-ripple 3.6s ease-in-out infinite!important')
+    expect(css).toContain('animation:sg-v57-turn-glow 1.15s ease-out 1 both!important')
     expect(css).not.toContain('opacity:.42')
     expect(app).toContain('turn-market-v56.css')
     expect(app).not.toContain("import './turn-feedback-v55.css'")
@@ -57,20 +57,33 @@ describe('v56 – gold outer frame, 1v1 markets and reliable human-turn notices'
 
   it('keeps the turn toast visible and legible, never blinking the screen', () => {
     expect(app).toContain('<strong>TWOJA TURA</strong>')
-    expect(app).toContain('setTurnNotice(null), 2700')
+    expect(app).toContain('setTurnNotice(null), 2000')
     expect(css).toContain('.sg .sg-human-turn-notice')
-    expect(css).toContain('min-height:75px')
+    expect(css).toContain('min-height:100px')
     expect(css).toContain('pointer-events:none')
+    expect(css).toContain('top:50%')
+    expect(css).toContain('transform:translate(-50%,-50%)')
   })
 
   it('scales 1v1 discs on LAPTOPS and keeps all gems and open slots synchronized', () => {
-    expect(css).toContain('data-sg-orbit-count="5"')
-    expect(css).toContain('--sg-disc-size:clamp(110px,min(46cqb,29cqi),118px)')
-    expect(css).toContain('data-sg-orbit-count="7"')
+    expect(css).toContain('grid-template-columns:235px minmax(0,1fr) 255px')
+    expect(css).toContain('--sg-disc-size:89px!important')
+    expect(css).not.toContain('data-sg-orbit-count="7"')
     expect(css).toContain('width:calc(var(--sg-unified-gem-size,28px) * 1.064)')
-    expect(geometry).toContain('const relaxed = !narrow && factoryCount <= 7')
-    expect(geometry).toContain('const paneRatio = relaxed ? .90 : .84')
+    expect(geometry).toContain('const desktop = !narrow && window.innerWidth >= 1101')
+    expect(geometry).toContain('const diameter = desktop ? 29 : mobileDiameter')
     expect(geometry).toContain("root.style.setProperty('--sg-unified-gem-size', value)")
+  })
+
+  it('makes the active AI seat glow just like a human seat', () => {
+    const game = newGame({opponents:1,seed:156})
+    const bot = renderToStaticMarkup(createElement(GameBoard,{
+      player:game.players[1],index:1,isCurrent:true,isHuman:false,isHumanTurn:false,
+    }))
+    expect(bot).toContain('sg-board-current')
+    expect(bot).not.toContain('sg-board-your-turn')
+    expect(css).toContain('.sg.sg-effects-cinematic .sg-board.sg-board-current')
+    expect(css).toContain('.sg.sg-effects-minimal .sg-board.sg-board-current')
   })
 
   it('gives selected diamonds a gold SHAPE outline, not a rectangular button frame', () => {
