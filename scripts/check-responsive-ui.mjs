@@ -126,6 +126,12 @@ try {
           'Laptop 1v1 gemstones should be enlarged with empty pane sockets')
       }
       const label = `${width}x${height}-${opponents+1}players`
+      // Record useful *finished* game layouts at laptop resolution, not
+      // a screenshot half-covered by the temporary round/turn notifications.
+      if (width === 1366 && height === 768) {
+        await page.locator('.sg-round-announcement').waitFor({state:'hidden',timeout:5000})
+        await page.locator('.sg-human-turn-notice').waitFor({state:'hidden',timeout:5000})
+      }
       await page.screenshot({ path:`reports/ui/${label}.png`, fullPage:true })
       results.push({ label, ...metrics, errors })
       await writeFile('reports/ui/metrics.json', JSON.stringify(results, null, 2))
