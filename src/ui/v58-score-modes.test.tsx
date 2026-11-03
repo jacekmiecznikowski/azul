@@ -30,7 +30,7 @@ describe('v58 — two visual scoring modes, original scoring logic untouched', (
     game.players[1].brokenSteps=6
     const html=renderToStaticMarkup(createElement(BoardScoringPanel,{game}))
     expect((html.match(/class="sg-boardscore-cell/g)??[])).toHaveLength(100)
-    expect((html.match(/class="sg-boardscore-broken-step/g)??[])).toHaveLength(BROKEN_TRACK.length)
+    expect((html.match(/class="sg-boardscore-broken-step(?: |")/g)??[])).toHaveLength(BROKEN_TRACK.length)
     expect((html.match(/class="sg-boardscore-legend-item"/g)??[])).toHaveLength(4)
     expect(html).toContain('105')
     expect(html).toContain('−11')
