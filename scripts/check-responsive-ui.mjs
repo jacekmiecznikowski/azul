@@ -457,6 +457,88 @@ try {
     console.log(`PASS ${width}x${height}: 5/7/9 factories and gems use exactly equal size`)
   }
 
+  // v58: switch between two scoring presentations IN the existing game menu.
+  // The preference survives reload; board track and penalties reflect real state.
+  for (const [width,height] of [[1440,900],[390,844]]) {
+    const page=await browser.newPage({viewport:{width,height}})
+    try {
+      await page.goto('http://127.0.0.1:5179')
+      await page.evaluate(async () => {
+        const {newGame}=await import('/src/game/engine.ts')
+        const state=newGame({opponents:1,seed:258,playerControllers:['human','human']})
+        state.players[0].score=45
+        state.players[0].brokenSteps=4
+        state.players[1].score=27
+        state.players[1].brokenSteps=2
+        localStorage.setItem('sintra-glass-save-v1',JSON.stringify(state))
+        localStorage.setItem('sintra-glass-score-presentation-v1','digital')
+        localStorage.setItem('sintra-glass-visual-effects-v1','false')
+      })
+      await page.reload()
+      await page.getByRole('button',{name:'Kontynuuj partię'}).click()
+      await page.locator('.sg-round-announcement').waitFor({state:'hidden',timeout:5000})
+      const mobile=width<=1100
+      if(mobile) {
+        await page.getByRole('button',{name:'Wyniki'}).click()
+        const digital=page.locator('.sg-mobile-stats.sg-score-mode-digital')
+        assert(await digital.isVisible(),'Mobile digital score panel not visible')
+        assert.equal(await digital.locator('.sg-digital-penalty-row').count(),2)
+        await page.getByRole('button',{name:'Zamknij ×'}).click()
+      } else {
+        assert.equal(await page.locator('.sg-stage .sg-digital-penalty-row').count(),2)
+      }
+
+      await page.getByRole('button',{name:'Otwórz menu gry'}).click()
+      await page.locator('.sg-menu-score-option').filter({hasText:'Planszowy'}).click()
+      assert.equal(await page.evaluate(()=>localStorage.getItem('sintra-glass-score-presentation-v1')),'board')
+      if(mobile) await page.getByRole('button',{name:'Wyniki'}).click()
+      const board=page.locator(mobile ? '.sg-mobile-stats.sg-score-mode-board .sg-physical-scores'
+        : '.sg-stage .sg-side-left.sg-score-mode-board .sg-physical-scores')
+      assert(await board.isVisible(),'Board-style scoring not visible')
+      assert.equal(await board.locator('.sg-boardscore-cell').count(),100)
+      assert.equal(await board.locator('.sg-boardscore-broken-step').count(),9)
+      assert.equal(await board.locator('.sg-score-round-tile').count(),6)
+      assert((await board.innerText()).includes('45'),'Actual points are missing on physical board')
+      await board.getByRole('button',{name:'Powiększ tor punktów'}).click()
+      const dialog=page.getByRole('dialog',{name:'Powiększona plansza punktacji'})
+      assert(await dialog.isVisible(),'Magnified physical score board did not open')
+      assert.equal(await dialog.locator('.sg-boardscore-cell').count(),100)
+      await dialog.getByRole('button',{name:'Zamknij powiększoną punktację'}).click()
+      if(!mobile) {
+        const frame=await page.locator('.sg-stage .sg-window.sg-window-active').first().evaluate(el=>{
+          const base=el.closest('.sg-board-windows').querySelector('.sg-window:not(.sg-window-active)')
+          const get=(root,selector)=>getComputedStyle(root.querySelector(selector)).borderTopColor
+          return {
+            active:getComputedStyle(el).borderTopColor,
+            inner:get(el,'.sg-window-lancet'),
+            otherInner:get(base,'.sg-window-lancet'),
+            foot:get(el,'.sg-window-foot'),
+            otherFoot:get(base,'.sg-window-foot')
+          }
+        })
+        assert.equal(frame.inner,frame.otherInner,'Glazier tinted the internal pane border')
+        assert.equal(frame.foot,frame.otherFoot,'Glazier tinted the footer')
+      }
+
+      await page.reload()
+      await page.getByRole('button',{name:'Kontynuuj partię'}).click()
+      if(mobile) await page.getByRole('button',{name:'Wyniki'}).click()
+      assert.equal(await page.locator('.sg-physical-scores').count(),1,
+        'Physical scoring preference not restored after page reload')
+      if(mobile) await page.getByRole('button',{name:'Zamknij ×'}).click()
+      await page.getByRole('button',{name:'Otwórz menu gry'}).click()
+      await page.locator('.sg-menu-score-option').filter({hasText:'Cyfrowy'}).click()
+      if(mobile) await page.getByRole('button',{name:'Wyniki'}).click()
+      assert.equal(await page.locator(mobile ? '.sg-mobile-stats .sg-digital-penalty-row'
+        : '.sg-stage .sg-digital-penalty-row').count(),2)
+      assert.equal(await page.evaluate(()=>localStorage.getItem('sintra-glass-score-presentation-v1')),'digital')
+      await page.screenshot({path:`reports/ui/score-modes-v58-${width}x${height}.png`,fullPage:true})
+      console.log(`PASS scoring-mode-${width}x${height}: 100 score fields, 9 penalty fields, round gems, zoom & persistence`)
+    } finally {
+      await page.close()
+    }
+  }
+
   // Regression: an AI that starts a new round MUST NOT move underneath the
   // ceremony, regardless of whether visual effects are enabled.
   for (const enabled of [true,false]) {
