@@ -252,8 +252,10 @@
 }
 .sg .sg-market .sg-factory-v45 .sg-market-token.sg-token-selected .sg-glass.sg-gem-faceted,
 .sg .sg-market .sg-factory-v45 .sg-market-token:focus-visible .sg-glass.sg-gem-faceted {
-  transform:scale(.84)!important;
-  filter:brightness(1.17) drop-shadow(0 0 4px #fff3b4);
+  /* Never shrink the selected physical glass relative to the window socket.
+     Selection is expressed by an exterior halo and highlighted workshop rim. */
+  transform:none!important;
+  filter:brightness(1.18) drop-shadow(0 0 3px #fff5c3) drop-shadow(0 0 8px #f7d18b);
 }
 .sg .sg-market .sg-center-v45 .sg-center-choice.sg-token-selected::before,
 .sg .sg-market .sg-center-v45 .sg-center-choice:focus-visible::before {
