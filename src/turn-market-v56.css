@@ -1,0 +1,222 @@
+/* v56 — restore the approved v54 board styling, replacing v55 visual overrides.
+   Human-turn feedback is applied to the OUTER GOLD FRAME, never to the panes,
+   gemstones, screen backdrop or overall board opacity. */
+
+/* Entire eight-window palace is the turn indicator on every seat. */
+.sg .sg-board.sg-board-your-turn {
+  position:relative;
+  border:2px solid #f3d596;
+  outline:2px solid #efcf8a;
+  outline-offset:1px;
+  box-shadow:
+    0 0 0 2px #cfab63aa,
+    0 0 15px #e4b76f93,
+    0 0 29px #e4b66e46,
+    inset 0 0 0 2px #fff0c74a,
+    0 5px 15px #02131cb8;
+}
+.sg .sg-board.sg-board-your-turn .sg-board-label {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  padding:4px 9px;
+  border-radius:7px;
+  background:linear-gradient(145deg,#f6e2a8,#d8b46d);
+  border:1px solid #fff2c6;
+  color:#15303b;
+  font:900 11px/1.05 'DM Sans',sans-serif;
+  letter-spacing:.6px;
+  text-shadow:none;
+  box-shadow:0 0 8px #e1ba73a8;
+  white-space:nowrap;
+}
+.sg.sg-effects-cinematic .sg-board.sg-board-your-turn {
+  /* Border-only breathing: never animate opacity/transform/brightness of the board.
+     Multiple rings ripple out from the gold frame every 3.6 seconds. */
+  animation:sg-v56-palace-ripple 3.6s ease-in-out infinite;
+}
+@keyframes sg-v56-palace-ripple {
+  0%,100% {
+    outline-color:#e8c989;
+    box-shadow:
+      0 0 0 2px #cea85e9a,
+      0 0 12px #dba75f83,
+      0 0 19px #dba75f48,
+      inset 0 0 0 2px #ffe6ae53,
+      0 5px 15px #02131cb8;
+  }
+  47% {
+    outline-color:#ffe6aa;
+    box-shadow:
+      0 0 0 4px #ffe3a6c9,
+      0 0 0 8px #e8b46b65,
+      0 0 27px #ffe6a7a6,
+      0 0 42px #dbb26452,
+      inset 0 0 0 2px #ffe9b171;
+  }
+}
+/* No animation in minimalist effects mode; a stable visual marker remains. */
+.sg.sg-effects-minimal .sg-board.sg-board-your-turn {
+  animation:none!important;
+  outline-color:#e5c985;
+  box-shadow:0 0 0 2px #e9c67ba0,0 0 12px #e2b36c72,
+    inset 0 0 0 2px #f5db9a4d;
+}
+.sg .sg-mobile-player.sg-mobile-player-current-human {
+  border:2px solid #e6cb88;
+  box-shadow:inset 0 0 0 1px #ffe9b978,0 0 10px #e5bf7996;
+}
+
+/* Visible, readable notification in addition to the PERSISTENT badge on board.
+   Unlike v55 it is not a flashing full-screen glow, and remains readable for 2s. */
+.sg .sg-human-turn-notice {
+  position:fixed;
+  z-index:100;
+  left:50%;
+  top:clamp(102px,19vh,220px);
+  transform:translateX(-50%);
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  width:max-content;
+  min-width:280px;
+  max-width:min(90vw,460px);
+  min-height:75px;
+  padding:15px 24px;
+  border:2px solid #f3d48f;
+  border-radius:15px;
+  background:linear-gradient(150deg,#285862f7,#123642fb 78%);
+  box-shadow:inset 0 0 0 1px #fff2c542,0 9px 35px #031722d9,
+    0 0 14px #e7bd7280;
+  color:#f7e5b9;
+  text-align:left;
+  pointer-events:none;
+  animation:sg-v56-turn-toast 2.7s ease-out both;
+}
+.sg .sg-human-turn-notice-icon {
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  width:42px;
+  height:42px;
+  border:1px solid #f6da9f;
+  border-radius:12px;
+  background:#a0804655;
+  font-size:28px;
+  color:#f9df9e;
+}
+.sg .sg-human-turn-notice>span:last-child {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:5px;
+}
+.sg .sg-human-turn-notice strong {
+  color:#fff2cd;
+  font:900 clamp(17px,2vw,22px)/1.05 'DM Sans',sans-serif;
+  letter-spacing:1.5px;
+  white-space:nowrap;
+}
+.sg .sg-human-turn-notice small {
+  font:600 11px/1.2 'DM Sans',sans-serif;
+  color:#b9dcd2;
+}
+@keyframes sg-v56-turn-toast {
+  0%{opacity:0;transform:translate(-50%,-6px);}
+  12%,83%{opacity:1;transform:translate(-50%,0);}
+  100%{opacity:0;transform:translate(-50%,0);}
+}
+
+/* Factory layout: count-sensitive, not a >=1700px-only override.
+   A 1v1 game has five circles and therefore far more clearance for large discs.
+   Seven circles grow moderately; nine keep their previously tested safe scale. */
+@media(min-width:1101px) and (min-height:621px) {
+  .sg .sg-center .sg-market .sg-market-orbit-v46[data-sg-orbit-count="5"] {
+    --sg-disc-size:clamp(78px,min(43cqb,39cqi),158px);
+  }
+  .sg .sg-center .sg-market .sg-market-orbit-v46[data-sg-orbit-count="7"] {
+    --sg-disc-size:clamp(64px,min(30cqb,25cqi),118px);
+  }
+  .sg .sg-center .sg-market .sg-factory-v45 .sg-factory-grid {
+    width:94%;
+    height:94%;
+  }
+  /* Socket and installed gem are still measured from the SAME DOM value.
+     The open dark diamond (socket * .94) equals the actual glass diameter. */
+  .sg .sg-board-windows .sg-pane-socket {
+    width:calc(var(--sg-unified-gem-size,28px) * 1.064);
+    height:calc(var(--sg-unified-gem-size,28px) * 1.064);
+  }
+  .sg .sg-board-windows .sg-pane-socket .sg-pane-empty-diamond {
+    inset:3%;
+  }
+}
+/* Strong, unambiguous gold selection drawn WITHIN the diamond hit shape.
+   Old inset-only shadow was hidden by the facets and clipped by clip-path. */
+.sg .sg-market .sg-factory-v45.sg-factory-is-selected {
+  border:2px solid #f6d88e!important;
+  box-shadow:0 0 0 2px #f6d38caf,0 0 16px #ffda8eb8,
+    inset 0 0 0 2px #f3d399b3!important;
+}
+.sg .sg-market .sg-factory-v45 .sg-market-token.sg-token-selected::before,
+.sg .sg-market .sg-factory-v45 .sg-market-token:focus-visible::before {
+  inset:0!important;
+  background:linear-gradient(130deg,#fff7c9,#d79a45 52%,#ffedaa)!important;
+  filter:drop-shadow(0 0 3px #fff0ac);
+}
+.sg .sg-market .sg-factory-v45 .sg-market-token.sg-token-selected .sg-glass.sg-gem-faceted,
+.sg .sg-market .sg-factory-v45 .sg-market-token:focus-visible .sg-glass.sg-gem-faceted {
+  transform:scale(.84)!important;
+  filter:brightness(1.17) drop-shadow(0 0 4px #fff3b4);
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice.sg-token-selected::before,
+.sg .sg-market .sg-center-v45 .sg-center-choice:focus-visible::before {
+  content:'';
+  position:absolute;
+  left:calc(50% - 4px);
+  top:50%;
+  z-index:0;
+  display:block;
+  width:calc(var(--sg-unified-gem-size,28px) * 1.17);
+  height:calc(var(--sg-unified-gem-size,28px) * 1.17);
+  transform:translate(-50%,-50%);
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  background:linear-gradient(140deg,#fff5bf,#e7ab51,#ffefb3);
+  pointer-events:none;
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice.sg-token-selected .sg-glass.sg-gem-faceted,
+.sg .sg-market .sg-center-v45 .sg-center-choice:focus-visible .sg-glass.sg-gem-faceted {
+  z-index:1;
+  filter:brightness(1.12) drop-shadow(0 0 4px #fff0b4);
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice.sg-token-selected b,
+.sg .sg-market .sg-center-v45 .sg-center-choice:focus-visible b {
+  z-index:2;
+  color:#ffe8ad;
+  text-shadow:0 0 5px #d7a658b8;
+}
+
+/* Preserve physically consistent touch sizes at every mobile breakpoint.
+   Make the notification fit, but never give up the clear palace label. */
+@media(max-width:1100px), (max-height:620px) {
+  .sg .sg-human-turn-notice {
+    top:clamp(104px,17vh,155px);
+    min-width:225px;
+    min-height:64px;
+    padding:10px 16px;
+  }
+  .sg .sg-human-turn-notice-icon {width:34px;height:34px;font-size:23px;}
+  .sg .sg-board.sg-board-your-turn .sg-board-label {
+    padding:3px 5px;
+    font-size:9px;
+    letter-spacing:.2px;
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .sg .sg-board.sg-board-your-turn,
+  .sg .sg-human-turn-notice {animation:none!important;}
+}
