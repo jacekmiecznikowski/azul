@@ -135,11 +135,11 @@ function PhysicalBrokenTrack({game}:{game:GameState}) {
   </div>
 }
 
-function PhysicalScoreContents({game}:{game:GameState}) {
+function PhysicalScoreContents({game, rounds = true}:{game:GameState; rounds?:boolean}) {
   return <>
     <PhysicalTrack game={game}/>
     <p className="sg-score-rule">−18: odejmij 18 pkt i wróć na START. Pozostała kara na koniec gry.</p>
-    <ScoreRoundBonuses game={game}/>
+    {rounds && <ScoreRoundBonuses game={game}/>}
   </>
 }
 
@@ -173,7 +173,8 @@ export function BoardScoringPanel({game}:{game:GameState}) {
           ? `Następna: ${game.players[game.nextStartingPlayer ?? game.startingPlayer].name}`
           : `Start: ${game.players[game.startingPlayer].name}`}</small>
       </div>
-      <div className="sg-boardscore-body"><PhysicalScoreContents game={game}/></div>
+      <div className="sg-boardscore-body"><PhysicalScoreContents game={game} rounds={false}/></div>
+      <ScoreRoundBonuses game={game}/>
     </section>
     {expanded && typeof document !== 'undefined' && createPortal(
       <div className="sg sg-boardscore-modal-backdrop" onMouseDown={()=>setExpanded(false)}>
