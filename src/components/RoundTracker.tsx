@@ -10,6 +10,11 @@ export function RoundTracker({ round, colors }: { round: number; colors: GlassCo
       <span className="sg-round-v52-caption">RUNDA</span>
       <span className="sg-round-v52-count">{round}<small>/6</small></span>
     </div>
+    <div className="sg-round-v54-bonus" aria-label={`Premiowany kolor: ${GLASS_COLOR_LABELS_PL[colors[round - 1]] ?? 'brak'}`}>
+      <span className="sg-round-v54-bonus-label">PREMIOWANY KOLOR</span>
+      {colors[round - 1] && <span className="sg-round-v54-featured-gem" aria-hidden="true"><GlassPiece color={colors[round - 1]}/></span>}
+      <strong className="sg-round-v54-color-name">{GLASS_COLOR_LABELS_PL[colors[round - 1]] ?? '—'}</strong>
+    </div>
     <ol className="sg-round-v52-steps" aria-label="Kolory premii w kolejnych rundach">
       {colors.map((color, i) => {
         const number = i + 1
