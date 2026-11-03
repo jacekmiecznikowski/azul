@@ -31,10 +31,13 @@
   box-shadow:0 0 8px #e1ba73a8;
   white-space:nowrap;
 }
-.sg.sg-effects-cinematic .sg-board.sg-board-your-turn {
-  /* Border-only breathing: never animate opacity/transform/brightness of the board.
-     Multiple rings ripple out from the gold frame every 3.6 seconds. */
-  animation:sg-v56-palace-ripple 3.6s ease-in-out infinite;
+.sg.sg-effects-cinematic .sg-board.sg-board-your-turn,
+.sg.sg-effects-cinematic .sg-seat.sg-seat-active-human .sg-board.sg-board-your-turn {
+  /* The older hot-seat arrival rule animates opacity of the entire palace.
+     Stop it completely: animate ONLY gold-frame box-shadow / outline-color. */
+  opacity:1!important;
+  transform:none;
+  animation:sg-v56-palace-ripple 3.6s ease-in-out infinite!important;
 }
 @keyframes sg-v56-palace-ripple {
   0%,100% {
@@ -57,7 +60,9 @@
   }
 }
 /* No animation in minimalist effects mode; a stable visual marker remains. */
-.sg.sg-effects-minimal .sg-board.sg-board-your-turn {
+.sg.sg-effects-minimal .sg-board.sg-board-your-turn,
+.sg.sg-effects-minimal .sg-seat.sg-seat-active-human .sg-board.sg-board-your-turn {
+  opacity:1!important;
   animation:none!important;
   outline-color:#e5c985;
   box-shadow:0 0 0 2px #e9c67ba0,0 0 12px #e2b36c72,
@@ -295,5 +300,6 @@
 }
 @media (prefers-reduced-motion:reduce) {
   .sg .sg-board.sg-board-your-turn,
+  .sg.sg-effects-cinematic .sg-board.sg-board-your-turn,
   .sg .sg-human-turn-notice {animation:none!important;}
 }
