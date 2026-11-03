@@ -98,42 +98,42 @@ export function SharedFieldMarker({players}:{players:Player[]}) {
 }
 
 function PhysicalTrack({game}:{game:GameState}) {
-  const cells = scoreTrackCoordinates()
-  return <div className="sg-boardscore-engraved" role="group"
-    aria-label="Tor punktów od 0 do 99, dwa połączone obwody">
-    <div className="sg-boardscore-mosaic">
-      {cells.map(([row,col],value) => {
-        const markers = game.players.filter(p => scoreTrackPosition(p.score) === value)
-        return <span key={value}
-          style={{gridRow:row + 1,gridColumn:col + 1}}
-          className={`sg-boardscore-cell${value % 5 === 0 ? ' sg-boardscore-milestone' : ''}${markers.length ? ' sg-boardscore-occupied' : ''}`}
-          title={`Pole ${value}`}>
-          <b>{value}</b>
-          {markers.length > 0 && <span className="sg-boardscore-markers">
-            <SharedFieldMarker players={markers}/>
-          </span>}
-        </span>
-      })}
-      <div className="sg-boardscore-core"><ScoreRoundBonuses game={game}/><PhysicalBrokenTrack game={game}/></div>
-    </div>
-
-  </div>
-}
-
-function PhysicalBrokenTrack({game}:{game:GameState}) {
-  return <div className="sg-boardscore-broken" role="group" aria-label="Planszowy tor stłuczonego szkła">
-    <b className="sg-boardscore-subtitle">TOR STŁUCZONEGO SZKŁA</b>
-    <div className="sg-boardscore-broken-steps">
-      {BROKEN_TRACK.map((penalty, step) =>
-        <div key={step} className={`sg-boardscore-broken-step${step===8?' sg-boardscore-broken-end':''}`}
-          title={`Pole ${step}: minus ${penalty} punktów`}>
-          <small>{step}</small>
-          <span>{penalty ? `−${penalty}` : '0'}</span>
-          <div className="sg-boardscore-broken-pawns">
-            <SharedFieldMarker players={game.players.filter(p=>p.brokenSteps===step)}/>
-          </div>
+  return <div className="sg-art-board" role="group" aria-label="Plansza punktacji Witraże Sintry">
+    <div className="sg-art-orbit">
+      {scoreTrackCoordinates().map(([row,col],value) => {
+        const players=game.players.filter(p=>scoreTrackPosition(p.score)===value)
+        return <div key={value} className={`sg-boardscore-cell sg-art-cell${value % 5 === 0 ? ' sg-art-checkpoint' : ''}`}
+          style={{gridRow:row+1,gridColumn:col+1}} title={`Pole ${value}${players.length ? ': '+players.map(p=>p.name).join(', ') : ''}`}>
+          <span className="sg-art-number">{value}</span>
+          {players.length > 0 && <div className="sg-art-marker"><SharedFieldMarker players={players}/></div>}
         </div>
-      )}
+      })}
+      <div className="sg-art-center">
+        <div className="sg-art-heading"><span>✧</span><div><b>WITRAŻE SINTRY</b><small>RUNDA {game.round} / 6</small></div><span>✧</span></div>
+        <div className="sg-art-panels">
+          <section className="sg-art-rounds" aria-label="Rundy i premie">
+            <h3>RUNDY I PREMIE</h3>
+            <div className="sg-art-round-list">{game.roundColors.map((color,i)=><div key={i}
+              className={`sg-score-round-tile sg-art-round${i+1===game.round ? ' sg-art-round-active' : ''}${i+1<game.round ? ' sg-art-round-done' : ''}`}
+              aria-current={i+1===game.round ? 'step' : undefined} title={`Runda ${i+1}: ${GLASS_COLOR_LABELS_PL[color]}`}>
+              <span className="sg-art-roman">{['I','II','III','IV','V','VI'][i]}</span>
+              <span className="sg-art-gem"><GlassPiece color={color}/></span>
+              <span className="sg-art-multiplier">×1</span>
+            </div>)}</div>
+          </section>
+          <section className="sg-art-broken" aria-label="Planszowy tor stłuczonego szkła">
+            <h3>STŁUCZONE SZKŁO</h3>
+            <div className="sg-art-break-list">{BROKEN_TRACK.map((penalty,step)=><div key={step}
+              className={`sg-boardscore-broken-step sg-art-break${step===8 ? ' sg-art-break-end' : ''}`}
+              title={`Pole ${step}: kara ${penalty} punktów`}>
+              <span className="sg-art-step">{step===0 ? '◇' : step}</span>
+              <span className="sg-art-penalty">{penalty ? `−${penalty}` : '0'}</span>
+              <SharedFieldMarker players={game.players.filter(p=>p.brokenSteps===step)}/>
+            </div>)}</div>
+          </section>
+        </div>
+        <div className="sg-art-flourish" aria-hidden="true">― ◇ ―</div>
+      </div>
     </div>
   </div>
 }
