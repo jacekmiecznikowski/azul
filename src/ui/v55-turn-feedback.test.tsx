@@ -69,7 +69,7 @@ describe('v57 – consistent market geometry, centered cue, short gold border si
     expect(css).toContain('grid-template-columns:235px minmax(0,1fr) 255px')
     expect(css).toContain('--sg-disc-size:89px!important')
     expect(css).not.toContain('data-sg-orbit-count="7"')
-    expect(css).toContain('width:calc(var(--sg-unified-gem-size,28px) * 1.064)')
+    expect(css).toContain('width:calc(var(--sg-unified-gem-size,29px) * 1.064)')
     expect(geometry).toContain('const desktop = !narrow && window.innerWidth >= 1101')
     expect(geometry).toContain('const diameter = desktop ? 29 : mobileDiameter')
     expect(geometry).toContain("root.style.setProperty('--sg-unified-gem-size', value)")
