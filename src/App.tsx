@@ -15,6 +15,7 @@ import { GlassVisualEffects, useVisualEffects } from './components/GlassVisualEf
 import { useAmbientMusic } from './hooks/useAmbientMusic'
 import { GameBoard, GlassPiece } from './components/GameBoard'
 import { useSharedGlassGeometry } from './hooks/useSharedGlassGeometry'
+import { roundPresentationTiming } from './ui/turnPresentation'
 import { GlassResources } from './components/GlassResources'
 import { GLASS_COLOR_LABELS_PL as COLORS_PL } from './game/colorLabels'
 import { ManualPlacementDialog } from './components/ManualPlacementDialog'
@@ -296,9 +297,11 @@ export default function App() {
   const { enabled: soundEnabled, toggle: toggleSound, play } = useGameAudio()
   const { enabled: musicEnabled, toggle: toggleMusic, unavailable: musicUnavailable } = useAmbientMusic()
   const { enabled: effectsEnabled, toggle: toggleEffects, emit: emitEffects, clear: clearEffects, bursts: visualBursts, reducedMotion } = useVisualEffects()
+  const roundTiming = roundPresentationTiming(effectsEnabled, reducedMotion)
   const humanTurn = screen === 'game' && game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
   const roundIsReady = roundReady === game.round && roundAnnouncement === null
   const humanCanPlay = humanTurn && roundIsReady
+  const showTurnPopup = humanCanPlay && roundTiming.cinematic
   const desktopTable = useMemo(() => desktopTableMetrics(viewport.width, viewport.height), [viewport.width, viewport.height])
   const viewerIndex = viewingPlayerIndex(game.currentPlayer, lastHumanIndex, game.players.map(p => p.controller))
   const tableSeats = useMemo(() => seatsForViewer(viewerIndex, game.players.length), [viewerIndex, game.players.length])
@@ -332,22 +335,22 @@ export default function App() {
     setTurnNotice(null)
     setRoundAnnouncement({ round: game.round, color })
     const releasingRound = game.round
-    const unlock = window.setTimeout(() => setRoundReady(releasingRound), 3050)
+    const unlock = window.setTimeout(() => setRoundReady(releasingRound), roundTiming.unlockMs)
     return () => window.clearTimeout(unlock)
-  }, [screen, game.round, game.roundColors, game.phase])
+  }, [screen, game.round, game.roundColors, game.phase, roundTiming.unlockMs])
   useEffect(() => {
     if (!roundAnnouncement) return
-    // The CSS exit ends at 2700ms; do not unlock gameplay until 350ms later.
-    const hide = window.setTimeout(() => setRoundAnnouncement(null), 2700)
+    // Hide at the real presentation duration; AI remains gated for 350ms more.
+    const hide = window.setTimeout(() => setRoundAnnouncement(null), roundTiming.visibleMs)
     return () => window.clearTimeout(hide)
-  }, [roundAnnouncement])
+  }, [roundAnnouncement, roundTiming.visibleMs])
   useEffect(() => {
-    if (!humanCanPlay) { setTurnNotice(null); return }
+    if (!showTurnPopup) { setTurnNotice(null); return }
     const key = `${game.round}:${game.turn}:${game.currentPlayer}`
     if (noticedHumanTurn.current === key) return
     noticedHumanTurn.current = key
     setTurnNotice({key, name:game.players[game.currentPlayer].name})
-  }, [humanCanPlay, game.round, game.turn, game.currentPlayer, game.players])
+  }, [showTurnPopup, game.round, game.turn, game.currentPlayer, game.players])
   useEffect(() => {
     if (!turnNotice) return
     const timer = window.setTimeout(() => setTurnNotice(null), 1900)
@@ -483,7 +486,7 @@ export default function App() {
     </div>
   }
 
-  return <div className={`sg${screen === "home" ? " sg-in-home" : ""}`}>
+  return <div className={`sg${screen === "home" ? " sg-in-home" : ""}${roundTiming.cinematic ? " sg-effects-cinematic" : " sg-effects-minimal"}`}>
     <header className="sg-header">
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span></div>
       <RoundTracker round={game.round} colors={game.roundColors}/>
@@ -591,8 +594,8 @@ export default function App() {
       musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}
       soundEnabled={soundEnabled} toggleSound={toggleSound}/>} 
     {screen === 'game' && <GlassVisualEffects bursts={visualBursts}/>}
-    {screen === 'game' && roundAnnouncement && <RoundAnnouncement key={roundAnnouncement.round} round={roundAnnouncement.round} color={roundAnnouncement.color}/>}
-    {screen === 'game' && humanCanPlay && turnNotice && <div className="sg-human-turn-notice" role="status" aria-live="polite" key={turnNotice.key}>
+    {screen === 'game' && roundAnnouncement && <RoundAnnouncement key={roundAnnouncement.round} round={roundAnnouncement.round} color={roundAnnouncement.color} minimal={!roundTiming.cinematic}/>}
+    {screen === 'game' && showTurnPopup && turnNotice && <div className="sg-human-turn-notice" role="status" aria-live="polite" key={turnNotice.key}>
       <span className="sg-human-turn-notice-icon" aria-hidden="true">✦</span>
       <span><strong>{turnNotice.name === 'Ty' ? 'TWOJA TURA' : `TURA: ${turnNotice.name.toLocaleUpperCase('pl-PL')}`}</strong><small>Wybierz szkło z warsztatu lub środka</small></span>
     </div>}
