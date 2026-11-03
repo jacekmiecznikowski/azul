@@ -48,9 +48,13 @@ try {
           animation:getComputedStyle(el).animationName,
           border:getComputedStyle(el).borderTopColor,
           opacity:getComputedStyle(el).opacity,
+          rootClass:document.querySelector('.sg')?.className,
+          boardClass:el.className,
+          reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,
+          animationDuration:getComputedStyle(el).animationDuration,
         }))
         assert(border.animation.includes('sg-v56-palace-ripple'),
-          'Gold outer palace frame should pulse, not the screen itself')
+          `Gold frame animation missing: ${JSON.stringify(border)}`)
         assert.equal(border.opacity,'1','Whole board must remain fully visible during its turn')
         const cue=page.locator('.sg-human-turn-notice')
         await cue.waitFor({state:'visible',timeout:3500})
