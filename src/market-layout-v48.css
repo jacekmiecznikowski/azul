@@ -16,27 +16,6 @@
   /* The original centers used only 66% of the card height.
      The oval below deliberately uses 78% of the height and 82% of width.
      Separate arrangements for 5/7/9 give round discs a collision-free area. */
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(1) { left:50%!important; top:11%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(2) { left:91%!important; top:35%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(3) { left:69%!important; top:89%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(4) { left:31%!important; top:89%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(5) { left:9%!important; top:35%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(1) { left:50%!important; top:11%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(2) { left:78%!important; top:21%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(3) { left:91%!important; top:59%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(4) { left:64%!important; top:89%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(5) { left:36%!important; top:89%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(6) { left:9%!important; top:59%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(7) { left:22%!important; top:21%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(1) { left:50%!important; top:11%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(2) { left:72%!important; top:15%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(3) { left:91%!important; top:37%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(4) { left:85%!important; top:71%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(5) { left:62%!important; top:89%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(6) { left:38%!important; top:89%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(7) { left:15%!important; top:71%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(8) { left:9%!important; top:37%!important; }
-.sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="9"] .sg-orbit-position-v46:nth-child(9) { left:28%!important; top:15%!important; }
   .sg .sg-center .sg-side-left > .sg-turn {
     flex:0 0 143px;
     height:143px;
