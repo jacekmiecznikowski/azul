@@ -1,9 +1,7 @@
-/* v56 — restore the approved v54 board styling, replacing v55 visual overrides.
-   Human-turn feedback is applied to the OUTER GOLD FRAME, never to the panes,
-   gemstones, screen backdrop or overall board opacity. */
+/* v57 — fixed tabletop geometry, quiet turn status for human and AI. */
 
-/* Entire eight-window palace is the turn indicator on every seat. */
-.sg .sg-board.sg-board-your-turn {
+/* Every current player gets the same gold frame. */
+.sg .sg-board.sg-board-current {
   position:relative;
   border:2px solid #f3d596;
   outline:2px solid #efcf8a;
@@ -31,42 +29,20 @@
   box-shadow:0 0 8px #e1ba73a8;
   white-space:nowrap;
 }
-.sg.sg-effects-cinematic .sg-board.sg-board-your-turn,
-.sg.sg-effects-cinematic .sg-seat.sg-seat-active-human .sg-board.sg-board-your-turn {
-  /* The older hot-seat arrival rule animates opacity of the entire palace.
-     Stop it completely: animate ONLY gold-frame box-shadow / outline-color. */
-  opacity:1!important;
-  transform:none;
-  animation:sg-v56-palace-ripple 3.6s ease-in-out infinite!important;
+/* Quiet, short, ONE-TIME border animation; never animate the board itself. */
+.sg .sg-board.sg-board-current {opacity:1!important;transform:none;}
+.sg.sg-effects-cinematic .sg-board.sg-board-current {
+  animation:sg-v57-turn-glow 1.15s ease-out 1 both!important;
 }
-@keyframes sg-v56-palace-ripple {
-  0%,100% {
-    outline-color:#e8c989;
-    box-shadow:
-      0 0 0 2px #cea85e9a,
-      0 0 12px #dba75f83,
-      0 0 19px #dba75f48,
-      inset 0 0 0 2px #ffe6ae53,
-      0 5px 15px #02131cb8;
-  }
-  47% {
-    outline-color:#ffe6aa;
-    box-shadow:
-      0 0 0 4px #ffe3a6c9,
-      0 0 0 8px #e8b46b65,
-      0 0 27px #ffe6a7a6,
-      0 0 42px #dbb26452,
-      inset 0 0 0 2px #ffe9b171;
-  }
+@keyframes sg-v57-turn-glow {
+  0% {outline-color:#d9b87c;box-shadow:0 0 0 1px #d5b5749e,0 0 7px #d5b57453,inset 0 0 0 1px #ffedc42c;}
+  38% {outline-color:#ffe6ae;box-shadow:0 0 0 3px #f5d69dc7,0 0 13px #e8c58e9a,inset 0 0 0 1px #ffedc45c;}
+  100% {outline-color:#e6c688;box-shadow:0 0 0 2px #d8b8799c,0 0 8px #d5b57467,inset 0 0 0 1px #ffedc43d;}
 }
-/* No animation in minimalist effects mode; a stable visual marker remains. */
-.sg.sg-effects-minimal .sg-board.sg-board-your-turn,
-.sg.sg-effects-minimal .sg-seat.sg-seat-active-human .sg-board.sg-board-your-turn {
-  opacity:1!important;
+.sg.sg-effects-minimal .sg-board.sg-board-current {
   animation:none!important;
-  outline-color:#e5c985;
-  box-shadow:0 0 0 2px #e9c67ba0,0 0 12px #e2b36c72,
-    inset 0 0 0 2px #f5db9a4d;
+  outline-color:#d7bd86;
+  box-shadow:0 0 0 1px #d5b87992,inset 0 0 0 1px #f5db9a3a;
 }
 .sg .sg-mobile-player.sg-mobile-player-current-human {
   border:2px solid #e6cb88;
@@ -79,17 +55,17 @@
   position:fixed;
   z-index:100;
   left:50%;
-  top:clamp(102px,19vh,220px);
-  transform:translateX(-50%);
+  top:50%;
+  transform:translate(-50%,-50%);
   box-sizing:border-box;
   display:flex;
   align-items:center;
   justify-content:center;
   gap:14px;
   width:max-content;
-  min-width:280px;
-  max-width:min(90vw,460px);
-  min-height:75px;
+  min-width:300px;
+  max-width:min(90vw,480px);
+  min-height:100px;
   padding:15px 24px;
   border:2px solid #f3d48f;
   border-radius:15px;
@@ -99,7 +75,7 @@
   color:#f7e5b9;
   text-align:left;
   pointer-events:none;
-  animation:sg-v56-turn-toast 2.7s ease-out both;
+  animation:sg-v57-turn-toast 2.0s ease-out both;
 }
 .sg .sg-human-turn-notice-icon {
   flex:0 0 auto;
@@ -130,10 +106,10 @@
   font:600 11px/1.2 'DM Sans',sans-serif;
   color:#b9dcd2;
 }
-@keyframes sg-v56-turn-toast {
-  0%{opacity:0;transform:translate(-50%,-6px);}
-  12%,83%{opacity:1;transform:translate(-50%,0);}
-  100%{opacity:0;transform:translate(-50%,0);}
+@keyframes sg-v57-turn-toast {
+  0% {opacity:0;transform:translate(-50%,-50%) scale(.985);}
+  12%,80% {opacity:1;transform:translate(-50%,-50%) scale(1);}
+  100% {opacity:0;transform:translate(-50%,-50%) scale(1);}
 }
 
 /* Keep the effects switch from v55: no blackout or animation when disabled.
@@ -198,59 +174,20 @@
   .sg .sg-round-announcement--minimal .sg-round-announcement-card {padding:5px 12px;}
 }
 
-/* 1v1 desktop: the two palaces previously shared only 245px of logical
-   depth and each floor was 24px tall. That forced EVERY factory/center gem
-   down to 14–15 physical pixels at 1366×768. Give the north and south
-   boards more depth while preserving the MARKET WIDTH and the 1700×1000
-   logical stage. Unlike arbitrary gem scaling this keeps every socket real. */
-@media(min-width:1101px) and (min-height:621px) {
-  .sg .sg-felt[data-sg-player-count="2"] {
-    grid-template-rows:330px minmax(0,1fr) 330px;
-  }
-  .sg .sg-felt[data-sg-player-count="2"] .sg-seat-north .sg-seat-rotation,
-  .sg .sg-felt[data-sg-player-count="2"] .sg-seat-south .sg-seat-rotation {
-    height:330px;
-  }
-}
-
-/* Factory layout: count-sensitive, not a >=1700px-only override.
-   A 1v1 game has five circles and therefore far more clearance for large discs.
-   Seven circles grow moderately; nine keep their previously tested safe scale. */
-@media(min-width:1101px) and (min-height:621px) {
-  .sg .sg-center .sg-market .sg-market-orbit-v46[data-sg-orbit-count="5"] {
-    --sg-disc-size:clamp(110px,min(46cqb,29cqi),118px);
-  }
-  .sg .sg-center .sg-market .sg-market-orbit-v46[data-sg-orbit-count="7"] {
-    --sg-disc-size:clamp(64px,min(30cqb,25cqi),118px);
-  }
-  /* Move disc centers inward to accommodate the larger physical circles.
-     Percentages describe centers; with the count-specific diameter they keep
-     all discs visible and maintain a spacious, centered oval. */
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(1) {left:50%!important;top:28%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(2) {left:84%!important;top:39%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(3) {left:64%!important;top:74%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(4) {left:36%!important;top:74%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="5"] .sg-orbit-position-v46:nth-child(5) {left:16%!important;top:39%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(1) {left:50%!important;top:18%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(2) {left:77%!important;top:29%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(3) {left:83%!important;top:60%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(4) {left:65%!important;top:82%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(5) {left:35%!important;top:82%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(6) {left:17%!important;top:60%!important;}
-  .sg .sg-center .sg-market-orbit-v46[data-sg-orbit-count="7"] .sg-orbit-position-v46:nth-child(7) {left:23%!important;top:29%!important;}
-  .sg .sg-center .sg-market .sg-factory-v45 .sg-factory-grid {
-    width:94%;
-    height:94%;
-  }
-  /* Socket and installed gem are still measured from the SAME DOM value.
-     The open dark diamond (socket * .94) equals the actual glass diameter. */
+/* Same panel dimensions and the SAME physical factory / diamond size
+   for 2, 3 and 4 players. The viewport zoom scales all variants equally. */
+@media (min-width:1101px) and (min-height:621px) {
+  .sg .sg-felt {grid-template-rows:310px minmax(0,1fr) 310px;}
+  .sg .sg-felt .sg-seat-north .sg-seat-rotation,
+  .sg .sg-felt .sg-seat-south .sg-seat-rotation {height:310px;}
+  .sg .sg-center {grid-template-columns:235px minmax(0,1fr) 255px;}
+  .sg .sg-center .sg-market .sg-market-orbit-v46 {--sg-disc-size:89px!important;}
+  .sg .sg-center .sg-market .sg-factory-v45 .sg-factory-grid {width:94%;height:94%;}
   .sg .sg-board-windows .sg-pane-socket {
-    width:calc(var(--sg-unified-gem-size,28px) * 1.064);
-    height:calc(var(--sg-unified-gem-size,28px) * 1.064);
+    width:calc(var(--sg-unified-gem-size,29px) * 1.064);
+    height:calc(var(--sg-unified-gem-size,29px) * 1.064);
   }
-  .sg .sg-board-windows .sg-pane-socket .sg-pane-empty-diamond {
-    inset:3%;
-  }
+  .sg .sg-board-windows .sg-pane-socket .sg-pane-empty-diamond {inset:3%;}
 }
 /* Strong, unambiguous gold selection drawn WITHIN the diamond hit shape.
    Old inset-only shadow was hidden by the facets and clipped by clip-path. */
@@ -303,9 +240,9 @@
    Make the notification fit, but never give up the clear palace label. */
 @media(max-width:1100px), (max-height:620px) {
   .sg .sg-human-turn-notice {
-    top:clamp(104px,17vh,155px);
+    top:50%;
     min-width:225px;
-    min-height:64px;
+    min-height:75px;
     padding:10px 16px;
   }
   .sg .sg-human-turn-notice-icon {width:34px;height:34px;font-size:23px;}
@@ -316,7 +253,7 @@
   }
 }
 @media (prefers-reduced-motion:reduce) {
-  .sg .sg-board.sg-board-your-turn,
-  .sg.sg-effects-cinematic .sg-board.sg-board-your-turn,
+  .sg .sg-board.sg-board-current,
+  .sg.sg-effects-cinematic .sg-board.sg-board-current,
   .sg .sg-human-turn-notice {animation:none!important;}
 }
