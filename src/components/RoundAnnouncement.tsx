@@ -10,8 +10,8 @@ const BONUS_COLORS: Record<GlassColor, string> = {
 }
 
 /** Visual-only announcement; never blocks the game or changes its timing. */
-export function RoundAnnouncement({ round, color }: { round: number; color: GlassColor }) {
-  return <div className="sg-round-announcement" role="status" aria-live="polite"
+export function RoundAnnouncement({ round, color, minimal = false }: { round: number; color: GlassColor; minimal?: boolean }) {
+  return <div className={`sg-round-announcement${minimal ? ' sg-round-announcement--minimal' : ''}`} role="status" aria-live="polite"
     aria-label={`Rozpoczęła się runda ${round}. Premiowany kolor: ${BONUS_COLORS[color].toLowerCase()}.`}>
     <div className="sg-round-announcement-card">
       <span className="sg-round-announcement-kicker">WITRAŻE SINTRY</span>
