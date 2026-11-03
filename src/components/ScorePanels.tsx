@@ -106,7 +106,7 @@ function PhysicalTrack({game}:{game:GameState}) {
           </span>}
         </span>
       })}
-      <div className="sg-boardscore-core"><PhysicalBrokenTrack game={game}/></div>
+      <div className="sg-boardscore-core"><ScoreRoundBonuses game={game}/><PhysicalBrokenTrack game={game}/></div>
     </div>
     <div className="sg-boardscore-legend" aria-label="Dokładne wyniki graczy">
       {game.players.map(p => <div className="sg-boardscore-legend-item" key={p.id}>
@@ -135,12 +135,35 @@ function PhysicalBrokenTrack({game}:{game:GameState}) {
   </div>
 }
 
-function PhysicalScoreContents({game, rounds = true}:{game:GameState; rounds?:boolean}) {
+function PhysicalScoreContents({game}:{game:GameState}) {
   return <>
     <PhysicalTrack game={game}/>
+    <div className="sg-boardscore-bonus" aria-label="Punktacja końcowa pałacu">
+      <b>PAŁAC {game.palaceSide}</b>
+      <span>{game.palaceSide === 'A' ? 'Tafle w parze kwater: 0/1 → 0 · 2 → 3 · 3 → 6 · 4 → 10 pkt' : 'Pełne okna × najliczniejszy kolor w pałacu'}</span>
+    </div>
     <p className="sg-score-rule">−18: odejmij 18 pkt i wróć na START. Pozostała kara na koniec gry.</p>
-    {rounds && <ScoreRoundBonuses game={game}/>}
   </>
+}
+
+/** Fit the complete board in both available dimensions, never crop its footer. */
+function FittedPhysicalContents({game}:{game:GameState}) {
+  const viewport = useRef<HTMLDivElement>(null)
+  const [scale,setScale] = useState(0.7)
+  useEffect(() => {
+    const element = viewport.current
+    if (!element) return
+    const observer = new ResizeObserver(([entry]) => {
+      setScale(Math.max(0.01,Math.min(entry.contentRect.width / 300,entry.contentRect.height / 380)))
+    })
+    observer.observe(element)
+    return () => observer.disconnect()
+  },[])
+  return <div ref={viewport} className="sg-boardscore-fit">
+    <div className="sg-boardscore-canvas" style={{transform:`translate(-50%,-50%) scale(${scale})`}}>
+      <PhysicalScoreContents game={game}/>
+    </div>
+  </div>
 }
 
 export function BoardScoringPanel({game}:{game:GameState}) {
@@ -173,8 +196,7 @@ export function BoardScoringPanel({game}:{game:GameState}) {
           ? `Następna: ${game.players[game.nextStartingPlayer ?? game.startingPlayer].name}`
           : `Start: ${game.players[game.startingPlayer].name}`}</small>
       </div>
-      <div className="sg-boardscore-body"><PhysicalScoreContents game={game} rounds={false}/></div>
-      <ScoreRoundBonuses game={game}/>
+      <div className="sg-boardscore-body"><FittedPhysicalContents game={game}/></div>
     </section>
     {expanded && typeof document !== 'undefined' && createPortal(
       <div className="sg sg-boardscore-modal-backdrop" onMouseDown={()=>setExpanded(false)}>
