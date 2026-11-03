@@ -387,11 +387,14 @@ try {
     try {
       await page.goto('http://127.0.0.1:5179')
       await page.evaluate(async enabled => {
-        const {newGame}=await import('/src/game/engine.ts')
-        const state=newGame({opponents:1,seed:105,playerControllers:['ai','human'],
-          botDifficulties:['easy','normal']})
-        state.currentPlayer=0
-        state.startingPlayer=0
+        const {newGame,legalMoves}=await import('/src/game/engine.ts')
+        // Seat zero is deliberately always human; seed seat one as the AI starter.
+        const state=newGame({opponents:1,seed:105,playerControllers:['human','ai'],
+          botDifficulties:['easy']})
+        state.currentPlayer=1
+        state.startingPlayer=1
+        if (state.players[1].controller!=='ai' || legalMoves(state).length===0)
+          throw new Error('Invalid AI-first test fixture')
         localStorage.setItem('sintra-glass-save-v1',JSON.stringify(state))
         localStorage.setItem('sintra-glass-visual-effects-v1',String(enabled))
       },enabled)
