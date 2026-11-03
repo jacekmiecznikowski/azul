@@ -3,20 +3,29 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { readFileSync } from 'node:fs'
 import { newGame, BROKEN_TRACK } from '../game/engine'
-import { BoardScoringPanel, DigitalBrokenGlass, ScoreRoundBonuses, scoreTrackCells, scoreTrackPosition } from '../components/ScorePanels'
+import { BoardScoringPanel, DigitalBrokenGlass, ScoreRoundBonuses, scoreTrackCells, scoreTrackCoordinates, scoreTrackPosition } from '../components/ScorePanels'
 
 const app = readFileSync(new URL('../App.tsx', import.meta.url),'utf8')
 const menu = readFileSync(new URL('../components/GameMenu.tsx', import.meta.url),'utf8')
 const css = readFileSync(new URL('../score-presentation-v58.css', import.meta.url),'utf8')
 
 describe('v58 — two visual scoring modes, original scoring logic untouched', () => {
-  it('snakes across all 100 distinct scoring squares exactly once', () => {
+  it('winds through two continuous ornamental orbits — exactly 100 connected squares', () => {
     const path=scoreTrackCells()
+    const coordinates=scoreTrackCoordinates()
     expect(path).toHaveLength(100)
-    expect(new Set(path).size).toBe(100)
+    expect(coordinates).toHaveLength(100)
+    expect(new Set(coordinates.map(([row,col])=>`${row}:${col}`)).size).toBe(100)
     expect(path.slice(0,10)).toEqual([0,1,2,3,4,5,6,7,8,9])
-    expect(path.slice(10,20)).toEqual([19,18,17,16,15,14,13,12,11,10])
-    expect(path.at(-1)).toBe(90)
+    expect(coordinates[0]).toEqual([0,0])
+    expect(coordinates[15]).toEqual([0,15])
+    expect(coordinates[53]).toEqual([1,0])
+    expect(coordinates[54]).toEqual([1,1])
+    expect(path.at(-1)).toBe(99)
+    for (let i=1;i<coordinates.length;i++) {
+      const [r1,c1]=coordinates[i-1], [r2,c2]=coordinates[i]
+      expect(Math.abs(r1-r2)+Math.abs(c1-c2)).toBe(1)
+    }
     expect(scoreTrackPosition(-18)).toBe(0)
     expect(scoreTrackPosition(100)).toBe(0)
     expect(scoreTrackPosition(143)).toBe(43)
