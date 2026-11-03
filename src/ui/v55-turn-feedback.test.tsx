@@ -23,7 +23,7 @@ describe('v55 – player turn feedback / bot round gate / effect preferences', (
   })
   it('effects OFF (and reduced motion) show only a short static cue, not the modal blackout', () => {
     for (const flags of [[false,false],[true,true],[false,true]] as const) {
-      const timing = roundPresentationTiming(...flags)
+      const timing = roundPresentationTiming(flags[0],flags[1])
       expect(timing.cinematic).toBe(false)
       expect(timing.visibleMs).toBe(ROUND_MINIMAL_MS)
       expect(timing.unlockMs).toBe(ROUND_MINIMAL_MS + POST_ROUND_PAUSE_MS)
