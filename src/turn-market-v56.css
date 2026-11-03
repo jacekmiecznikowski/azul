@@ -131,6 +131,68 @@
   100%{opacity:0;transform:translate(-50%,0);}
 }
 
+/* Keep the effects switch from v55: no blackout or animation when disabled.
+   Only the broken v55 palace glow and scale rules have been rolled back. */
+.sg .sg-round-announcement.sg-round-announcement--minimal {
+  inset:0;
+  position:fixed;
+  z-index:90;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:clamp(74px,11vh,110px) 8px 0;
+  background:transparent!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  animation:none!important;
+  pointer-events:none;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-card {
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  width:min(370px,94vw);
+  min-height:0;
+  max-height:none;
+  gap:10px;
+  padding:9px 15px;
+  border:1px solid #c1a477;
+  border-radius:11px;
+  background:#153640f5;
+  box-shadow:0 4px 13px #06182395;
+  animation:none!important;
+  opacity:1!important;
+  transform:none!important;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-card::before,
+.sg .sg-round-announcement--minimal .sg-round-announcement-card::after,
+.sg .sg-round-announcement--minimal .sg-round-announcement-kicker,
+.sg .sg-round-announcement--minimal .sg-round-announcement-separator,
+.sg .sg-round-announcement--minimal .sg-round-announcement-label {display:none;}
+.sg .sg-round-announcement--minimal .sg-round-announcement-heading {
+  margin:0; gap:4px;flex:0 0 auto;white-space:nowrap;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-heading span {
+  font-size:13px;letter-spacing:0;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-heading strong {
+  font-size:22px;line-height:1;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-bonus {
+  margin:0;gap:5px;font-size:10px;letter-spacing:0;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-gem,
+.sg .sg-round-announcement--minimal .sg-round-announcement-gem .sg-glass.sg-glass-placed.sg-gem-faceted {
+  width:25px;height:25px;min-width:25px;min-height:25px;
+  filter:none;animation:none!important;
+}
+@media(max-height:460px) {
+  .sg .sg-round-announcement--minimal {padding-top:52px;}
+  .sg .sg-round-announcement--minimal .sg-round-announcement-card {padding:5px 12px;}
+}
+
 /* Factory layout: count-sensitive, not a >=1700px-only override.
    A 1v1 game has five circles and therefore far more clearance for large discs.
    Seven circles grow moderately; nine keep their previously tested safe scale. */
