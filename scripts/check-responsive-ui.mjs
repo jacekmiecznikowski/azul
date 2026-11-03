@@ -64,6 +64,19 @@ try {
           factories, gemDiscs, zoom: parseFloat(getComputedStyle(root.querySelector('.sg-felt') ?? root).zoom) || 1,
           documentWidth:document.documentElement.scrollWidth, viewport:innerWidth }
       })
+      // Larger full-HD trays must remain fully separated around the orbit.
+      if (width >= 1700 && height >= 880) {
+        for (let i=0; i<metrics.factories.length; i++) {
+          for (let j=i+1; j<metrics.factories.length; j++) {
+            const a=metrics.factories[i], b=metrics.factories[j]
+            const distance=Math.hypot((a.x+a.width/2)-(b.x+b.width/2),
+              (a.y+a.height/2)-(b.y+b.height/2))
+            const touchingDistance=(a.width+b.width)/2
+            assert(distance >= touchingDistance-2,
+              `${width}x${height}: full-HD workshops ${i+1} and ${j+1} overlap by ${touchingDistance-distance}px`)
+          }
+        }
+      }
       const label = `${width}x${height}-${opponents+1}players`
       await page.screenshot({ path:`reports/ui/${label}.png`, fullPage:true })
       results.push({ label, ...metrics, errors })
@@ -363,6 +376,56 @@ try {
       }
       assert.deepEqual(errors, [], label)
       console.log(`PASS ${label}: ${metrics.gems.length} visible gems, selection works`)
+      await page.close()
+    }
+  }
+
+  // Regression: an AI that starts a new round MUST NOT move underneath the
+  // ceremony, regardless of whether visual effects are enabled.
+  for (const enabled of [true,false]) {
+    const page=await browser.newPage({viewport:{width:1440,height:900}})
+    try {
+      await page.goto('http://127.0.0.1:5179')
+      await page.evaluate(async enabled => {
+        const {newGame}=await import('/src/game/engine.ts')
+        const state=newGame({opponents:1,seed:105,playerControllers:['ai','human'],
+          botDifficulties:['easy','normal']})
+        state.currentPlayer=0
+        state.startingPlayer=0
+        localStorage.setItem('sintra-glass-save-v1',JSON.stringify(state))
+        localStorage.setItem('sintra-glass-visual-effects-v1',String(enabled))
+      },enabled)
+      await page.reload()
+      await page.getByRole('button',{name:'Kontynuuj partię'}).click()
+      const popup=page.locator('.sg-round-announcement')
+      await popup.waitFor({state:'visible',timeout:2600})
+      assert.equal(await popup.locator('.sg-glass.sg-gem-faceted').count(),1,
+        'Round cue must show a physical faceted bonus gem')
+      const minimal=await popup.evaluate(el=>el.classList.contains('sg-round-announcement--minimal'))
+      assert.equal(minimal,!enabled,'Visual effects switch does not control the round cue')
+      if (enabled) {
+        await page.waitForTimeout(850)
+        const blur=await popup.evaluate(el=>getComputedStyle(el).backdropFilter)
+        assert(blur.includes('blur('),'Cinematic ceremony must blur the board')
+      } else {
+        const backdrop=await popup.evaluate(el=>getComputedStyle(el).backdropFilter)
+        assert(backdrop==='none','Effects OFF should not blur the board')
+      }
+      const readTurn=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('sintra-glass-save-v1')).turn)
+      assert.equal(await readTurn(),0,'AI moved while round announcement was visible')
+      await popup.waitFor({state:'hidden',timeout:5000})
+      assert.equal(await readTurn(),0,'AI moved before the ceremony finished')
+      await page.waitForFunction(()=>JSON.parse(localStorage.getItem('sintra-glass-save-v1')).turn>=1,
+        null,{timeout:11000})
+      // The second seat is human: only cinematic mode shows the brief turn cue.
+      if(enabled) {
+        await page.locator('.sg-human-turn-notice').waitFor({state:'visible',timeout:2600})
+      } else {
+        assert.equal(await page.locator('.sg-human-turn-notice').count(),0,
+          'Effects OFF must not display the human turn popup')
+      }
+      console.log(`PASS ai-round-gate-effects-${enabled?'on':'off'}: no hidden AI move, optional turn cue`)
+    } finally {
       await page.close()
     }
   }
