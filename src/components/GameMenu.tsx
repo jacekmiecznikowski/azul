@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { BookOpen, BrainCircuit, ChevronDown, LayoutGrid, Monitor, Music2, Settings2, Sparkles, Volume2, VolumeX } from 'lucide-react'
-import type { ScoreDisplayMode } from './ScorePanels'
+import { BookOpen, BrainCircuit, ChevronDown, Music2, Settings2, Sparkles, Volume2, VolumeX } from 'lucide-react'
 
 interface GameMenuProps {
-  scoreMode: ScoreDisplayMode
-  onScoreModeChange: (mode: ScoreDisplayMode) => void
   effectsEnabled: boolean
   reducedMotion: boolean
   toggleEffects: () => void
@@ -18,7 +15,6 @@ interface GameMenuProps {
 }
 
 export function GameMenu({
-  scoreMode, onScoreModeChange,
   effectsEnabled, reducedMotion, toggleEffects,
   musicEnabled, musicUnavailable, toggleMusic,
   soundEnabled, toggleSound, openStrategy, openRules,
@@ -72,20 +68,6 @@ export function GameMenu({
           : 'Minimalne komunikaty bez animacji'}</small></span>
         <i className="sg-menu-switch" aria-hidden="true"/>
       </button>
-      <div className="sg-menu-divider"/>
-      <span className="sg-menu-title">WIDOK PUNKTACJI</span>
-      <div className="sg-menu-score-modes" role="group" aria-label="Tryb punktacji">
-        <button type="button" className={`sg-menu-score-option${scoreMode === 'digital' ? ' sg-menu-score-selected' : ''}`}
-          aria-pressed={scoreMode === 'digital'}
-          onClick={() => { onScoreModeChange('digital'); setOpen(false) }}>
-          <Monitor size={16}/><span><b>Cyfrowy</b><small>Wyniki i proste kary</small></span>
-        </button>
-        <button type="button" className={`sg-menu-score-option${scoreMode === 'board' ? ' sg-menu-score-selected' : ''}`}
-          aria-pressed={scoreMode === 'board'}
-          onClick={() => { onScoreModeChange('board'); setOpen(false) }}>
-          <LayoutGrid size={16}/><span><b>Planszowy</b><small>Tor z pionkami</small></span>
-        </button>
-      </div>
       <div className="sg-menu-divider"/>
       <span className="sg-menu-title">POMOC I ANALIZA</span>
       <button type="button" className="sg-menu-item" onClick={() => { setOpen(false); openStrategy() }}>

@@ -20,8 +20,7 @@ import { GlassResources } from './components/GlassResources'
 import { GLASS_COLOR_LABELS_PL as COLORS_PL } from './game/colorLabels'
 import { ManualPlacementDialog } from './components/ManualPlacementDialog'
 import { GameMenu } from './components/GameMenu'
-import { BoardScoringPanel, DigitalBrokenGlass } from './components/ScorePanels'
-import type { ScoreDisplayMode } from './components/ScorePanels'
+import { CompactScores } from './components/ScorePanels'
 import { HomeScreen } from './components/HomeScreen'
 import { RoundTracker } from './components/RoundTracker'
 import { RoundAnnouncement } from './components/RoundAnnouncement'
@@ -61,7 +60,6 @@ import './turn-market-v56.css'
 import './score-presentation-v58.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
-const SCORE_MODE_KEY = 'sintra-glass-score-presentation-v1'
 const PLAYER_AVATARS = ['✦', '✧', '✳', '❖']
 interface Settings { opponents: number; difficulties: Difficulty[]; controllers: Controller[]; names: string[]; palaceSide: PalaceSide }
 const DEFAULT_OPTIONS: Settings = {
@@ -284,14 +282,6 @@ export default function App() {
   const [showStrategy, setShowStrategy] = useState(false)
   const [mobileBoard, setMobileBoard] = useState<number | null>(null)
   const [mobilePanel, setMobilePanel] = useState<'score' | 'history' | null>(null)
-  const [scoreMode,setScoreMode] = useState<ScoreDisplayMode>(() => {
-    try { return localStorage.getItem(SCORE_MODE_KEY) === 'board' ? 'board' : 'digital' }
-    catch { return 'digital' }
-  })
-  useEffect(() => {
-    try { localStorage.setItem(SCORE_MODE_KEY,scoreMode) }
-    catch { /* private browsing: keep this preference for the current session */ }
-  },[scoreMode])
   const [lastHumanIndex, setLastHumanIndex] = useState(() =>
     game.players[game.currentPlayer]?.controller === 'human' ? game.currentPlayer : 0)
   const { enabled: soundEnabled, toggle: toggleSound, play } = useGameAudio()
@@ -492,7 +482,7 @@ export default function App() {
       <RoundTracker round={game.round} colors={game.roundColors}/>
       <div className="sg-header-actions">
         <GlassResources game={game}/>
-        <GameMenu scoreMode={scoreMode} onScoreModeChange={setScoreMode} effectsEnabled={effectsEnabled} reducedMotion={reducedMotion} toggleEffects={toggleEffects}
+        <GameMenu effectsEnabled={effectsEnabled} reducedMotion={reducedMotion} toggleEffects={toggleEffects}
           musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}
           soundEnabled={soundEnabled} toggleSound={toggleSound}
           openStrategy={() => setShowStrategy(true)} openRules={() => setShowRules(true)}/>
@@ -506,10 +496,8 @@ export default function App() {
       <div className="sg-felt" data-sg-player-count={game.players.length} style={{ zoom: desktopTable.scale, width: desktopTable.width, minWidth: desktopTable.width, height: desktopTable.height, '--sg-long': `${desktopTable.boardLong}px` } as React.CSSProperties}>
         {tableSeats.filter(seatInfo => seatInfo.place !== 'south').map(seatInfo => seat(seatInfo.playerIndex, seatInfo.place))}
         <div className="sg-center">
-          <div className={`sg-side-left sg-score-mode-${scoreMode}`}>
-            {scoreMode === 'board'
-              ? <BoardScoringPanel game={game}/>
-              : <><TurnSummary game={game}/><DigitalBrokenGlass game={game}/></>}
+          <div className="sg-side-left sg-score-mode-simple">
+            <CompactScores game={game}/>
           </div>
           <Market game={game} selection={selection} disabled={!humanCanPlay || !!finishing} onPick={chooseSource}/>
           <LiveHistory state={game} status={status} onCancel={selection ? () => setSelection(null) : undefined}
@@ -582,10 +570,8 @@ export default function App() {
           <div className="sg-mobile-overlay-heading"><strong>{mobilePanel === 'score' ? 'Wyniki i stłuczone szkło' : 'Historia ruchów'}</strong>
             <button type="button" onClick={() => setMobilePanel(null)}>Zamknij ×</button></div>
           {mobilePanel === 'score'
-            ? <div className={`sg-mobile-stats sg-score-mode-${scoreMode}`}>
-                {scoreMode === 'board'
-                  ? <BoardScoringPanel game={game}/>
-                  : <><TurnSummary game={game}/><DigitalBrokenGlass game={game}/></>}
+            ? <div className="sg-mobile-stats sg-score-mode-simple">
+                <CompactScores game={game}/>
               </div>
             : <LiveHistory state={game} status={status}
                 onCancel={selection ? () => setSelection(null) : undefined}

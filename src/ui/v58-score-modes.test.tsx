@@ -58,15 +58,10 @@ describe('v58 — two visual scoring modes, original scoring logic untouched', (
     const rounds=renderToStaticMarkup(createElement(ScoreRoundBonuses,{game}))
     expect((rounds.match(/sg-glass-placed sg-gem-faceted/g)??[])).toHaveLength(6)
   })
-  it('persists selection independently of saved game rules and uses it on desktop and mobile', () => {
-    expect(app).toContain("SCORE_MODE_KEY = 'sintra-glass-score-presentation-v1'")
-    expect(app).toContain('localStorage.setItem(SCORE_MODE_KEY,scoreMode)')
-    expect(app).toContain('onScoreModeChange={setScoreMode}')
-    expect(app).toContain("scoreMode === 'board'")
-    expect(app).toContain('sg-mobile-stats sg-score-mode-')
-    expect(menu).toContain('aria-label="Tryb punktacji"')
-    expect(menu).toContain("onScoreModeChange('board')")
-    expect(menu).toContain("onScoreModeChange('digital')")
+  it('uses a single compact default and removes the scoring mode menu', () => {
+    expect(app).toContain('<CompactScores game={game}/>')
+    expect(app).not.toContain('setScoreMode')
+    expect(menu).not.toContain('Tryb punktacji')
   })
   it('keeps the purple glazier styling entirely outside window contents', () => {
     expect(css).toContain('.sg .sg-board-windows .sg-window.sg-window-active {')

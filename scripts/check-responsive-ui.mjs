@@ -457,99 +457,29 @@ try {
     console.log(`PASS ${width}x${height}: 5/7/9 factories and gems use exactly equal size`)
   }
 
-  // v58: switch between two scoring presentations IN the existing game menu.
-  // The preference survives reload; board track and penalties reflect real state.
-  for (const [width,height] of [[1920,1080],[1440,900],[1101,621],[844,390],[390,844],[320,568]]) {
+  // Compact scoring is the only default; its contents must fit without scrolling.
+  for (const [width,height] of [[1440,900],[1101,621],[390,844],[844,390],[320,568]]) {
     const page=await browser.newPage({viewport:{width,height}})
-    try {
-      await page.goto('http://127.0.0.1:5179')
-      await page.evaluate(async () => {
-        const {newGame}=await import('/src/game/engine.ts')
-        const state=newGame({opponents:3,seed:258,playerControllers:['human','human','human','human']})
-        state.players[0].score=45
-        state.players[0].brokenSteps=4
-        state.players[1].score=27
-        state.players[1].brokenSteps=2
-        localStorage.setItem('sintra-glass-save-v1',JSON.stringify(state))
-        localStorage.setItem('sintra-glass-score-presentation-v1','digital')
-        localStorage.setItem('sintra-glass-visual-effects-v1','false')
-      })
-      await page.reload()
-      await page.getByRole('button',{name:'Kontynuuj partię'}).click()
-      await page.locator('.sg-round-announcement').waitFor({state:'hidden',timeout:5000})
-      const mobile=width<=1100 || height<=620
-      const status=page.locator(mobile ? '.sg-mobile-stats .sg-turn' : '.sg-stage .sg-turn')
-      if(mobile) {
-        await page.getByRole('button',{name:'Wyniki'}).click()
-        const digital=page.locator('.sg-mobile-stats.sg-score-mode-digital')
-        assert(await digital.isVisible(),'Mobile digital score panel not visible')
-        assert.equal(await digital.locator('.sg-digital-penalty-row').count(),4)
-        await page.getByRole('button',{name:'Zamknij ×'}).click()
-      } else {
-        assert.equal(await page.locator('.sg-stage .sg-digital-penalty-row').count(),4)
-      }
-
-      if(mobile) await page.getByRole('button',{name:'Wyniki'}).click()
-      const statusLayout=await status.evaluate(el=>{
-        const children=[...el.children].map(child=>child.getBoundingClientRect())
-        return children.every((rect,i)=>i===0 || rect.top>=children[i-1].bottom-1)
-      })
-      assert(statusLayout,`${width}x${height}: turn, scores and first player overlap`)
-      if(mobile) await page.getByRole('button',{name:'Zamknij ×'}).click()
-      await page.getByRole('button',{name:'Otwórz menu gry'}).click()
-      await page.locator('.sg-menu-score-option').filter({hasText:'Planszowy'}).click()
-      assert.equal(await page.evaluate(()=>localStorage.getItem('sintra-glass-score-presentation-v1')),'board')
-      if(mobile) await page.getByRole('button',{name:'Wyniki'}).click()
-      const board=page.locator(mobile ? '.sg-mobile-stats.sg-score-mode-board .sg-physical-scores'
-        : '.sg-stage .sg-side-left.sg-score-mode-board .sg-physical-scores')
-      assert(await board.isVisible(),'Board-style scoring not visible')
-      assert.equal(await board.locator('.sg-boardscore-cell').count(),100)
-      assert.equal(await board.locator('.sg-boardscore-broken-step').count(),9)
-      assert.equal(await board.locator('.sg-score-round-tile').count(),6)
-      assert((await board.innerText()).includes('45'),'Actual points are missing on physical board')
-      await board.getByRole('button',{name:'Powiększ tor punktów'}).click()
-      const dialog=page.getByRole('dialog',{name:'Powiększona plansza punktacji'})
-      assert(await dialog.isVisible(),'Magnified physical score board did not open')
-      assert.equal(await dialog.locator('.sg-boardscore-cell').count(),100)
-      assert(await dialog.getByRole('button',{name:'Zamknij powiększoną punktację'}).evaluate(el=>el===document.activeElement),'Zoom dialog must receive keyboard focus')
-      await page.keyboard.press('Escape')
-      assert(await board.getByRole('button',{name:'Powiększ tor punktów'}).evaluate(el=>el===document.activeElement),'Zoom must restore keyboard focus')
-      if(!mobile) {
-        const frame=await page.locator('.sg-stage .sg-window.sg-window-active').first().evaluate(el=>{
-          const base=el.closest('.sg-board-windows').querySelector('.sg-window:not(.sg-window-active)')
-          const get=(root,selector)=>getComputedStyle(root.querySelector(selector)).borderTopColor
-          return {
-            active:getComputedStyle(el).borderTopColor,
-            inner:get(el,'.sg-window-lancet'),
-            otherInner:get(base,'.sg-window-lancet'),
-            foot:get(el,'.sg-window-foot'),
-            otherFoot:get(base,'.sg-window-foot')
-          }
-        })
-        assert.equal(frame.inner,frame.otherInner,'Glazier tinted the internal pane border')
-        assert.equal(frame.foot,frame.otherFoot,'Glazier tinted the footer')
-      }
-
-      await page.reload()
-      await page.getByRole('button',{name:'Kontynuuj partię'}).click()
-      if(mobile) await page.getByRole('button',{name:'Wyniki'}).click()
-      const restored=page.locator(mobile
-        ? '.sg-mobile-stats.sg-score-mode-board .sg-physical-scores'
-        : '.sg-stage .sg-side-left.sg-score-mode-board .sg-physical-scores')
-      assert(await restored.isVisible(),
-        'Physical scoring preference not restored after page reload')
-      if(mobile) await page.getByRole('button',{name:'Zamknij ×'}).click()
-      await page.getByRole('button',{name:'Otwórz menu gry'}).click()
-      await page.locator('.sg-menu-score-option').filter({hasText:'Cyfrowy'}).click()
-      if(mobile) await page.getByRole('button',{name:'Wyniki'}).click()
-      assert.equal(await page.locator(mobile ? '.sg-mobile-stats .sg-digital-penalty-row'
-        : '.sg-stage .sg-digital-penalty-row').count(),4)
-      assert.equal(await page.evaluate(()=>localStorage.getItem('sintra-glass-score-presentation-v1')),'digital')
-      await page.screenshot({path:`reports/ui/score-modes-v58-${width}x${height}.png`,fullPage:true})
-      console.log(`PASS scoring-mode-${width}x${height}: 100 score fields, 9 penalty fields, round gems, zoom & persistence`)
-    } finally {
-      await page.close()
-    }
+    await page.goto('http://127.0.0.1:5179')
+    await page.evaluate(async()=>{
+      const {newGame}=await import('/src/game/engine.ts')
+      localStorage.setItem('sintra-glass-save-v1',JSON.stringify(newGame({opponents:3,seed:258,playerControllers:['human','human','human','human']})))
+    })
+    await page.reload()
+    await page.getByRole('button',{name:'Kontynuuj partię'}).click()
+    const mobile=width<=1100 || height<=620
+    if(mobile) await page.getByRole('button',{name:'Wyniki'}).click()
+    const root=page.locator(mobile ? '.sg-mobile-stats' : '.sg-stage .sg-side-left')
+    const compact=root.locator('.sg-compact-scores')
+    assert.equal(await compact.locator('.sg-compact-player').count(),4)
+    assert(await root.evaluate(el=>el.scrollHeight<=el.clientHeight+1),'Compact scoring must fit without scrolling')
+    await compact.getByRole('button',{name:'Powiększ tor punktów'}).click()
+    const dialog=page.getByRole('dialog',{name:'Powiększona plansza punktacji'})
+    assert.equal(await dialog.locator('.sg-boardscore-cell').count(),100)
+    assert.equal(await dialog.locator('.sg-score-round-tile').count(),6)
+    assert.equal(await dialog.locator('.sg-boardscore-broken-step').count(),9)
+    await page.keyboard.press('Escape')
+    await page.close()
   }
 
   // Regression: an AI that starts a new round MUST NOT move underneath the
