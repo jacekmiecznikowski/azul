@@ -48,6 +48,8 @@ describe('v56 – gold outer frame, 1v1 markets and reliable human-turn notices'
     expect((html.match(/data-sg-window=/g)??[])).toHaveLength(8)
     expect(css).toContain('.sg .sg-board.sg-board-your-turn')
     expect(css).toContain('@keyframes sg-v56-palace-ripple')
+    expect(css).toContain('opacity:1!important')
+    expect(css).toContain('animation:sg-v56-palace-ripple 3.6s ease-in-out infinite!important')
     expect(css).not.toContain('opacity:.42')
     expect(app).toContain('turn-market-v56.css')
     expect(app).not.toContain("import './turn-feedback-v55.css'")
@@ -74,7 +76,7 @@ describe('v56 – gold outer frame, 1v1 markets and reliable human-turn notices'
   it('gives selected diamonds a gold SHAPE outline, not a rectangular button frame', () => {
     expect(css).toContain('.sg-token-selected::before')
     expect(css).toContain('clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)')
-    expect(css).toContain('transform:scale(.84)!important')
+    expect(css).toContain('transform:none!important')
     expect(css).toContain('sg-factory-is-selected')
   })
 })
