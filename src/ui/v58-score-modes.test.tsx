@@ -47,7 +47,7 @@ describe('v58 — two visual scoring modes, original scoring logic untouched', (
     expect(html).toContain('105')
     expect(html).toContain('−11')
     expect(html).toContain('Powiększ tor punktów')
-    expect(html).toContain('sg-score-rounds')
+    expect(html).toContain('sg-art-rounds')
     expect((html.match(/class="sg-score-round-tile/g)??[])).toHaveLength(6)
   })
   it('renders concise digital penalties for every player and the same round jewels', () => {
