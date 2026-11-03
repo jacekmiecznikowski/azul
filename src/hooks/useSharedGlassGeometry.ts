@@ -29,17 +29,21 @@ export function useSharedGlassGeometry(
       if (pane.clientWidth === 0 || grid.clientWidth === 0) return
 
       const narrow = root.classList.contains('sg-mobile-layout')
-      const roomy = !narrow && window.innerWidth >= 1700 && window.innerHeight >= 880
+      const orbit = root.querySelector<HTMLElement>('.sg-market-orbit-v46')
+      const factoryCount = Number(orbit?.dataset.sgOrbitCount ?? 9)
+      // The previous >=1700px rule never helped 1v1 on 1366px laptops.
+      // Count rather than viewport pixels determines how much room exists.
+      const relaxed = !narrow && factoryCount <= 7 && window.innerWidth >= 1101 && window.innerHeight >= 621
       const columns = narrow && center.clientWidth < 125 ? 2 : 3
-      // Full HD sockets can use more of their pane; decorative lead borders
-      // shrink in tandem. The same measured diameter is used everywhere.
-      const paneRatio = roomy ? .91 : .84
-      const factoryRatio = roomy ? .97 : .91
+      const paneRatio = relaxed ? .90 : .84
+      const factoryRatio = relaxed ? .97 : .91
       const paneSpace = Math.min(pane.clientWidth * paneRatio, pane.clientHeight * paneRatio)
       const factorySpace = Math.min(grid.clientWidth / 2, grid.clientHeight / 2) * factoryRatio
       const centerSpace = (center.clientWidth - (columns - 1) * 3) / columns - 11
       const centerHeightSpace = (center.clientHeight - 12) / Math.ceil(5 / columns) - 4
-      const diameter = Math.max(8, Math.min(roomy ? 62 : 48, paneSpace, factorySpace, centerSpace, centerHeightSpace))
+      // A single geometric measurement is still reused for placed diamonds,
+      // open sockets, workshop glass and loose center glass.
+      const diameter = Math.max(8, Math.min(relaxed ? 62 : 48, paneSpace, factorySpace, centerSpace, centerHeightSpace))
       const value = `${Math.round(diameter * 10) / 10}px`
       if (root.style.getPropertyValue('--sg-unified-gem-size') !== value) {
         root.style.setProperty('--sg-unified-gem-size', value)
