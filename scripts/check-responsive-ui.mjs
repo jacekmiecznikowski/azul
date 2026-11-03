@@ -101,7 +101,14 @@ try {
         }
       }
       if (width === 1366 && height === 768 && opponents === 1) {
-        console.log(`SIZE laptop 1v1: factory=${metrics.factories[0].width.toFixed(1)}px, diamond=${metrics.gems[0].width.toFixed(1)}px`)
+        const sizing = await page.locator(root).evaluate(stage => {
+          const pane=stage.querySelector('.sg-pane')
+          const grid=stage.querySelector('.sg-factory-grid')
+          const center=stage.querySelector('.sg-center-pile.sg-center-v45')
+          return {pane:[pane.clientWidth,pane.clientHeight],grid:[grid.clientWidth,grid.clientHeight],
+            center:[center.clientWidth,center.clientHeight],canonical:getComputedStyle(stage.querySelector('.sg-felt')??stage).getPropertyValue('--sg-unified-gem-size')}
+        })
+        console.log(`SIZE laptop 1v1: factory=${metrics.factories[0].width.toFixed(1)}px, diamond=${metrics.gems[0].width.toFixed(1)}px, geometry=${JSON.stringify(sizing)}`)
         assert(metrics.factories[0].width >= 65,
           'Larger laptop 1v1 workshops must use the room around the five-circle orbit')
         assert(metrics.gems[0].width >= 23,
