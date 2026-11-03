@@ -278,6 +278,11 @@ export default function App() {
   const [screen, setScreen] = useState<'home' | 'game'>('home')
   const announcedRound = useRef<number | null>(null)
   const [roundAnnouncement, setRoundAnnouncement] = useState<{ round: number; color: GlassColor } | null>(null)
+  // A round can start with an AI seat. Never schedule or reveal that move behind
+  // the round ceremony; release the turn only after its exit and a short pause.
+  const [roundReady, setRoundReady] = useState<number | null>(null)
+  const [turnNotice, setTurnNotice] = useState<{ key: string; name: string } | null>(null)
+  const noticedHumanTurn = useRef<string | null>(null)
   const [hasSave, setHasSave] = useState(() => restore() !== null)
   const [viewport, setViewport] = useState(() => typeof window === 'undefined' ? { width: 1600, height: 900 } : { width: window.innerWidth, height: window.innerHeight })
   const [showSetup, setShowSetup] = useState(false)
@@ -292,6 +297,8 @@ export default function App() {
   const { enabled: musicEnabled, toggle: toggleMusic, unavailable: musicUnavailable } = useAmbientMusic()
   const { enabled: effectsEnabled, toggle: toggleEffects, emit: emitEffects, clear: clearEffects, bursts: visualBursts, reducedMotion } = useVisualEffects()
   const humanTurn = screen === 'game' && game.phase === 'playing' && game.players[game.currentPlayer].controller === 'human'
+  const roundIsReady = roundReady === game.round && roundAnnouncement === null
+  const humanCanPlay = humanTurn && roundIsReady
   const desktopTable = useMemo(() => desktopTableMetrics(viewport.width, viewport.height), [viewport.width, viewport.height])
   const viewerIndex = viewingPlayerIndex(game.currentPlayer, lastHumanIndex, game.players.map(p => p.controller))
   const tableSeats = useMemo(() => seatsForViewer(viewerIndex, game.players.length), [viewerIndex, game.players.length])
@@ -301,7 +308,7 @@ export default function App() {
   const selectionMoves = useMemo(() => selection ? moves.filter(m => m.kind === 'take' &&
     sourceEquals(m.source, selection.source) && m.color === selection.color) : [], [moves, selection])
   const targets = new Set<number>(selectionMoves.flatMap(m => m.kind === 'take' && m.windowIndex !== null ? [m.windowIndex] : []))
-  const canReset = humanTurn && moves.some(m => m.kind === 'reset')
+  const canReset = humanCanPlay && moves.some(m => m.kind === 'reset')
   const current = game.players[game.currentPlayer]
   const best = standings(game)
   const finishOverlay = finishOverlayVisibility({ phase: game.phase, setupOpen: showSetup, rulesOpen: showRules || showStrategy, resultsOpen: showResults })
@@ -321,13 +328,30 @@ export default function App() {
     const color = game.roundColors[game.round - 1]
     if (!color) return
     announcedRound.current = game.round
+    setRoundReady(null)
+    setTurnNotice(null)
     setRoundAnnouncement({ round: game.round, color })
   }, [screen, game.round, game.roundColors, game.phase])
   useEffect(() => {
     if (!roundAnnouncement) return
-    const id = window.setTimeout(() => setRoundAnnouncement(null), 2700)
-    return () => window.clearTimeout(id)
+    const announced = roundAnnouncement.round
+    // The CSS exit ends at 2700ms; do not unlock gameplay until 350ms later.
+    const hide = window.setTimeout(() => setRoundAnnouncement(null), 2700)
+    const unlock = window.setTimeout(() => setRoundReady(announced), 3050)
+    return () => { window.clearTimeout(hide); window.clearTimeout(unlock) }
   }, [roundAnnouncement])
+  useEffect(() => {
+    if (!humanCanPlay) { setTurnNotice(null); return }
+    const key = `${game.round}:${game.turn}:${game.currentPlayer}`
+    if (noticedHumanTurn.current === key) return
+    noticedHumanTurn.current = key
+    setTurnNotice({key, name:game.players[game.currentPlayer].name})
+  }, [humanCanPlay, game.round, game.turn, game.currentPlayer, game.players])
+  useEffect(() => {
+    if (!turnNotice) return
+    const timer = window.setTimeout(() => setTurnNotice(null), 1900)
+    return () => window.clearTimeout(timer)
+  }, [turnNotice])
 
   useEffect(() => {
     const onResize = () => setViewport({ width: window.innerWidth, height: window.innerHeight })
@@ -344,7 +368,7 @@ export default function App() {
     }
   }, [game.currentPlayer, game.phase, game.players])
   useEffect(() => {
-    if (screen !== 'game' || game.phase !== 'playing' || game.players[game.currentPlayer].controller !== 'ai' || finishing) return
+    if (screen !== 'game' || game.phase !== 'playing' || !roundIsReady || game.players[game.currentPlayer].controller !== 'ai' || finishing || showSetup || showRules || showStrategy) return
     const difficulty = game.players[game.currentPlayer].difficulty ?? 'normal'
     const base = difficulty === 'easy' ? 1100 : difficulty === 'normal' ? 1500 : difficulty === 'expert' ? 2200 : difficulty === 'master' ? 2250 : 1900
     const delay = base + Math.round(Math.random() * 450)
@@ -378,10 +402,11 @@ export default function App() {
       window.clearTimeout(timer)
       worker?.terminate()
     }
-  }, [game, screen, finishing, play, emitEffects])
+  }, [game, screen, finishing, roundIsReady, showSetup, showRules, showStrategy, play, emitEffects])
   useEffect(() => { if (!humanTurn) { setSelection(null); setFinishing(null); setPlacementOptions(null) } }, [humanTurn])
 
   function commit(move: Move) {
+    if (!humanCanPlay) return
     const next = applyMove(game, move)
     emitEffects(game, next, move)
     setGame(next)
@@ -391,7 +416,7 @@ export default function App() {
     setPlacementOptions(null)
   }
   function chooseSource(source: Source, color: GlassColor) {
-    if (!humanTurn || finishing) return
+    if (!humanCanPlay || finishing) return
     if (!sourceOptions.some(option => option.color === color && sourceEquals(option.source, source))) return
     play('pick')
     setSelection(prev => prev && prev.color === color && sourceEquals(prev.source, source) ? null : { source, color })
@@ -420,6 +445,9 @@ export default function App() {
   }
   function startNew(options: Settings) {
     announcedRound.current = null
+    noticedHumanTurn.current = null
+    setRoundReady(null)
+    setTurnNotice(null)
     setRoundAnnouncement(null)
     clearEffects()
     setSettings(options)
@@ -441,7 +469,7 @@ export default function App() {
   function seat(index: number, place: 'north' | 'west' | 'east' | 'south') {
     const player = game.players[index]
     if (!player) return null
-    const activeHuman = humanTurn && index === game.currentPlayer
+    const activeHuman = humanCanPlay && index === game.currentPlayer
     const viewedHuman = player.controller === 'human' && index === viewerIndex
     return <div className={`sg-seat sg-seat-${place}${activeHuman ? ' sg-seat-active-human' : ''}`} key={player.id}>
       <div className="sg-seat-rotation"><GameBoard player={player} index={index} isCurrent={game.currentPlayer === index && game.phase === 'playing'}
@@ -475,7 +503,7 @@ export default function App() {
         {tableSeats.filter(seatInfo => seatInfo.place !== 'south').map(seatInfo => seat(seatInfo.playerIndex, seatInfo.place))}
         <div className="sg-center">
           <div className="sg-side-left"><TurnSummary game={game}/><PenaltyTrack game={game}/></div>
-          <Market game={game} selection={selection} disabled={!humanTurn || !!finishing} onPick={chooseSource}/>
+          <Market game={game} selection={selection} disabled={!humanCanPlay || !!finishing} onPick={chooseSource}/>
           <LiveHistory state={game} status={status} onCancel={selection ? () => setSelection(null) : undefined}
             onDiscard={selection && selectionMoves.some(m => m.kind === 'take' && m.windowIndex === null) ? () => chooseTarget(null) : undefined}/>
 
@@ -503,9 +531,9 @@ export default function App() {
             player={game.players[mobileBoardIndex]} index={mobileBoardIndex}
             isCurrent={game.currentPlayer === mobileBoardIndex && game.phase === 'playing'}
             isHuman={game.players[mobileBoardIndex].controller === 'human'}
-            isHumanTurn={humanTurn && game.currentPlayer === mobileBoardIndex}
-            selected={!!selection && humanTurn && game.currentPlayer === mobileBoardIndex}
-            targets={humanTurn && game.currentPlayer === mobileBoardIndex ? targets : undefined}
+            isHumanTurn={humanCanPlay && game.currentPlayer === mobileBoardIndex}
+            selected={!!selection && humanCanPlay && game.currentPlayer === mobileBoardIndex}
+            targets={humanCanPlay && game.currentPlayer === mobileBoardIndex ? targets : undefined}
             onTarget={humanTurn && game.currentPlayer === mobileBoardIndex ? chooseTarget : undefined}
             canReset={canReset && !finishing && game.currentPlayer === mobileBoardIndex}
             onReset={() => commit({kind:'reset'})}
@@ -514,7 +542,7 @@ export default function App() {
             hasFirstToken={game.firstCenterTaken && game.nextStartingPlayer === mobileBoardIndex}/>}
         </div>
         <div className="sg-mobile-market">
-          <Market game={game} selection={selection} disabled={!humanTurn || !!finishing} onPick={chooseSource}/>
+          <Market game={game} selection={selection} disabled={!humanCanPlay || !!finishing} onPick={chooseSource}/>
           <div className="sg-mobile-penalty-strip" role="group" aria-label="Tor stłuczonego szkła — naciśnij pole, aby zobaczyć wyniki">
             <span className="sg-mobile-penalty-label">STŁUCZONE SZKŁO</span>
             {BROKEN_TRACK.map((points, i) => <button type="button" key={i}
@@ -563,6 +591,10 @@ export default function App() {
       soundEnabled={soundEnabled} toggleSound={toggleSound}/>} 
     {screen === 'game' && <GlassVisualEffects bursts={visualBursts}/>}
     {screen === 'game' && roundAnnouncement && <RoundAnnouncement key={roundAnnouncement.round} round={roundAnnouncement.round} color={roundAnnouncement.color}/>}
+    {screen === 'game' && humanCanPlay && turnNotice && <div className="sg-human-turn-notice" role="status" aria-live="polite" key={turnNotice.key}>
+      <span className="sg-human-turn-notice-icon" aria-hidden="true">✦</span>
+      <span><strong>{turnNotice.name === 'Ty' ? 'TWOJA TURA' : `TURA: ${turnNotice.name.toLocaleUpperCase('pl-PL')}`}</strong><small>Wybierz szkło z warsztatu lub środka</small></span>
+    </div>}
     {screen === 'game' && finishOverlay.banner && <FinishCelebration state={game} onResults={() => setShowResults(true)} onNewGame={() => setShowSetup(true)}/>}
     {screen === 'game' && finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
