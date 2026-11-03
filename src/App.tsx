@@ -338,7 +338,7 @@ export default function App() {
     const releasingRound = game.round
     const unlock = window.setTimeout(() => setRoundReady(releasingRound), roundTiming.unlockMs)
     return () => window.clearTimeout(unlock)
-  }, [screen, game.round, game.roundColors, game.phase, roundTiming.unlockMs])
+  }, [screen, game.round, game.roundColors, game.phase])
   useEffect(() => {
     if (!roundAnnouncement) return
     // Hide at the real presentation duration; AI remains gated for 350ms more.
@@ -497,7 +497,7 @@ export default function App() {
           musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}
           soundEnabled={soundEnabled} toggleSound={toggleSound}
           openStrategy={() => setShowStrategy(true)} openRules={() => setShowRules(true)}/>
-        <button type="button" className="sg-home-return" onClick={() => { clearEffects(); setScreen('home'); setSelection(null); setFinishing(null); setPlacementOptions(null); setMobilePanel(null) }} aria-label="Menu główne" title="Menu główne"><House size={16}/><span>Główne</span></button>
+        <button type="button" className="sg-home-return" onClick={() => { clearEffects(); announcedRound.current = null; setRoundAnnouncement(null); setRoundReady(null); setTurnNotice(null); setScreen('home'); setSelection(null); setFinishing(null); setPlacementOptions(null); setMobilePanel(null) }} aria-label="Menu główne" title="Menu główne"><House size={16}/><span>Główne</span></button>
         <button type="button" className="sg-new" onClick={() => setShowSetup(true)}>
           <RotateCcw size={16}/> Nowa gra
         </button>
