@@ -51,6 +51,7 @@ describe('gameplay-only visual effects', () => {
 describe('header menu', () => {
   it('renders one consolidated trigger with stateful audio and effects options available in the menu', () => {
     const markup = renderToStaticMarkup(createElement(GameMenu, {
+      scoreMode:'digital', onScoreModeChange: () => {},
       effectsEnabled: true, reducedMotion: false, toggleEffects: () => {},
       musicEnabled: true, musicUnavailable: false, toggleMusic: () => {},
       soundEnabled: true, toggleSound: () => {}, openRules: () => {}, openStrategy: () => {},
