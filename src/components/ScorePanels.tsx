@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Maximize2, X } from 'lucide-react'
 import { BROKEN_TRACK } from '../game/engine'
 import type { GameState, Player } from '../game/engine'
@@ -129,6 +130,14 @@ function PhysicalScoreContents({game}:{game:GameState}) {
 
 export function BoardScoringPanel({game}:{game:GameState}) {
   const [expanded,setExpanded] = useState(false)
+  useEffect(() => {
+    if (!expanded) return
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setExpanded(false)
+    }
+    document.addEventListener('keydown',onEscape)
+    return () => document.removeEventListener('keydown',onEscape)
+  },[expanded])
   const current = game.players[game.currentPlayer]
   return <>
     <section className="sg-physical-scores sg-center-card" aria-label="Planszowa punktacja">
@@ -147,14 +156,15 @@ export function BoardScoringPanel({game}:{game:GameState}) {
       </div>
       <div className="sg-boardscore-body"><PhysicalScoreContents game={game}/></div>
     </section>
-    {expanded && <div className="sg-boardscore-modal-backdrop" onMouseDown={()=>setExpanded(false)}>
-      <div className="sg-boardscore-modal" role="dialog" aria-modal="true"
-        aria-label="Powiększona plansza punktacji" onMouseDown={event=>event.stopPropagation()}>
-        <div className="sg-boardscore-modal-header"><strong>PUNKTACJA · WITRAŻE SINTRY</strong>
-          <button type="button" onClick={()=>setExpanded(false)} aria-label="Zamknij powiększoną punktację"><X size={18}/></button>
+    {expanded && typeof document !== 'undefined' && createPortal(
+      <div className="sg sg-boardscore-modal-backdrop" onMouseDown={()=>setExpanded(false)}>
+        <div className="sg-boardscore-modal" role="dialog" aria-modal="true"
+          aria-label="Powiększona plansza punktacji" onMouseDown={event=>event.stopPropagation()}>
+          <div className="sg-boardscore-modal-header"><strong>PUNKTACJA · WITRAŻE SINTRY</strong>
+            <button type="button" onClick={()=>setExpanded(false)} aria-label="Zamknij powiększoną punktację"><X size={18}/></button>
+          </div>
+          <PhysicalScoreContents game={game}/>
         </div>
-        <PhysicalScoreContents game={game}/>
-      </div>
-    </div>}
+      </div>,document.body)}
   </>
 }
