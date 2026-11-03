@@ -165,6 +165,15 @@
   .sg .sg-center .sg-market .sg-market-orbit-v46 {
     --sg-disc-size:clamp(54px,min(30cqb,22cqi),122px);
   }
+  /* Larger physical diamonds also mean larger open sockets, both using the
+     same live measurement. Reduce the lead margin so the socket still fits. */
+  .sg .sg-board-windows .sg-pane-socket {
+    width:calc(var(--sg-unified-gem-size,28px) * 1.08);
+    height:calc(var(--sg-unified-gem-size,28px) * 1.08);
+  }
+  .sg .sg-board-windows .sg-pane-socket .sg-pane-empty-diamond {
+    inset:3.6%;
+  }
   .sg .sg-center .sg-market .sg-center-pile.sg-center-v45 {
     width:64%;
     height:69%;
