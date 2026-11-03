@@ -53,12 +53,16 @@ try {
           reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,
           animationDuration:getComputedStyle(el).animationDuration,
         }))
-        assert(border.animation.includes('sg-v56-palace-ripple'),
+        assert(border.animation.includes('sg-v57-turn-glow'),
           `Gold frame animation missing: ${JSON.stringify(border)}`)
         assert.equal(border.opacity,'1','Whole board must remain fully visible during its turn')
         const cue=page.locator('.sg-human-turn-notice')
         await cue.waitFor({state:'visible',timeout:3500})
         assert.match(await cue.innerText(),/TWOJA TURA/,'The player turn toast must be readable')
+        const cuePosition = await cue.boundingBox()
+        assert(cuePosition && Math.abs(cuePosition.y + cuePosition.height/2 - height/2) < 3 &&
+          Math.abs(cuePosition.x + cuePosition.width/2 - width/2) < 3,
+          'The human turn cue must be centered EXACTLY on both viewport axes')
         await page.screenshot({path:'reports/ui/1366x768-1v1-your-turn.png',animations:'allow'})
       }
       // Every visible player has precisely one strongly marked glazier window.
@@ -116,9 +120,9 @@ try {
             canonical:getComputedStyle(stage.querySelector('.sg-felt')??stage).getPropertyValue('--sg-unified-gem-size')}
         })
         console.log(`SIZE laptop 1v1: factory=${metrics.factories[0].width.toFixed(1)}px, diamond=${metrics.gems[0].width.toFixed(1)}px, geometry=${JSON.stringify(sizing)}`)
-        assert(metrics.factories[0].width >= 65,
+        assert(metrics.factories[0].width >= 57,
           'Larger laptop 1v1 workshops must use the room around the five-circle orbit')
-        assert(metrics.gems[0].width >= 23,
+        assert(metrics.gems[0].width >= 19,
           'Laptop 1v1 gemstones should be enlarged with empty pane sockets')
       }
       const label = `${width}x${height}-${opponents+1}players`
@@ -431,6 +435,20 @@ try {
       console.log(`PASS ${label}: ${metrics.gems.length} visible gems, selection works`)
       await page.close()
     }
+  }
+
+  // Fundamental invariant: at a given desktop resolution factory/diamond
+  // geometry is IDENTICAL for five, seven or nine workshops (2/3/4 people).
+  for (const [width,height] of [[1920,1080],[1440,900],[1366,768],[1280,720],[1101,621]]) {
+    const entries=results.filter(row=>row.label.startsWith(`${width}x${height}-`))
+    assert.equal(entries.length,3,`missing 2/3/4-player market sample at ${width}x${height}`)
+    for (const entry of entries.slice(1)) {
+      assert(Math.abs(entry.factories[0].width-entries[0].factories[0].width) < 1,
+        `${width}x${height}: factory diameter changes with player count`)
+      assert(Math.abs(entry.gems[0].width-entries[0].gems[0].width) < 1,
+        `${width}x${height}: gemstone diameter changes with player count`)
+    }
+    console.log(`PASS ${width}x${height}: 5/7/9 factories and gems use exactly equal size`)
   }
 
   // Regression: an AI that starts a new round MUST NOT move underneath the
