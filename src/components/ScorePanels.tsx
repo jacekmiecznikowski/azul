@@ -17,14 +17,10 @@ export function scoreTrackPosition(score: number): number {
  * central broken-glass ladder: 54 outer squares + 46 inner squares. */
 export function scoreTrackCoordinates(): ReadonlyArray<readonly [number,number]> {
   const coordinates: Array<readonly [number,number]> = []
-  for (let col=0;col<16;col++) coordinates.push([0,col])
-  for (let row=1;row<13;row++) coordinates.push([row,15])
-  for (let col=14;col>=0;col--) coordinates.push([12,col])
-  for (let row=11;row>=1;row--) coordinates.push([row,0])
-  for (let col=1;col<15;col++) coordinates.push([1,col])
-  for (let row=2;row<12;row++) coordinates.push([row,14])
-  for (let col=13;col>=1;col--) coordinates.push([11,col])
-  for (let row=10;row>=2;row--) coordinates.push([row,1])
+  for(let c=0;c<26;c++) coordinates.push([0,c])
+  for(let r=1;r<26;r++) coordinates.push([r,25])
+  for(let c=24;c>=0;c--) coordinates.push([25,c])
+  for(let r=24;r>0;r--) coordinates.push([r,0])
   return coordinates
 }
 
@@ -91,10 +87,12 @@ const PAWN_COLORS = {red:'#de777a', yellow:'#e9c769', blue:'#6ac5df', white:'#d7
 
 export function SharedFieldMarker({players}:{players:Player[]}) {
   if (!players.length) return null
-  const sectors = players.map((p,i) => `${PAWN_COLORS[p.palaceColor ?? 'red']} ${i * 100 / players.length}% ${(i+1) * 100 / players.length}%`)
-  const label = players.map(p=>`${p.name}: ${p.score} pkt, szkło ${p.brokenSteps}/8`).join('; ')
-  return <span className="sg-shared-field-marker" role="img" aria-label={label} title={label}
-    style={{background:players.length === 1 ? PAWN_COLORS[players[0].palaceColor ?? 'red'] : `conic-gradient(${sectors.join(',')})`}}/>
+  return <span className="sg-pawn-stack" role="img" aria-label={players.map(p=>`${p.name}: ${p.score} pkt`).join('; ')}>
+    {players.map((p,i)=><span key={p.id} className="sg-stacked-pawn" title={`${p.name}: ${p.score} pkt`}
+      style={{background:PAWN_COLORS[p.palaceColor ?? 'red'],left:`${i*2}px`,top:`${-i*1.5}px`,zIndex:i+1}}>
+      {p.score>=100 && <small className="sg-score-lap">+{Math.floor(p.score/100)*100}</small>}
+    </span>)}
+  </span>
 }
 
 function PhysicalTrack({game}:{game:GameState}) {
@@ -109,7 +107,7 @@ function PhysicalTrack({game}:{game:GameState}) {
         </div>
       })}
       <div className="sg-art-center">
-        <div className="sg-art-heading"><span>✧</span><div><b>WITRAŻE SINTRY</b><small>RUNDA {game.round} / 6</small></div><span>✧</span></div>
+
         <div className="sg-art-panels">
           <section className="sg-art-rounds" aria-label="Rundy i premie">
             <h3>RUNDY I PREMIE</h3>
@@ -150,7 +148,7 @@ function FittedPhysicalContents({game}:{game:GameState}) {
     const element = viewport.current
     if (!element) return
     const observer = new ResizeObserver(([entry]) => {
-      setScale(Math.max(0.01,Math.min(entry.contentRect.width / 300,entry.contentRect.height / 250)))
+      setScale(Math.max(0.01,Math.min(entry.contentRect.width / 300,entry.contentRect.height / 300)))
     })
     observer.observe(element)
     return () => observer.disconnect()
