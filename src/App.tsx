@@ -571,7 +571,7 @@ export default function App() {
             <button type="button" onClick={() => setMobilePanel(null)}>Zamknij ×</button></div>
           {mobilePanel === 'score'
             ? <div className="sg-mobile-stats sg-score-mode-simple">
-                <CompactScores game={game}/>
+                <CompactScores game={game} showBoard={false}/>
               </div>
             : <LiveHistory state={game} status={status}
                 onCancel={selection ? () => setSelection(null) : undefined}
