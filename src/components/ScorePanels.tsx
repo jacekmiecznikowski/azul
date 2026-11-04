@@ -237,10 +237,20 @@ export function CompactScores({game}:{game:GameState}) {
       <strong>{p.score}</strong>
     </div>)}</div>
     <div className="sg-compact-broken-heading">STŁUCZONE SZKŁO</div>
-    <div className="sg-compact-players sg-compact-broken">{ordered.map(p => <div className="sg-compact-player" key={p.id}>
-      <span className="sg-compact-name"><PlayerMarker player={p}/><span>{p.name}</span></span>
-      <span className="sg-compact-break">{p.brokenSteps}/8 <b>−{BROKEN_TRACK[p.brokenSteps]} pkt</b></span>
-    </div>)}</div>
+    <div className="sg-compact-glass-grid" role="group" aria-label="Tor stłuczonego szkła">
+      {BROKEN_TRACK.map((penalty,step) => {
+        const occupants = ordered.filter(p => p.brokenSteps === step)
+        return <div key={step} className={`sg-compact-glass-cell${step === 8 ? ' sg-glass-limit' : ''}${occupants.length ? ' sg-glass-occupied' : ''}`}>
+          <small>{step === 0 ? 'START' : step}</small>
+          <strong>{penalty ? `−${penalty}` : '0'}</strong>
+          <span className="sg-compact-glass-markers">{occupants.map(p => <span key={p.id}
+            className="sg-compact-glass-pawn" role="img"
+            aria-label={`${p.name}: ${step}/8 stłuczeń, kara ${penalty} pkt`}
+            title={`${p.name}: ${step}/8 stłuczeń, kara ${penalty} pkt`}
+            style={{background:PAWN_COLORS[p.palaceColor ?? 'red']}}/>)}</span>
+        </div>
+      })}
+    </div>
     <ScoreRoundBonuses game={game}/>
   </section>
 }
