@@ -44,7 +44,7 @@ describe('v57 – consistent market geometry, centered cue, short gold border si
       player:game.players[0],index:0,isCurrent:true,isHuman:true,isHumanTurn:true,
     }))
     expect(html).toContain('sg-board-your-turn')
-    expect(html).toContain('TWOJA TURA')
+    expect(html).not.toContain('TWOJA TURA')
     expect((html.match(/data-sg-window=/g)??[])).toHaveLength(8)
     expect(css).toContain('.sg .sg-board.sg-board-your-turn')
     expect(css).toContain('@keyframes sg-v57-turn-glow')
