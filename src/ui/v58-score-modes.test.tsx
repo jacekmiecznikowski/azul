@@ -3,7 +3,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { readFileSync } from 'node:fs'
 import { newGame, BROKEN_TRACK } from '../game/engine'
-import { BoardScoringPanel, DigitalBrokenGlass, ScoreRoundBonuses, scoreTrackCells, scoreTrackCoordinates, scoreTrackPosition } from '../components/ScorePanels'
+import { CompactScores, BoardScoringPanel, DigitalBrokenGlass, ScoreRoundBonuses, scoreTrackCells, scoreTrackCoordinates, scoreTrackPosition } from '../components/ScorePanels'
 
 const app = readFileSync(new URL('../App.tsx', import.meta.url),'utf8')
 const menu = readFileSync(new URL('../components/GameMenu.tsx', import.meta.url),'utf8')
@@ -72,4 +72,16 @@ describe('v58 — two visual scoring modes, original scoring logic untouched', (
     expect(css).toContain('border:2px solid #c6a46e!important')
     expect(css).toContain('box-shadow:inset 0 0 0 1px #f4d9a021')
   })
+})
+
+it('keeps score and penalty rows in first-round order after the starter changes', () => {
+  const game = newGame({opponents:3,seed:94})
+  const first = game.startingPlayer
+  expect(game.initialStartingPlayer).toBe(first)
+  game.startingPlayer = (first + 2) % 4
+  game.round = 2
+  const html = renderToStaticMarkup(createElement(CompactScores,{game}))
+  const rows = [...html.matchAll(/class="sg-compact-name"[^>]*title="([^"]+)"/g)].map(m=>m[1])
+  expect(rows).toEqual(game.players.map((_,i)=>game.players[(first+i)%4].name))
+  expect(html.indexOf('sg-compact-broken-heading')).toBeGreaterThan(html.indexOf('sg-compact-players'))
 })
