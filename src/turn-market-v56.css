@@ -13,7 +13,7 @@
     inset 0 0 0 2px #fff0c74a,
     0 5px 15px #02131cb8;
 }
-.sg .sg-board.sg-board-your-turn .sg-board-label {
+.sg .sg-board .sg-board-status-active {
   display:inline-flex;
   align-items:center;
   justify-content:center;
@@ -29,24 +29,31 @@
   box-shadow:0 0 8px #e1ba73a8;
   white-space:nowrap;
 }
-/* Quiet, short, ONE-TIME border animation; never animate the board itself. */
+/* The frame stays still; only the narrow light inside the upper edge moves. */
 .sg .sg-board.sg-board-current {opacity:1!important;transform:none;}
-.sg.sg-effects-cinematic .sg-board.sg-board-current::after {
-  content:'';
-  position:absolute;
-  inset:-3px;
-  border:1px solid #ffe6ae;
-  border-radius:inherit;
-  pointer-events:none;
-  box-shadow:0 0 12px 4px #f5d69d80,0 0 28px 10px #e8c58e55;
-  animation:sg-v57-turn-glow 2.8s cubic-bezier(.45,0,.55,1) infinite;
+.sg .sg-board-turn-rail {
+  position:absolute;top:0;left:14px;right:14px;height:3px;
+  border-radius:999px;overflow:hidden;pointer-events:none;
+  background:#d9b76780;
 }
-@keyframes sg-v57-turn-glow {
-  0%, 100% {opacity:.2;transform:scale(1);}
-  50% {opacity:1;transform:scale(1.008);}
+.sg .sg-board-turn-rail::after {
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,#ffe4a3 42%,#fff9e7 50%,#ffe4a3 58%,transparent 100%);
+  transform:translateX(-100%);
+}
+.sg.sg-effects-cinematic .sg-board-turn-rail::after {
+  animation:sg-turn-edge 2.6s cubic-bezier(.4,0,.2,1) infinite;
+}
+.sg .sg-board.sg-board-current .sg-player-icon {
+  outline:2px solid #ffe2a0;outline-offset:2px;
+  box-shadow:0 0 10px #e9c57188;
+}
+@keyframes sg-turn-edge {
+  from {transform:translateX(-100%);}
+  to {transform:translateX(100%);}
 }
 @media(prefers-reduced-motion:reduce) {
-  .sg.sg-effects-cinematic .sg-board.sg-board-current::after {animation:none;opacity:.35;transform:none;}
+  .sg.sg-effects-cinematic .sg-board-turn-rail::after {animation:none;transform:none;}
 }
 .sg.sg-effects-minimal .sg-board.sg-board-current {
   animation:none!important;
@@ -255,7 +262,7 @@
     padding:10px 16px;
   }
   .sg .sg-human-turn-notice-icon {width:34px;height:34px;font-size:23px;}
-  .sg .sg-board.sg-board-your-turn .sg-board-label {
+  .sg .sg-board .sg-board-status-active {
     padding:3px 5px;
     font-size:9px;
     letter-spacing:.2px;
