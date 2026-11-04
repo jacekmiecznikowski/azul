@@ -17,12 +17,12 @@ describe('v58 — two visual scoring modes, original scoring logic untouched', (
     expect(coordinates).toHaveLength(100)
     expect(new Set(coordinates.map(([row,col])=>`${row}:${col}`)).size).toBe(100)
     expect(path.slice(0,10)).toEqual([0,1,2,3,4,5,6,7,8,9])
-    expect(coordinates[0][0]).toBeCloseTo(4)
+    expect(coordinates[0]).toEqual([0,0])
     expect(path.at(-1)).toBe(99)
-    expect(Math.hypot(coordinates[99][0]-coordinates[0][0],coordinates[99][1]-coordinates[0][1])).toBeLessThan(8)
+    expect(Math.hypot(coordinates[99][0]-coordinates[0][0],coordinates[99][1]-coordinates[0][1])).toBe(1)
     for (let i=1;i<coordinates.length;i++) {
       const [r1,c1]=coordinates[i-1], [r2,c2]=coordinates[i]
-      expect(Math.hypot(r1-r2,c1-c2)).toBeLessThan(8)
+      expect(Math.hypot(r1-r2,c1-c2)).toBe(1)
     }
     expect(scoreTrackPosition(-18)).toBe(0)
     expect(scoreTrackPosition(100)).toBe(0)
