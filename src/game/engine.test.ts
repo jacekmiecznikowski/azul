@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { applyMove, availableSources, availableTargets, COLORS, FACTORY_COUNT, finalBreakdown, legalMoves, newGame, patternFor, standings } from './engine'
+import { PHYSICAL_STRIPS, applyMove, availableSources, availableTargets, COLORS, FACTORY_COUNT, finalBreakdown, legalMoves, newGame, patternFor, standings } from './engine'
 import { chooseAIMove } from './ai'
 import type { GameState } from './engine'
 
@@ -349,4 +349,13 @@ describe('poprawki v13: joker, kolory graczy, tury', () => {
     }
     expect(state.phase).toBe('finished')
   })
+})
+
+it('pairs the blue yellow/red strip with one red and four orange panes', () => {
+  expect(PHYSICAL_STRIPS.blue[6]).toEqual(['YRRRR','ROOOO'])
+})
+it('accepts custom bot names with the same trimming as human names', () => {
+  const game = newGame({opponents:1,playerNames:['Ty','  Stefan  ']})
+  expect(game.players[1].controller).toBe('ai')
+  expect(game.players[1].name).toBe('Stefan')
 })
