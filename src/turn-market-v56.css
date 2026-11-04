@@ -29,31 +29,35 @@
   box-shadow:0 0 8px #e1ba73a8;
   white-space:nowrap;
 }
-/* The frame stays still; only the narrow light inside the upper edge moves. */
-.sg .sg-board.sg-board-current {opacity:1!important;transform:none;}
+/* Mask the moving highlight to the actual two-pixel border, including corners. */
+.sg .sg-board.sg-board-current {opacity:1!important;transform:none;overflow:visible;}
 .sg .sg-board-turn-rail {
-  position:absolute;top:0;left:14px;right:14px;height:3px;
-  border-radius:999px;overflow:hidden;pointer-events:none;
-  background:#d9b76780;
+  position:absolute;inset:-2px;z-index:2;
+  border-radius:inherit;pointer-events:none;
+  padding:2px;
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  mask-composite:exclude;
 }
 .sg .sg-board-turn-rail::after {
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,transparent 0%,#ffe4a3 42%,#fff9e7 50%,#ffe4a3 58%,transparent 100%);
-  transform:translateX(-100%);
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(90deg,transparent 38%,#e8b94f22 42%,#ffd57988 46%,#fff0b9 49%,#fffdf0 50%,#fff0b9 51%,#ffd57988 54%,#e8b94f22 58%,transparent 62%);
+  background-size:300% 100%;background-position:75% 0;
 }
 .sg.sg-effects-cinematic .sg-board-turn-rail::after {
-  animation:sg-turn-edge 2.6s cubic-bezier(.4,0,.2,1) infinite;
+  animation:sg-turn-edge 1.8s cubic-bezier(.37,0,.63,1) infinite alternate;
 }
 .sg .sg-board.sg-board-current .sg-player-icon {
   outline:2px solid #ffe2a0;outline-offset:2px;
   box-shadow:0 0 10px #e9c57188;
 }
 @keyframes sg-turn-edge {
-  from {transform:translateX(-100%);}
-  to {transform:translateX(100%);}
+  from {background-position:75% 0;}
+  to {background-position:25% 0;}
 }
 @media(prefers-reduced-motion:reduce) {
-  .sg.sg-effects-cinematic .sg-board-turn-rail::after {animation:none;transform:none;}
+  .sg.sg-effects-cinematic .sg-board-turn-rail::after {animation:none;background:none;}
 }
 .sg.sg-effects-minimal .sg-board.sg-board-current {
   animation:none!important;
