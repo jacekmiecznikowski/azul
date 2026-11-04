@@ -117,16 +117,14 @@ export function GameBoard({ player, index, isCurrent, isHuman = false, isHumanTu
   canReset?: boolean; onReset?: () => void; isStartingPlayer?: boolean; hasFirstToken?: boolean
   palaceSide?: 'A' | 'B'
 }) {
-  const completed = player.strips.filter(s => s.side === 2).length
   return <section data-sg-board={index} className={`sg-board sg-player-${index} sg-palace-${player.palaceColor ?? 'red'}${isCurrent ? ' sg-board-current' : ''}${isHuman ? ' sg-board-human' : ''}${isHumanTurn ? ' sg-board-your-turn' : ''}`}
     aria-label={`Plansza gracza ${player.name} (${player.palaceColor === 'red' ? 'czerwona' : player.palaceColor === 'yellow' ? 'żółta' : player.palaceColor === 'blue' ? 'niebieska' : 'biała'})`}>
     <div className="sg-board-top">
       <span className={`sg-player-icon sg-player-icon-${index} sg-palace-icon-${player.palaceColor ?? 'red'}`}>{avatars[index]}</span>
       <span className="sg-board-name">{isHuman && player.name === 'Ty' ? 'Twoje witraże' : player.name} <small className="sg-palace-label">{({red:'CZERWONY', yellow:'ŻÓŁTY', blue:'NIEBIESKI', white:'BIAŁY'} as const)[player.palaceColor ?? 'red']}</small></span>
-      {!isHumanTurn && <span className="sg-board-label">{isCurrent ? 'TERAZ GRA' : isStartingPlayer ? 'ROZPOCZĄŁ RUNDĘ' : player.controller === 'human' ? 'GRACZ LOKALNY' : `AI · ${player.difficulty === 'master' ? 'TRENING AI' : player.difficulty === 'expert' ? 'EKSPERT' : player.difficulty === 'hard' ? 'TRUDNY' : player.difficulty === 'easy' ? 'ŁATWY' : 'NORMALNY'}`}</span>}
+      {player.controller !== 'human' && <span className="sg-board-label sg-board-ai-level">AI · {player.difficulty === 'master' ? 'TRENING AI' : player.difficulty === 'expert' ? 'EKSPERT' : player.difficulty === 'hard' ? 'TRUDNY' : player.difficulty === 'easy' ? 'ŁATWY' : 'NORMALNY'}</span>}
+      {!isHumanTurn && (isCurrent || isStartingPlayer) && <span className="sg-board-label">{isCurrent ? 'TERAZ GRA' : 'ROZPOCZĄŁ RUNDĘ'}</span>}
       {hasFirstToken && <span className="sg-start-tile sg-start-on-board" title="Ten gracz zdobył żeton pierwszego gracza i rozpocznie kolejną rundę">+1</span>}
-      <span className="sg-board-stat">{completed}/8 <small>okien</small></span>
-      <span data-sg-break className="sg-board-stat">{player.brokenSteps}/8 <small>stłuczeń</small></span>
       <strong data-sg-score className="sg-board-score">{player.score}<small> pkt</small></strong>
       {isHuman && <button type="button" className="sg-reset" onClick={onReset} disabled={!canReset}><RotateCcw size={13}/> Cofnij witrażystę</button>}
     </div>
