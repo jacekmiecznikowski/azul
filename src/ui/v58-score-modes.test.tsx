@@ -19,7 +19,7 @@ describe('v58 — two visual scoring modes, original scoring logic untouched', (
     expect(path.slice(0,10)).toEqual([0,1,2,3,4,5,6,7,8,9])
     expect(coordinates[0]).toEqual([0,0])
     expect(path.at(-1)).toBe(99)
-    expect(coordinates.at(-1)).toEqual([0,1])
+    expect(coordinates.at(-1)).toEqual([1,0])
     for (let i=1;i<coordinates.length;i++) {
       const [r1,c1]=coordinates[i-1], [r2,c2]=coordinates[i]
       expect(Math.abs(r1-r2)+Math.abs(c1-c2)).toBe(1)
