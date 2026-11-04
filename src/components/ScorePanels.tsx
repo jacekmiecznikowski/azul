@@ -16,13 +16,24 @@ export function scoreTrackPosition(score: number): number {
 /** A continuous, 100-square double rectangular orbit around the original
  * central broken-glass ladder: 54 outer squares + 46 inner squares. */
 export function scoreTrackCoordinates(): ReadonlyArray<readonly [number,number]> {
-  const coordinates: Array<readonly [number,number]> = [[0,0]]
-  for(let r=1;r<10;r++) coordinates.push([r,0])
-  for(let c=1;c<10;c++) {
-    if(c%2) for(let r=9;r>=1;r--) coordinates.push([r,c])
-    else for(let r=1;r<10;r++) coordinates.push([r,c])
+  // Repeat the same two glass-board bends on every side of a square.
+  // Each side has 25 steps; rotation keeps every fifth field symmetrical.
+  const side: Array<readonly [number,number]> = [[0,0]]
+  let col=0
+  while(col<13) {
+    if(col===4 || col===8) {
+      side.push([1,col],[2,col],[3,col],[3,col+1],[3,col+2],[2,col+2],[1,col+2],[0,col+2])
+      col+=2
+    } else { col++; side.push([0,col]) }
   }
-  for(let c=9;c>=1;c--) coordinates.push([0,c])
+  const coordinates: Array<readonly [number,number]> = []
+  for(let rotation=0;rotation<4;rotation++) {
+    for(const point of side.slice(0,-1)) {
+      let [row,column]=point
+      for(let turn=0;turn<rotation;turn++) [row,column]=[column,13-row]
+      coordinates.push([row,column])
+    }
+  }
   return coordinates
 }
 
@@ -108,7 +119,6 @@ function PhysicalTrack({game}:{game:GameState}) {
           {players.length > 0 && <div className="sg-art-marker"><SharedFieldMarker players={players}/></div>}
         </div>
       })}
-    </div>
       <div className="sg-art-center">
 
         <div className="sg-art-panels">
@@ -135,6 +145,7 @@ function PhysicalTrack({game}:{game:GameState}) {
         </div>
         <div className="sg-art-flourish" aria-hidden="true">― ◇ ―</div>
       </div>
+    </div>
   </div>
 }
 
@@ -150,7 +161,7 @@ function FittedPhysicalContents({game}:{game:GameState}) {
     const element = viewport.current
     if (!element) return
     const observer = new ResizeObserver(([entry]) => {
-      setScale(Math.max(0.01,Math.min(entry.contentRect.width / 300,entry.contentRect.height / 380)))
+      setScale(Math.max(0.01,Math.min(entry.contentRect.width / 300,entry.contentRect.height / 300)))
     })
     observer.observe(element)
     return () => observer.disconnect()
