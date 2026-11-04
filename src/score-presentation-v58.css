@@ -706,3 +706,19 @@
 .sg .sg-art-break .sg-pawn-stack {position:relative;bottom:auto;left:auto;transform:scale(.7);transform-origin:center;}
 .sg .sg-art-number {font-size:6px;}
 .sg .sg-art-checkpoint .sg-art-number {font-size:7px;}
+
+/* Rosette: two concentric glass paths around a generous central medallion. */
+.sg .sg-art-board {border-radius:50%;padding:0;background:radial-gradient(circle,#1a4249 0%,#12343d 65%,#203f43 72%,#0c2832 100%);border:1px solid #c2a36c;box-shadow:inset 0 0 0 3px #0b2831,inset 0 0 0 4px #b39a6159,0 5px 15px #0007;}
+.sg .sg-art-orbit {display:block;position:relative;width:100%;height:100%;border-radius:50%;}
+.sg .sg-art-board .sg-art-cell {position:absolute;width:12px;height:12px;border-radius:3px;z-index:2;}
+.sg .sg-art-number {font-size:4px;}
+.sg .sg-art-checkpoint .sg-art-number {font-size:5px;}
+.sg .sg-art-marker .sg-pawn-stack {width:8px;height:8px;}
+.sg .sg-art-marker .sg-stacked-pawn {width:8px;height:8px;}
+.sg .sg-art-center {position:absolute;left:20%;top:20%;width:60%;height:60%;box-sizing:border-box;margin:0;padding:18px 14px;border-radius:50%;border:1px solid #ba9f6359;background:radial-gradient(ellipse at top,#285258,#102f39 80%);box-shadow:0 0 0 4px #081f2833,inset 0 0 0 3px #b9a36d12;}
+.sg .sg-art-panels {gap:9px;}
+.sg .sg-art-panels h3 {font-size:4px;letter-spacing:.25px;margin-bottom:5px;}
+.sg .sg-art-board .sg-art-round {border-radius:3px;}
+.sg .sg-art-board .sg-art-break {border-radius:3px;}
+.sg .sg-art-gem .sg-glass.sg-glass-placed.sg-gem-faceted {width:12px;height:12px;}
+.sg .sg-art-orbit::before {content:'';position:absolute;inset:14%;border:1px solid #b9a36d32;border-radius:50%;pointer-events:none;}
