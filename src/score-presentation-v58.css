@@ -805,7 +805,12 @@
 .sg .sg-header.sg-toolbar-modern .sg-round-v54-bonus {min-width:max-content;overflow:visible;}
 .sg.sg-effects-cinematic .sg-board.sg-board-current {animation:sg-v57-turn-glow 2s ease-in-out infinite!important;}
 @media(prefers-reduced-motion:reduce) {.sg.sg-effects-cinematic .sg-board.sg-board-current {animation:none!important;}}
-.sg .sg-center-pile .sg-center-first-token {position:relative;display:grid;place-items:center;flex:none;width:27px;height:27px;margin:5px auto 0;font:800 15px/1 'DM Sans',sans-serif;color:#153744;background:linear-gradient(140deg,#fff8dc,#e2cc93);border:2px solid #d7b76e;border-radius:5px;box-shadow:inset 0 0 0 1px #fff9,0 2px 4px #0006;}
+.sg .sg-start-tile.sg-center-first-token,
+.sg .sg-start-tile.sg-start-on-board {position:relative;display:inline-grid;place-items:center;flex:none;width:27px;height:27px;font:800 15px/1 'DM Sans',sans-serif;color:#153744;-webkit-text-fill-color:#153744;background:linear-gradient(140deg,#fff8dc,#e2cc93);border:2px solid #d7b76e;border-radius:5px;outline:none;box-shadow:inset 0 0 0 1px #fff9,0 2px 4px #0006;}
+.sg .sg-center-first-token {margin:5px auto 0;}
+.sg .sg-start-on-board {margin:0 0 0 3px;}
+.sg .sg-board .sg-window-target {animation:none!important;}
+
 
 /* Cover the new table on its first paint; the card may animate inside the veil. */
 .sg .sg-round-announcement {animation:none;opacity:1;}
