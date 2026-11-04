@@ -1018,3 +1018,34 @@
 .sg .sg-home-glass .sg-glass {width:52%;max-width:33px;}
 .sg .sg-home-arch-gem {top:3%;filter:drop-shadow(0 0 5px #e4c57a55);}
 .sg .sg-home-arch-gem svg {width:21px;height:21px;}
+
+/* Player colours identify counters without an extra outline. */
+.sg .sg-art-marker .sg-stacked-pawn,
+.sg .sg-pawns-inline .sg-stacked-pawn,
+.sg .sg-compact-glass-pawn,
+.sg .sg-mobile-penalty-pawns .sg-pawn {border:0!important;outline:0;box-shadow:none;}
+/* Completed glazing is one aperture, not a five-row pane grid. */
+.sg .sg-board-windows .sg-window-completed .sg-window-lancet {
+  display:flex;align-items:center;justify-content:center;min-height:0;
+}
+.sg .sg-board-windows .sg-window-completed .sg-finished {
+  min-height:0;max-height:100%;margin:0;padding:0;box-sizing:border-box;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  font-size:clamp(7px,.8vw,11px);letter-spacing:.5px;
+}
+@media(max-width:1100px),(max-height:620px) {
+ .sg .sg-boardscore-expand {display:none;}
+ .sg .sg-mobile-layout {background:radial-gradient(ellipse at top,#20474e,#0d2935);}
+ .sg .sg-mobile-overlay-dialog {border:1px solid #bca371;border-radius:12px;background:linear-gradient(145deg,#193e48,#0d2935);color:#c5dcd8;box-sizing:border-box;max-height:94dvh;}
+ .sg .sg-mobile-overlay-heading {border-bottom:1px solid #83a7a53d;color:#eed9ab;font:800 11px/1.3 'DM Sans',sans-serif;letter-spacing:.7px;padding:10px;}
+ .sg .sg-mobile-overlay-heading button {border:1px solid #88aaa880;border-radius:5px;background:#244a53;color:#dbe8df;min-height:32px;}
+ .sg .sg-mobile-stats.sg-score-mode-simple {overflow:auto;min-height:0;}
+ .sg .sg-mobile-stats .sg-compact-scores {min-height:300px;}
+ .sg .sg-mobile-board .sg-board-top {height:auto;min-height:26px;gap:4px;flex-wrap:wrap;}
+ .sg .sg-mobile-board .sg-board-label.sg-board-status {font-size:8px;letter-spacing:0;}
+ .sg .sg-mobile-board .sg-reset.sg-glazier-home {min-width:32px;min-height:30px;}
+ .sg .sg-mobile-player {border-radius:7px;background:#15353f;color:#d5e5df;}
+ .sg .sg-mobile-player.sg-mobile-player-selected {background:#344c47;border-color:#dab879;}
+ .sg .sg-mobile-board .sg-window-completed .sg-finished {font-size:7px;letter-spacing:0;}
+ .sg .sg-mobile-board .sg-window-completed .sg-finished svg {width:16px;height:16px;}
+}
