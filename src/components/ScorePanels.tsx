@@ -95,13 +95,13 @@ export function DigitalBrokenGlass({ game }: { game: GameState }) {
   </section>
 }
 
-const PAWN_COLORS = {red:'#de777a', yellow:'#e9c769', blue:'#6ac5df', white:'#d7e2e8'}
+const PAWN_COLORS = {red:'#b82731', yellow:'#dec06b', blue:'#17548b', white:'#f3f6f4'}
 
 export function SharedFieldMarker({players, broken = false}:{players:Player[]; broken?:boolean}) {
   if (!players.length) return null
   return <span className={`sg-pawn-stack${broken ? ' sg-pawns-inline' : ''}`} role="img" aria-label={players.map(p=>broken ? `${p.name}: ${p.brokenSteps}/8 stłuczeń` : `${p.name}: ${p.score} pkt`).join('; ')}>
     {players.map((p,i)=><span key={p.id} className="sg-stacked-pawn" title={broken ? `${p.name}: ${p.brokenSteps}/8 stłuczeń` : `${p.name}: ${p.score} pkt`}
-      style={{background:PAWN_COLORS[p.palaceColor ?? 'red'],left:broken ? undefined : `${i*1}px`,top:broken ? undefined : `${i*1}px`,zIndex:i+1}}>
+      style={{background:PAWN_COLORS[p.palaceColor ?? 'red'],zIndex:i+1}}>
       {!broken && p.score>=100 && <small className="sg-score-lap">+{Math.floor(p.score/100)*100}</small>}
     </span>)}
   </span>
