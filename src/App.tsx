@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { ArrowRight, BookOpen, Check, CirclePlus, Gem, House, Info, Settings2, X } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, legalMoves, newGame, standings } from './game/engine'
 import type { Controller, Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
@@ -114,7 +114,7 @@ export function Market({ game, selection, disabled, onPick }: {
 }) {
   const center = COLORS.map(color => ({ color, count: game.center.filter(x => x === color).length })).filter(item => item.count > 0)
   return <section className="sg-market sg-center-card" aria-label="Warsztaty szkła">
-    <div className="sg-panel-title"><span>WARSZTATY SZKŁA</span><span className="sg-market-title-meta"><small>{game.factories.filter(f => f.length).length} aktywnych</small>{!game.firstCenterTaken && <span className="sg-start-tile sg-market-first-badge" aria-label="Żeton pierwszego gracza jest na środku stołu" title="Żeton pierwszego gracza jest na środku stołu">1</span>}</span></div>
+    <div className="sg-panel-title"><span>WARSZTATY SZKŁA</span><span className="sg-market-title-meta"><small>{game.factories.filter(f => f.length).length} aktywnych</small></span></div>
     <div className="sg-market-layout-v45">
       <div className="sg-market-orbit-v46" data-sg-orbit-count={game.factories.length}>
         <div className="sg-market-factories-v45" role="group" aria-label="Warsztaty szkła">
@@ -139,7 +139,7 @@ export function Market({ game, selection, disabled, onPick }: {
               className={`sg-center-choice${selection?.source.type === 'center' && selection.color === color ? ' sg-token-selected' : ''}`}>
               <GlassPiece color={color}/><b aria-hidden="true">{count}</b>
             </button>) : <span className="sg-center-quiet">✧</span>}</div>
-          {!game.firstCenterTaken && <small className="sg-center-penalty">+1 stłuczenie</small>}
+          {!game.firstCenterTaken && <span className="sg-start-tile sg-center-first-token" aria-label="Żeton pierwszego gracza: plus jedno stłuczenie" title="Pierwszy pobór: znacznik pierwszego gracza i 1 stłuczenie">+1</span>}
         </div>
       </div>
     </div>
@@ -316,7 +316,7 @@ export default function App() {
     `${game.players.length}-${viewerIndex}-${mobileBoardIndex}-${game.currentPlayer}-${viewport.width}x${viewport.height}`,
   )
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (screen !== 'game' || game.phase !== 'playing' || announcedRound.current === game.round) return
     const color = game.roundColors[game.round - 1]
     if (!color) return
