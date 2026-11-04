@@ -1,3 +1,5 @@
+import { GlassPiece } from './GameBoard'
+import type { GlassColor } from '../game/engine'
 import { SettingsControls } from './GameMenu'
 import { useState } from 'react'
 import { ArrowRight, BookOpen, Gem, BookmarkCheck, CirclePlus, GraduationCap, Settings2, UserRound, X } from 'lucide-react'
@@ -30,7 +32,7 @@ export function HomeScreen({
       <div className="sg-home-art" aria-hidden="true">
         <div className="sg-home-arch"><div className="sg-home-mosaic">
           {['rose','slate','citrine','cyan','amber','rose','cyan','amber','slate','citrine','citrine','rose','cyan','slate','amber'].map((color,i) =>
-            <span key={i} className={`sg-home-glass sg-glass-${color}`}/>)}
+            <span key={i} className={`sg-home-glass sg-pane sg-pane-${color}`}><GlassPiece color={color as GlassColor}/></span>)}
         </div><span className="sg-home-arch-gem"><Gem size={29}/></span></div>
       </div>
       <div className="sg-home-copy">
