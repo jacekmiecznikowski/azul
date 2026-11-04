@@ -899,3 +899,23 @@
 .sg .sg-art-board .sg-art-break .sg-art-step {color:#c0d1c1;font-size:4.5px;}
 .sg .sg-art-board .sg-art-break .sg-art-penalty {font-size:6px;}
 .sg .sg-art-board .sg-art-break-end {background:#77524070;border:1px solid #d3a67880;}
+
+/* The two toolbar popovers share the same panel surface and typography. */
+.sg .sg-header :is(.sg-resource-popover,.sg-menu-popup) {
+  border:1px solid #86aaa680;border-radius:12px;
+  background:linear-gradient(145deg,#1d404b,#102e38);
+  box-shadow:0 12px 35px #010c17b0,inset 0 1px 0 #d5ebe414;
+  padding:12px;font-family:'DM Sans',sans-serif;
+}
+.sg .sg-resource-popover-title strong,.sg .sg-menu-title {
+  font:800 10px/1.4 'DM Sans',sans-serif;color:#d8dfc7;letter-spacing:1.2px;text-transform:uppercase;
+}
+.sg .sg-resource-popover-title {padding:5px 9px 10px;border-bottom:1px solid #83a7a53d;margin-bottom:6px;}
+.sg .sg-center {align-items:stretch;}
+.sg .sg-center>.sg-side-left.sg-score-mode-simple {display:flex;min-height:0;align-self:stretch;}
+.sg .sg-center>.sg-side-left>.sg-compact-scores,
+.sg .sg-center>.sg-market,.sg .sg-center>.sg-history {height:100%;box-sizing:border-box;align-self:stretch;}
+.sg .sg-compact-columns,.sg .sg-compact-player {grid-template-columns:minmax(0,1fr) auto;}
+.sg .sg-compact-broken-heading {font:800 9px/1.2 'DM Sans',sans-serif;letter-spacing:.7px;color:#cddbd1;padding:7px 9px;border-top:1px solid #83a7a53d;}
+.sg .sg-compact-broken .sg-compact-player {padding:3px 5px;}
+.sg .sg-compact-scores>.sg-score-rounds {margin-top:auto;}
