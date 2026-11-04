@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Maximize2, X } from 'lucide-react'
@@ -16,16 +17,7 @@ export function scoreTrackPosition(score: number): number {
 /** A continuous, 100-square double rectangular orbit around the original
  * central broken-glass ladder: 54 outer squares + 46 inner squares. */
 export function scoreTrackCoordinates(): ReadonlyArray<readonly [number,number]> {
-  // A closed two-lane rosette. The four lane transitions join adjacent sectors.
-  const route: Array<readonly [number,number]> = []
-  for(let i=0;i<25;i++) route.push([46,i])
-  for(let i=24;i>=0;i--) route.push([39,i])
-  for(let i=49;i>=25;i--) route.push([39,i])
-  for(let i=25;i<50;i++) route.push([46,i])
-  const coordinates: Array<readonly [number,number]> = route.map(([radius,sector])=>{
-    const angle=(-90+sector*360/50)*Math.PI/180
-    return [50+radius*Math.sin(angle),50+radius*Math.cos(angle)] as const
-  })
+  const coordinates: Array<readonly [number,number]> = [[0, 0], [1, 0], [2, 0], [2, 1], [3, 1], [3, 0], [4, 0], [4, 1], [5, 1], [5, 0], [6, 0], [6, 1], [7, 1], [7, 0], [8, 0], [9, 0], [9, 1], [8, 1], [8, 2], [9, 2], [9, 3], [8, 3], [8, 4], [9, 4], [9, 5], [8, 5], [8, 6], [9, 6], [9, 7], [8, 7], [8, 8], [9, 8], [9, 9], [8, 9], [8, 10], [9, 10], [9, 11], [8, 11], [8, 12], [9, 12], [9, 13], [8, 13], [8, 14], [9, 14], [9, 15], [8, 15], [8, 16], [9, 16], [9, 17], [9, 18], [8, 18], [8, 17], [7, 17], [7, 18], [6, 18], [6, 17], [5, 17], [5, 18], [4, 18], [4, 17], [3, 17], [3, 18], [2, 18], [2, 17], [1, 17], [1, 18], [0, 18], [0, 17], [0, 16], [1, 16], [1, 15], [0, 15], [0, 14], [1, 14], [1, 13], [0, 13], [0, 12], [1, 12], [1, 11], [0, 11], [0, 10], [1, 10], [1, 9], [0, 9], [0, 8], [1, 8], [1, 7], [0, 7], [0, 6], [1, 6], [1, 5], [0, 5], [0, 4], [1, 4], [1, 3], [0, 3], [0, 2], [1, 2], [1, 1], [0, 1]]
   return coordinates
 }
 
@@ -106,7 +98,7 @@ function PhysicalTrack({game}:{game:GameState}) {
       {scoreTrackCoordinates().map(([row,col],value) => {
         const players=game.players.filter(p=>scoreTrackPosition(p.score)===value)
         return <div key={value} className={`sg-boardscore-cell sg-art-cell${value % 5 === 0 ? ' sg-art-checkpoint' : ''}`}
-          style={{top:`${row}%`,left:`${col}%`,transform:`translate(-50%,-50%) rotate(${Math.atan2(row-50,col-50)*180/Math.PI+90}deg)`}} title={`Pole ${value}${players.length ? ': '+players.map(p=>p.name).join(', ') : ''}`}>
+          style={{'--field-row':row+1,'--field-col':col+1} as CSSProperties} title={`Pole ${value}${players.length ? ': '+players.map(p=>p.name).join(', ') : ''}`}>
           <span className="sg-art-number">{value}</span>
           {players.length > 0 && <div className="sg-art-marker"><SharedFieldMarker players={players}/></div>}
         </div>
@@ -149,17 +141,20 @@ function PhysicalScoreContents({game}:{game:GameState}) {
 function FittedPhysicalContents({game}:{game:GameState}) {
   const viewport = useRef<HTMLDivElement>(null)
   const [scale,setScale] = useState(0.7)
+  const [portrait,setPortrait] = useState(false)
   useEffect(() => {
     const element = viewport.current
     if (!element) return
     const observer = new ResizeObserver(([entry]) => {
-      setScale(Math.max(0.01,Math.min(entry.contentRect.width / 300,entry.contentRect.height / 300)))
+      const tall = entry.contentRect.width / entry.contentRect.height < 0.85
+      setPortrait(tall)
+      setScale(Math.max(0.01,Math.min(entry.contentRect.width / (tall ? 230 : 300),entry.contentRect.height / (tall ? 300 : 230))))
     })
     observer.observe(element)
     return () => observer.disconnect()
   },[])
   return <div ref={viewport} className="sg-boardscore-fit">
-    <div className="sg-boardscore-canvas" style={{transform:`translate(-50%,-50%) scale(${scale})`}}>
+    <div className={`sg-boardscore-canvas${portrait ? ' sg-frame-portrait' : ''}`} style={{transform:`translate(-50%,-50%) scale(${scale})`}}>
       <PhysicalScoreContents game={game}/>
     </div>
   </div>
