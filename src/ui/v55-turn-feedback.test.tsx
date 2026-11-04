@@ -49,7 +49,7 @@ describe('v57 – consistent market geometry, centered cue, short gold border si
     expect(css).toContain('.sg .sg-board .sg-board-status-active')
     expect(css).toContain('@keyframes sg-turn-edge')
     expect(css).toContain('opacity:1!important')
-    expect(css).toContain('animation:sg-turn-edge 1.8s cubic-bezier(.37,0,.63,1) infinite alternate')
+    expect(css).toContain('animation:sg-turn-edge 5s linear infinite')
     expect(css).not.toContain('opacity:.42')
     expect(app).toContain('turn-market-v56.css')
     expect(app).not.toContain("import './turn-feedback-v55.css'")
