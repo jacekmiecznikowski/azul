@@ -221,16 +221,25 @@ export function BoardScoringPanel({game, launcherOnly = false}:{game:GameState; 
 }
 
 export function CompactScores({game}:{game:GameState}) {
+  const opening = game.history?.find(e => e.kind === 'start')
+  const legacyStarter = game.players.findIndex(p => opening?.description.endsWith(`${p.name}.`))
+  const first = game.initialStartingPlayer ?? (legacyStarter >= 0 ? legacyStarter : game.startingPlayer)
+  const ordered = game.players.map((_,offset) => game.players[(first + offset) % game.players.length])
   const current = game.players[game.currentPlayer]
   const starter = game.players[game.firstCenterTaken ? game.nextStartingPlayer ?? game.startingPlayer : game.startingPlayer]
   return <section className="sg-compact-scores sg-center-card" aria-label="Wyniki i przebieg gry">
     <div className="sg-panel-title"><span>PRZY STOLE</span><BoardScoringPanel game={game} launcherOnly/></div>
     <div className="sg-compact-turn"><PlayerMarker player={current}/><strong>{game.phase === 'finished' ? 'Koniec gry' : `Ruch: ${current.name}`}</strong></div>
     <div className="sg-compact-start">{game.firstCenterTaken ? 'Następna runda' : 'Rozpoczyna'}: <b>{starter.name}</b></div>
-    <div className="sg-compact-columns"><span>GRACZ</span><span>PUNKTY</span><span>SZKŁO / KARA</span></div>
-    <div className="sg-compact-players">{game.players.map((p,i) => <div key={p.id} className={`sg-compact-player${i === game.currentPlayer ? ' sg-score-current' : ''}`}>
+    <div className="sg-compact-columns"><span>GRACZ</span><span>PUNKTY</span></div>
+    <div className="sg-compact-players">{ordered.map((p) => <div key={p.id} className={`sg-compact-player${p.id === current.id ? ' sg-score-current' : ''}`}>
       <span className="sg-compact-name" title={p.name}><PlayerMarker player={p}/><span>{p.name}</span></span>
-      <strong>{p.score}</strong><span className="sg-compact-break">{p.brokenSteps}/8 <b>−{BROKEN_TRACK[p.brokenSteps]} pkt</b></span>
+      <strong>{p.score}</strong>
+    </div>)}</div>
+    <div className="sg-compact-broken-heading">STŁUCZONE SZKŁO</div>
+    <div className="sg-compact-players sg-compact-broken">{ordered.map(p => <div className="sg-compact-player" key={p.id}>
+      <span className="sg-compact-name"><PlayerMarker player={p}/><span>{p.name}</span></span>
+      <span className="sg-compact-break">{p.brokenSteps}/8 <b>−{BROKEN_TRACK[p.brokenSteps]} pkt</b></span>
     </div>)}</div>
     <ScoreRoundBonuses game={game}/>
   </section>
