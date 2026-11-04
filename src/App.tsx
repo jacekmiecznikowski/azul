@@ -66,7 +66,7 @@ const DEFAULT_OPTIONS: Settings = {
   opponents: 3,
   difficulties: ['normal', 'normal', 'normal'],
   controllers: ['human', 'ai', 'ai', 'ai'],
-  names: ['Ty', 'Gracz 2', 'Gracz 3', 'Gracz 4'],
+  names: ['Ty', 'Aurora', 'Iris', 'Noctis'],
   palaceSide: 'A',
 }
 interface Selection { source: Source; color: GlassColor }
@@ -204,14 +204,14 @@ function SetupModal({ settings, onClose, onStart }: {
                 <option value="human">Człowiek</option>
                 <option value="ai">Bot AI</option>
               </select>
-              {isHuman ? <input
+              {<input
                 aria-label={`Imię gracza ${i + 1}`}
                 value={local.names[i] ?? `Gracz ${i + 1}`}
                 maxLength={28}
                 onChange={e => setLocal(previous => ({
                   ...previous, names: previous.names.map((name,j) => j === i ? e.target.value : name),
                 }))} placeholder={`Gracz ${i + 1}`}/>
-              : <select aria-label={`Poziom trudności bota ${i + 1}`}
+              }{!isHuman && <select aria-label={`Poziom trudności bota ${i + 1}`}
                   value={local.difficulties[i - 1] ?? 'normal'}
                   onChange={e => setLocal(previous => ({
                     ...previous,
@@ -260,7 +260,7 @@ export default function App() {
     opponents: game.players.length - 1,
     difficulties: DEFAULT_OPTIONS.difficulties.map((difficulty, i) => game.players[i + 1]?.difficulty ?? difficulty),
     controllers: DEFAULT_OPTIONS.controllers.map((controller, i) => game.players[i]?.controller ?? controller),
-    names: DEFAULT_OPTIONS.names.map((name, i) => game.players[i]?.controller === 'human' ? game.players[i].name : name),
+    names: DEFAULT_OPTIONS.names.map((name, i) => game.players[i]?.name ?? name),
     palaceSide: game.palaceSide,
   }))
   const [selection, setSelection] = useState<Selection | null>(null)
