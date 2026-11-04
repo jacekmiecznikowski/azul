@@ -16,24 +16,16 @@ export function scoreTrackPosition(score: number): number {
 /** A continuous, 100-square double rectangular orbit around the original
  * central broken-glass ladder: 54 outer squares + 46 inner squares. */
 export function scoreTrackCoordinates(): ReadonlyArray<readonly [number,number]> {
-  // Repeat the same two glass-board bends on every side of a square.
-  // Each side has 25 steps; rotation keeps every fifth field symmetrical.
-  const side: Array<readonly [number,number]> = [[0,0]]
-  let col=0
-  while(col<13) {
-    if(col===4 || col===8) {
-      side.push([1,col],[2,col],[3,col],[3,col+1],[3,col+2],[2,col+2],[1,col+2],[0,col+2])
-      col+=2
-    } else { col++; side.push([0,col]) }
-  }
-  const coordinates: Array<readonly [number,number]> = []
-  for(let rotation=0;rotation<4;rotation++) {
-    for(const point of side.slice(0,-1)) {
-      let [row,column]=point
-      for(let turn=0;turn<rotation;turn++) [row,column]=[column,13-row]
-      coordinates.push([row,column])
-    }
-  }
+  // A closed two-lane rosette. The four lane transitions join adjacent sectors.
+  const route: Array<readonly [number,number]> = []
+  for(let i=0;i<25;i++) route.push([46,i])
+  for(let i=24;i>=0;i--) route.push([39,i])
+  for(let i=49;i>=25;i--) route.push([39,i])
+  for(let i=25;i<50;i++) route.push([46,i])
+  const coordinates: Array<readonly [number,number]> = route.map(([radius,sector])=>{
+    const angle=(-90+sector*360/50)*Math.PI/180
+    return [50+radius*Math.sin(angle),50+radius*Math.cos(angle)] as const
+  })
   return coordinates
 }
 
@@ -114,7 +106,7 @@ function PhysicalTrack({game}:{game:GameState}) {
       {scoreTrackCoordinates().map(([row,col],value) => {
         const players=game.players.filter(p=>scoreTrackPosition(p.score)===value)
         return <div key={value} className={`sg-boardscore-cell sg-art-cell${value % 5 === 0 ? ' sg-art-checkpoint' : ''}`}
-          style={{gridRow:row+1,gridColumn:col+1}} title={`Pole ${value}${players.length ? ': '+players.map(p=>p.name).join(', ') : ''}`}>
+          style={{top:`${row}%`,left:`${col}%`,transform:`translate(-50%,-50%) rotate(${Math.atan2(row-50,col-50)*180/Math.PI+90}deg)`}} title={`Pole ${value}${players.length ? ': '+players.map(p=>p.name).join(', ') : ''}`}>
           <span className="sg-art-number">{value}</span>
           {players.length > 0 && <div className="sg-art-marker"><SharedFieldMarker players={players}/></div>}
         </div>
