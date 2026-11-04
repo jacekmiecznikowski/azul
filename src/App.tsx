@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowRight, BookOpen, Check, Gem, House, Info, RotateCcw, Settings2, X } from 'lucide-react'
+import { ArrowRight, BookOpen, Check, CirclePlus, Gem, House, Info, RotateCcw, Settings2, X } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, legalMoves, newGame, standings } from './game/engine'
 import type { Controller, Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
@@ -477,7 +477,7 @@ export default function App() {
   }
 
   return <div className={`sg${screen === "home" ? " sg-in-home" : ""}${roundTiming.cinematic ? " sg-effects-cinematic" : " sg-effects-minimal"}`}>
-    <header className="sg-header">
+    <header className="sg-header sg-toolbar-modern">
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span></div>
       <RoundTracker round={game.round} colors={game.roundColors}/>
       <div className="sg-header-actions">
@@ -487,8 +487,8 @@ export default function App() {
           soundEnabled={soundEnabled} toggleSound={toggleSound}
           openStrategy={() => setShowStrategy(true)} openRules={() => setShowRules(true)}/>
         <button type="button" className="sg-home-return" onClick={() => { clearEffects(); announcedRound.current = null; setRoundAnnouncement(null); setRoundReady(null); setTurnNotice(null); setScreen('home'); setSelection(null); setFinishing(null); setPlacementOptions(null); setMobilePanel(null) }} aria-label="Menu główne" title="Menu główne"><House size={16}/><span>Główne</span></button>
-        <button type="button" className="sg-new" onClick={() => setShowSetup(true)}>
-          <RotateCcw size={16}/> Nowa gra
+        <button type="button" className="sg-new" aria-label="Nowa gra" title="Nowa gra" onClick={() => setShowSetup(true)}>
+          <CirclePlus size={16}/><span>Nowa gra</span>
         </button>
       </div>
     </header>
