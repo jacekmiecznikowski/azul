@@ -39,13 +39,6 @@
 .sg-home-dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
 .sg-home-dialog-heading h2{font:700 23px 'Playfair Display',serif;color:#f2e2c3}
 .sg .sg-home-dialog-heading button{display:grid;place-items:center;border:1px solid #88a9a6;border-radius:8px;background:#193943;color:#fff;width:34px;height:34px}
-.sg-home-options{display:flex;flex-direction:column;gap:8px}
-.sg-home-options>button{display:flex;align-items:center;gap:14px;padding:11px 12px;min-height:56px;border:1px solid #7caca171;background:#122f3b;border-radius:9px;color:#e5eee6;text-align:left}
-.sg-home-options>button:disabled{opacity:.58}
-.sg-home-options>button>span{flex:1;display:flex;flex-direction:column;gap:3px}
-.sg-home-options>button small{font-size:10px;color:#a5c4c6}
-.sg-home-options>button>b{font-size:11px;color:#ebd6a3}
-.sg-home-options>p{color:#a3bfbc;font-size:11px;line-height:1.5;padding-top:6px}
 .sg-home-about{display:flex;flex-direction:column;gap:12px;line-height:1.6;color:#c5ddd8;font-size:13px}
 .sg-home-about h3{color:#f1dfb2;font:700 22px 'Playfair Display',serif}
 .sg-home-author-mark{width:54px;height:54px;display:grid;place-items:center;border:1px solid #cbb588;background:#24575c;border-radius:14px;color:#e9d49e}
