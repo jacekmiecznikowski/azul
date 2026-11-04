@@ -932,8 +932,8 @@
 .sg .sg-board .sg-glazier-home:hover:not(:disabled) {border-color:#ebcc8d;background:#31545b;box-shadow:0 0 8px #c7a3e445;}
 .sg .sg-board .sg-glazier-home:focus-visible {outline:2px solid #f1d391;outline-offset:3px;}
 .sg .sg-board .sg-glazier-home:disabled {opacity:.45;}
-/* A three-player table has two side seats and an open northern gallery. */
-.sg .sg-felt[data-sg-player-count="3"]>.sg-center {grid-area:1 / 2 / 3 / 3;}
+
+
 /* Four compact score cards and four separate penalty cards fit without scrolling. */
 .sg .sg-compact-multiplayer .sg-compact-columns {display:none;}
 .sg .sg-compact-multiplayer .sg-compact-players {grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:3px 7px 5px;}
@@ -944,3 +944,22 @@
 .sg .sg-compact-multiplayer .sg-compact-turn {font-size:12px;padding-top:5px;}
 .sg .sg-compact-multiplayer .sg-score-bonus-label {display:none;}
 .sg .sg-compact-multiplayer .sg-score-rounds {padding-top:4px;padding-bottom:5px;}
+
+/* Shared nine-field penalty mosaic replaces repeated player rows. */
+.sg .sg-compact-scores>.sg-compact-glass-grid {
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:repeat(3,minmax(26px,1fr));gap:3px;
+  flex:1 1 auto;min-height:84px;margin:0 7px 5px;
+}
+.sg .sg-compact-glass-cell {
+  position:relative;min-width:0;display:grid;place-items:center;
+  border:1px solid #668b8b80;border-radius:4px;
+  background:linear-gradient(145deg,#244852,#14343f);padding:9px 2px 8px;
+}
+.sg .sg-compact-glass-cell>small {position:absolute;top:2px;left:4px;font:700 6px/1 'DM Sans',sans-serif;letter-spacing:.3px;color:#accccd;}
+.sg .sg-compact-glass-cell>strong {font:700 12px/1 'DM Sans',sans-serif;color:#f0d9a9;}
+.sg .sg-compact-glass-cell.sg-glass-occupied {border-color:#dbbb7b;background:linear-gradient(145deg,#365650,#1c4046);}
+.sg .sg-compact-glass-cell.sg-glass-limit {background:#563c46;border-color:#a97e82;}
+.sg .sg-glass-limit>strong {color:#ffb5b3;}
+.sg .sg-compact-glass-markers {position:absolute;bottom:3px;right:4px;display:flex;gap:3px;}
+.sg .sg-compact-glass-pawn {display:block;width:6px;height:6px;transform:rotate(45deg);border:1px solid #f8f1d7;border-radius:2px;box-sizing:border-box;}
