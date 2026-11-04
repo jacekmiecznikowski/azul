@@ -227,7 +227,7 @@ export function CompactScores({game}:{game:GameState}) {
   const ordered = game.players.map((_,offset) => game.players[(first + offset) % game.players.length])
   const current = game.players[game.currentPlayer]
   const starter = game.players[game.firstCenterTaken ? game.nextStartingPlayer ?? game.startingPlayer : game.startingPlayer]
-  return <section className="sg-compact-scores sg-center-card" aria-label="Wyniki i przebieg gry">
+  return <section className={`sg-compact-scores sg-center-card${game.players.length > 2 ? ' sg-compact-multiplayer' : ''}`} aria-label="Wyniki i przebieg gry">
     <div className="sg-panel-title"><span>PRZY STOLE</span><BoardScoringPanel game={game} launcherOnly/></div>
     <div className="sg-compact-turn"><PlayerMarker player={current}/><strong>{game.phase === 'finished' ? 'Koniec gry' : `Ruch: ${current.name}`}</strong></div>
     <div className="sg-compact-start">{game.firstCenterTaken ? 'Następna runda' : 'Rozpoczyna'}: <b>{starter.name}</b></div>
