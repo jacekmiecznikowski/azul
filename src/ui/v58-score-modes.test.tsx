@@ -19,9 +19,10 @@ describe('v58 — two visual scoring modes, original scoring logic untouched', (
     expect(path.slice(0,10)).toEqual([0,1,2,3,4,5,6,7,8,9])
     expect(coordinates[0]).toEqual([0,0])
     expect(coordinates[15]).toEqual([0,15])
-    expect(coordinates[53]).toEqual([1,0])
-    expect(coordinates[54]).toEqual([1,1])
+    expect(coordinates[53]).toEqual([25,22])
+    expect(coordinates[54]).toEqual([25,21])
     expect(path.at(-1)).toBe(99)
+    expect(coordinates.at(-1)).toEqual([1,0])
     for (let i=1;i<coordinates.length;i++) {
       const [r1,c1]=coordinates[i-1], [r2,c2]=coordinates[i]
       expect(Math.abs(r1-r2)+Math.abs(c1-c2)).toBe(1)
@@ -41,7 +42,7 @@ describe('v58 — two visual scoring modes, original scoring logic untouched', (
     expect((html.match(/class="sg-boardscore-cell/g)??[])).toHaveLength(100)
     expect((html.match(/class="sg-boardscore-broken-step(?: |")/g)??[])).toHaveLength(BROKEN_TRACK.length)
     expect(html).not.toContain('sg-boardscore-legend-item')
-    expect(html).toContain('conic-gradient')
+    expect(html).toContain('sg-pawn-stack')
     expect(html).not.toContain('PAŁAC')
     expect(html).not.toContain('sg-score-rule')
     expect(html).toContain('105')
