@@ -41,20 +41,20 @@
   mask-composite:exclude;
 }
 .sg .sg-board-turn-rail::after {
-  content:'';position:absolute;inset:0;border-radius:inherit;
-  background:linear-gradient(90deg,transparent 36%,#082c3de6 41%,#168bbf 45%,#72e9ff 48%,#ffffff 50%,#72e9ff 52%,#168bbf 55%,#082c3de6 59%,transparent 64%);
-  background-size:300% 100%;background-position:75% 0;
+  content:'';position:absolute;width:80px;height:12px;
+  offset-path:inset(1px round 12px);offset-distance:0%;offset-rotate:auto;
+  background:radial-gradient(ellipse,#fff 0%,#fff3c4 18%,#edc777aa 44%,transparent 72%);
 }
 .sg.sg-effects-cinematic .sg-board-turn-rail::after {
-  animation:sg-turn-edge 1.8s cubic-bezier(.37,0,.63,1) infinite alternate;
+  animation:sg-turn-edge 5s linear infinite;
 }
 .sg .sg-board.sg-board-current .sg-player-icon {
   outline:2px solid #ffe2a0;outline-offset:2px;
   box-shadow:0 0 10px #e9c57188;
 }
 @keyframes sg-turn-edge {
-  from {background-position:75% 0;}
-  to {background-position:25% 0;}
+  from {offset-distance:0%;}
+  to {offset-distance:100%;}
 }
 @media(prefers-reduced-motion:reduce) {
   .sg.sg-effects-cinematic .sg-board-turn-rail::after {animation:none;background:none;}
