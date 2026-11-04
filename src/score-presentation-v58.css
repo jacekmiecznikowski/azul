@@ -991,3 +991,30 @@
 .sg .sg-home-glass .sg-glass {width:65%;height:auto;aspect-ratio:1;max-width:42px;z-index:1;}
 .sg .sg-home-arch {border-color:#c7ab72;background:linear-gradient(90deg,#506459,#102e3b 6%,#102e3b 94%,#506459);}
 .sg .sg-hotseat-player-fields>input {min-width:0;}
+
+/* Four distinct counters, never a stack that hides another player's colour. */
+.sg .sg-art-marker .sg-pawn-stack {display:grid;grid-template-columns:repeat(2,4px);grid-auto-rows:4px;gap:1px;width:9px;height:auto;}
+.sg .sg-art-marker .sg-stacked-pawn {position:relative;width:4px;height:4px;border:.35px solid #bdac79;border-radius:1px;box-shadow:none;}
+.sg .sg-art-break .sg-pawn-stack.sg-pawns-inline {width:26px;height:6px;gap:2px;}
+.sg .sg-pawns-inline .sg-stacked-pawn {width:5px;height:5px;border:.35px solid #bdaa7d;border-radius:1px;box-shadow:none;}
+.sg .sg-art-board .sg-art-break {grid-template-columns:7px 1fr 26px;gap:1px;}
+/* Name, controller and difficulty have explicit columns after adding bot names. */
+.sg .sg-hotseat-setup .sg-hotseat-player-fields {grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr);gap:6px;}
+.sg .sg-hotseat-setup .sg-hotseat-player-fields>label {grid-column:1/-1;grid-row:1;}
+.sg .sg-hotseat-setup .sg-hotseat-player-fields>input {grid-column:1;grid-row:2;}
+.sg .sg-hotseat-setup .sg-hotseat-player-fields>select:first-of-type {grid-column:2;grid-row:2;}
+.sg .sg-hotseat-setup .sg-hotseat-player-fields>select:last-of-type:not(:first-of-type) {grid-column:3;grid-row:2;}
+@media(max-width:580px) {
+ .sg .sg-hotseat-setup .sg-hotseat-player-fields {grid-template-columns:repeat(2,minmax(0,1fr));}
+ .sg .sg-hotseat-setup .sg-hotseat-player-fields>input {grid-column:1/-1;grid-row:2;}
+ .sg .sg-hotseat-setup .sg-hotseat-player-fields>select:first-of-type {grid-column:1;grid-row:3;}
+ .sg .sg-hotseat-setup .sg-hotseat-player-fields>select:last-of-type:not(:first-of-type) {grid-column:2;grid-row:3;}
+}
+/* A single coherent lancet, with the glass fitted into its arched frame. */
+.sg .sg-home-arch {padding:12% 8% 8%;background:linear-gradient(90deg,#46574d,#102f3a 6%,#102f3a 94%,#46574d);}
+.sg .sg-home-arch:before {display:none;}
+.sg .sg-home-mosaic {border-radius:48% 48% 3px 3px / 26% 26% 3px 3px;overflow:hidden;border:2px solid #c5a367;gap:2px;background:#b59b69;box-shadow:0 0 0 3px #071f2b,inset 0 0 16px #0008;}
+.sg .sg-home-glass.sg-pane {border:0;border-radius:0;}
+.sg .sg-home-glass .sg-glass {width:52%;max-width:33px;}
+.sg .sg-home-arch-gem {top:3%;filter:drop-shadow(0 0 5px #e4c57a55);}
+.sg .sg-home-arch-gem svg {width:21px;height:21px;}
