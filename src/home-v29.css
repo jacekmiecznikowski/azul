@@ -218,3 +218,53 @@
   .sg.sg-in-home .sg-home-subtitle{display:none;}
   .sg.sg-in-home .sg-home-guide{padding:0;}
 }
+
+/* Palace entrance: a quiet stained-glass hero and a clear invitation to play. */
+.sg .sg-home-screen {box-sizing:border-box;background:radial-gradient(ellipse at 22% 42%,#35656855,transparent 55%),linear-gradient(125deg,#0a2732,#123e46 55%,#081e2b);}
+.sg .sg-home-shell {width:min(1120px,100%);grid-template-columns:minmax(240px,.9fr) minmax(340px,1fr);gap:clamp(28px,6vw,90px);padding:30px 0;}
+.sg .sg-home-art {position:relative;padding:24px;}
+.sg .sg-home-art::before,.sg .sg-home-art::after {content:'';position:absolute;width:52%;height:76%;border:1px solid #bda16855;border-radius:50% 50% 5px 5px;background:linear-gradient(160deg,#477b762e,#0a283766);box-shadow:inset 0 0 0 5px #0c2b3280;z-index:-1;}
+.sg .sg-home-art::before {left:-8%;transform:rotate(-9deg);}
+.sg .sg-home-art::after {right:-8%;transform:rotate(9deg);}
+.sg .sg-home-arch {transform:none;width:100%;max-width:300px;border-width:5px;box-shadow:inset 0 0 0 4px #08222b,inset 0 0 0 6px #e4cfa58c,0 22px 50px #0006,0 0 90px #d8c08015;}
+.sg .sg-home-copy {gap:15px;}
+.sg .sg-home-copy h1 {font-family:'Playfair Display',Georgia,serif;font-size:clamp(40px,5.3vw,70px);font-weight:700;letter-spacing:1px;margin:0;}
+.sg .sg-home-copy h1 span {color:#d9c18c;}
+.sg .sg-home-overline {font-size:10px;letter-spacing:3px;color:#a9c5bb;}
+.sg .sg-home-subtitle {font:400 14px/1.6 'DM Sans',sans-serif;color:#b6cfc6;margin:0 0 8px;}
+.sg .sg-home-buttons {width:100%;max-width:490px;gap:12px;}
+.sg .sg-home-action,.sg .sg-home-tutorial {box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:17px 18px;border-radius:10px;min-height:76px;}
+.sg .sg-home-action {background:linear-gradient(120deg,#234b53,#173742);border-color:#77988c70;}
+.sg .sg-home-primary {background:linear-gradient(115deg,#eddbb2,#cbb078);color:#14343e;border-color:#f5dfad;box-shadow:0 6px 22px #0003,inset 0 1px 0 #fff8;}
+.sg .sg-home-action > .sg-home-action-icon,.sg .sg-home-tutorial > .sg-home-action-icon {display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;border:1px solid currentColor;border-radius:10px;opacity:.85;}
+.sg .sg-home-action-copy {display:flex;flex:1;flex-direction:column;gap:5px;min-width:0;}
+.sg .sg-home-action-copy strong {font:700 16px/1.2 'DM Sans',sans-serif;}
+.sg .sg-home-action-copy small {font:400 11px/1.4 'DM Sans',sans-serif;opacity:.75;}
+.sg .sg-home-tutorial {border:1px dashed #a5b79566;background:#17374055;color:#b5c9bc;}
+.sg .sg-home-soon {font:600 9px/1 'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:1px;padding:6px 7px;border:1px solid #bfa57355;border-radius:20px;color:#d1b984;white-space:nowrap;}
+.sg .sg-home-guide {justify-content:flex-start;padding:8px 2px;font-size:12px;gap:9px;color:#c0d4c8;}
+.sg .sg-home-guide > span {flex:1;text-align:left;}
+.sg .sg-home-secondary {padding-top:12px;border-top:1px solid #8d9f773b;gap:12px;}
+.sg .sg-home-secondary .sg-home-action {min-height:40px;padding:8px;background:transparent;border-color:transparent;font-weight:500;color:#adc7bd;box-shadow:none;}
+.sg .sg-home-action:focus-visible,.sg .sg-home-guide:focus-visible {outline:2px solid #f2d28c;outline-offset:3px;}
+@media(max-width:700px) {
+ .sg .sg-home-shell {grid-template-columns:1fr;max-width:440px;padding:20px 0;gap:12px;margin:auto;}
+ .sg .sg-home-art {display:none;}
+ .sg .sg-home-copy {align-items:stretch;text-align:left;gap:12px;}
+ .sg .sg-home-copy h1 {font-size:clamp(32px,9vw,48px);}
+ .sg .sg-home-action,.sg .sg-home-tutorial {padding:12px;min-height:68px;gap:10px;}
+ .sg .sg-home-action-copy strong {font-size:14px;}
+ .sg .sg-home-action-copy small {font-size:10px;}
+ .sg .sg-home-soon {font-size:8px;padding:5px;}
+}
+@media(max-height:650px) and (min-width:701px) {
+ .sg .sg-home-shell {padding:12px 0;gap:28px;grid-template-columns:minmax(150px,.7fr) minmax(340px,1fr);}
+ .sg .sg-home-art {padding:12px;}
+ .sg .sg-home-arch {max-width:220px;}
+ .sg .sg-home-copy {gap:8px;}
+ .sg .sg-home-copy h1 {font-size:38px;}
+ .sg .sg-home-subtitle {margin:0;font-size:12px;}
+ .sg .sg-home-buttons {gap:7px;}
+ .sg .sg-home-action,.sg .sg-home-tutorial {padding:9px 12px;min-height:57px;}
+ .sg .sg-home-secondary {padding-top:6px;}
+}
