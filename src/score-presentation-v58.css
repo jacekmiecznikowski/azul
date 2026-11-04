@@ -860,3 +860,42 @@
   border-radius:7px;color:#17353e;font:800 13px/1.3 'DM Sans',sans-serif;
 }
 .sg .modal:is(.sg-hotseat-setup,.sg-manual-dialog) button:focus-visible {outline:2px solid #8ce7f2;outline-offset:3px;}
+
+/* Keep footer contents inside the available height as well as the footer itself. */
+.sg .sg-board-windows .sg-window-foot {container-type:size;align-items:center;}
+.sg .sg-board-windows .sg-window-kept {height:100%;max-height:100%;gap:4px;}
+.sg .sg-board-windows .sg-window-kept>span.sg-kept-slot {
+  width:min(19px,85cqh);height:min(19px,85cqh);max-height:100%;
+}
+.sg .sg-board-windows .sg-window-foot>b {font-size:min(14px,78cqh);line-height:1;}
+.sg .sg-board-windows .sg-window-foot>b small {font:700 min(9px,52cqh)/1 'DM Sans',sans-serif;}
+/* Two leaded-glass insets, with aligned caps and a quieter penalty ladder. */
+.sg .sg-art-panels {grid-template-columns:1fr 1.15fr;gap:7px;}
+.sg .sg-art-panels section {
+  padding:5px;gap:0;border:1px solid #c0a77566;border-radius:9px 9px 4px 4px;
+  background:linear-gradient(145deg,#244b51,#102f3a 70%);
+  box-shadow:inset 0 0 0 1px #e5cc9220,0 2px 4px #031c2866;
+}
+.sg .sg-art-panels h3 {
+  min-height:10px;display:flex;align-items:center;justify-content:center;
+  font:800 4.5px/1.3 'DM Sans',sans-serif;letter-spacing:.4px;
+  margin:0 0 5px;padding:0 0 4px;color:#f0ddb5;border-bottom:1px solid #c0a77566;
+}
+.sg .sg-art-round-list {gap:3px;}
+.sg .sg-art-board .sg-art-round {
+  grid-template-columns:14px 1fr 14px;padding:1px 3px;border-radius:6px 6px 3px 3px;
+  border-color:#7eaaa449;background:linear-gradient(120deg,#34565b66,#102e3980);
+}
+.sg .sg-art-board .sg-art-round-active {
+  border-color:#f0cf8d;background:linear-gradient(110deg,#9b8553,#355452 75%);
+  box-shadow:inset 1px 0 0 #fff0bb,inset 0 0 5px #f3d89128;
+}
+.sg .sg-art-gem .sg-glass.sg-glass-placed.sg-gem-faceted {width:12px;height:12px;}
+.sg .sg-art-board .sg-art-break {
+  grid-template-columns:10px 1fr 16px;border-width:0 0 1px;border-color:#8cb5ab50;
+  border-radius:2px;background:linear-gradient(90deg,#628b7d25,#0b29334d);
+  padding:1px 3px;box-shadow:none;
+}
+.sg .sg-art-board .sg-art-break .sg-art-step {color:#c0d1c1;font-size:4.5px;}
+.sg .sg-art-board .sg-art-break .sg-art-penalty {font-size:6px;}
+.sg .sg-art-board .sg-art-break-end {background:#77524070;border:1px solid #d3a67880;}
