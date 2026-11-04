@@ -49,7 +49,7 @@ describe('v57 – consistent market geometry, centered cue, short gold border si
     expect(css).toContain('.sg .sg-board .sg-board-status-active')
     expect(css).toContain('@keyframes sg-turn-edge')
     expect(css).toContain('opacity:1!important')
-    expect(css).toContain('animation:sg-turn-edge 2.6s cubic-bezier(.4,0,.2,1) infinite')
+    expect(css).toContain('animation:sg-turn-edge 1.8s cubic-bezier(.37,0,.63,1) infinite alternate')
     expect(css).not.toContain('opacity:.42')
     expect(app).toContain('turn-market-v56.css')
     expect(app).not.toContain("import './turn-feedback-v55.css'")
@@ -62,7 +62,8 @@ describe('v57 – consistent market geometry, centered cue, short gold border si
         player:{...game.players[1], difficulty:'hard'}, index:1, isCurrent, isStartingPlayer:true,
       }))
       expect(html).toContain('TRUDNY')
-      expect(html).toContain(isCurrent ? 'TERAZ GRA' : 'ROZPOCZĄŁ RUNDĘ')
+      expect(html).toContain('ROZPOCZĄŁ RUNDĘ')
+        expect(html.includes('TERAZ GRA')).toBe(isCurrent)
       expect(html).not.toContain('class="sg-board-stat"')
       expect(html).toContain('data-sg-score')
     }
@@ -78,7 +79,8 @@ describe('v57 – consistent market geometry, centered cue, short gold border si
         }))
         expect(html).not.toContain('Twoje witraże')
         expect(html).toContain(`sg-board-name">${name}`)
-        expect(html).toContain(isCurrent ? 'TERAZ GRA' : 'ROZPOCZĄŁ RUNDĘ')
+        expect(html).toContain('ROZPOCZĄŁ RUNDĘ')
+        expect(html.includes('TERAZ GRA')).toBe(isCurrent)
         expect(html.includes('sg-board-turn-rail')).toBe(isCurrent)
       }
     }
