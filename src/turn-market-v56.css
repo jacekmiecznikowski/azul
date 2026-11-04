@@ -35,10 +35,10 @@
   animation:sg-v57-turn-glow 1.15s ease-out 1 both!important;
 }
 @keyframes sg-v57-turn-glow {
-  0% {outline-color:#d9b87c;box-shadow:0 0 0 1px #d5b5749e,0 0 7px #d5b57453,inset 0 0 0 1px #ffedc42c;}
-  38% {outline-color:#ffe6ae;box-shadow:0 0 0 3px #f5d69dc7,0 0 13px #e8c58e9a,inset 0 0 0 1px #ffedc45c;}
-  100% {outline-color:#e6c688;box-shadow:0 0 0 2px #d8b8799c,0 0 8px #d5b57467,inset 0 0 0 1px #ffedc43d;}
+  0%, 100% {outline-color:#d9b87c;box-shadow:0 0 0 2px #d5b5749e,0 0 10px 2px #d5b57453,inset 0 0 0 1px #ffedc42c;}
+  50% {outline-color:#ffe6ae;box-shadow:0 0 0 5px #f5d69d80,0 0 24px 9px #e8c58e75,0 0 42px 14px #e8c58e28,inset 0 0 0 1px #ffedc45c;}
 }
+
 .sg.sg-effects-minimal .sg-board.sg-board-current {
   animation:none!important;
   outline-color:#d7bd86;
