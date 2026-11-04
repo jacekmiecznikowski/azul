@@ -16,11 +16,13 @@ export function scoreTrackPosition(score: number): number {
 /** A continuous, 100-square double rectangular orbit around the original
  * central broken-glass ladder: 54 outer squares + 46 inner squares. */
 export function scoreTrackCoordinates(): ReadonlyArray<readonly [number,number]> {
-  const coordinates: Array<readonly [number,number]> = []
-  for(let c=0;c<26;c++) coordinates.push([0,c])
-  for(let r=1;r<26;r++) coordinates.push([r,25])
-  for(let c=24;c>=0;c--) coordinates.push([25,c])
-  for(let r=24;r>0;r--) coordinates.push([r,0])
+  const coordinates: Array<readonly [number,number]> = [[0,0]]
+  for(let r=1;r<10;r++) coordinates.push([r,0])
+  for(let c=1;c<10;c++) {
+    if(c%2) for(let r=9;r>=1;r--) coordinates.push([r,c])
+    else for(let r=1;r<10;r++) coordinates.push([r,c])
+  }
+  for(let c=9;c>=1;c--) coordinates.push([0,c])
   return coordinates
 }
 
@@ -106,6 +108,7 @@ function PhysicalTrack({game}:{game:GameState}) {
           {players.length > 0 && <div className="sg-art-marker"><SharedFieldMarker players={players}/></div>}
         </div>
       })}
+    </div>
       <div className="sg-art-center">
 
         <div className="sg-art-panels">
@@ -132,7 +135,6 @@ function PhysicalTrack({game}:{game:GameState}) {
         </div>
         <div className="sg-art-flourish" aria-hidden="true">― ◇ ―</div>
       </div>
-    </div>
   </div>
 }
 
@@ -148,7 +150,7 @@ function FittedPhysicalContents({game}:{game:GameState}) {
     const element = viewport.current
     if (!element) return
     const observer = new ResizeObserver(([entry]) => {
-      setScale(Math.max(0.01,Math.min(entry.contentRect.width / 300,entry.contentRect.height / 300)))
+      setScale(Math.max(0.01,Math.min(entry.contentRect.width / 300,entry.contentRect.height / 380)))
     })
     observer.observe(element)
     return () => observer.disconnect()
@@ -196,7 +198,7 @@ export function BoardScoringPanel({game, launcherOnly = false}:{game:GameState; 
       <div className="sg sg-boardscore-modal-backdrop" onMouseDown={()=>setExpanded(false)}>
         <div className="sg-boardscore-modal" role="dialog" aria-modal="true"
           aria-label="Powiększona plansza punktacji" onMouseDown={event=>event.stopPropagation()}>
-          <div className="sg-boardscore-modal-header"><strong>PUNKTACJA · WITRAŻE SINTRY</strong>
+          <div className="sg-panel-title sg-boardscore-modal-header"><strong>PUNKTACJA · WITRAŻE SINTRY</strong>
             <button ref={closeButton} type="button" onClick={()=>setExpanded(false)} aria-label="Zamknij powiększoną punktację"><X size={18}/></button>
           </div>
           <div className="sg-boardscore-full"><FittedPhysicalContents game={game}/></div>
