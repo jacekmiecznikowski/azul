@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowRight, BookOpen, Gem, Music2, Play, RotateCcw, Settings2, Sparkles, UserRound, Volume2, VolumeX, X } from 'lucide-react'
+import { ArrowRight, BookOpen, Gem, Music2, BookmarkCheck, CirclePlus, GraduationCap, Settings2, Sparkles, UserRound, Volume2, VolumeX, X } from 'lucide-react'
 
 interface HomeScreenProps {
   hasSave: boolean
@@ -33,25 +33,29 @@ export function HomeScreen({
         </div><span className="sg-home-arch-gem"><Gem size={29}/></span></div>
       </div>
       <div className="sg-home-copy">
-        <div className="sg-home-overline"><Gem size={14}/> WITRAŻE SINTRY · EDYCJA CYFROWA</div>
+        <div className="sg-home-overline"><Gem size={14}/> WITRAŻE SINTRY</div>
         <h1>SINTRA <span>GLASS</span></h1>
-        <p className="sg-home-subtitle">Układaj szkło. Rozświetl pałac. Zwycięż w Sintrze.</p>
+        <p className="sg-home-subtitle">Twój kolejny witraż zaczyna się tutaj.</p>
         <div className="sg-home-buttons" role="group" aria-label="Opcje menu głównego">
-          {hasSave && <button type="button" className="sg-home-action sg-home-primary" onClick={onContinue}>
-            <Play size={19} fill="currentColor"/><span>Kontynuuj partię</span><ArrowRight size={17}/>
+          {hasSave && <button type="button" className="sg-home-action sg-home-primary sg-home-continue" onClick={onContinue}>
+            <span className="sg-home-action-icon"><BookmarkCheck size={24}/></span><span className="sg-home-action-copy"><strong>Kontynuuj partię</strong><small>Wróć do swojego stołu</small></span><ArrowRight size={17}/>
           </button>}
-          <button type="button" className={`sg-home-action${hasSave ? '' : ' sg-home-primary'}`} onClick={onNewGame}>
-            <RotateCcw size={19}/><span>Nowa gra</span><ArrowRight size={17}/>
+          <button type="button" className={`sg-home-action sg-home-new${hasSave ? '' : ' sg-home-primary'}`} onClick={onNewGame}>
+            <span className="sg-home-action-icon"><CirclePlus size={24}/></span><span className="sg-home-action-copy"><strong>Nowa gra</strong><small>Zaproś graczy lub zagraj z AI</small></span><ArrowRight size={17}/>
           </button>
+          <div className="sg-home-tutorial" aria-label="Samouczek — wkrótce">
+            <span className="sg-home-action-icon"><GraduationCap size={24}/></span>
+            <span className="sg-home-action-copy"><strong>Pierwszy witraż</strong><small>Samouczek krok po kroku</small></span>
+            <span className="sg-home-soon">Wkrótce</span>
+          </div>
+          <button type="button" className="sg-home-guide" onClick={onRules}><BookOpen size={17}/><span>Zasady gry</span><ArrowRight size={15}/></button>
           <div className="sg-home-secondary">
             <button type="button" className="sg-home-action" onClick={() => setPanel('settings')}><Settings2 size={18}/> Ustawienia</button>
             <button type="button" className="sg-home-action" onClick={() => setPanel('about')}><UserRound size={18}/> O twórcy</button>
           </div>
-          <button type="button" className="sg-home-guide" onClick={onRules}><BookOpen size={16}/> Jak grać?</button>
         </div>
       </div>
     </section>
-    <footer className="sg-home-footer">SINTRA GLASS · Gra offline · Vite / Windows EXE / Android APK</footer>
     {panel && <div className="sg-home-dialog-backdrop" onMouseDown={() => setPanel(null)}>
       <section className="sg-home-dialog" role="dialog" aria-modal="true" aria-label={panel === 'settings' ? 'Ustawienia' : 'O twórcy'}
         onMouseDown={event => event.stopPropagation()}>
@@ -69,7 +73,6 @@ export function HomeScreen({
           <button type="button" aria-pressed={effectsEnabled && !reducedMotion} disabled={reducedMotion} onClick={toggleEffects}>
             <Sparkles size={20}/><span><strong>Efekty wizualne</strong><small>{reducedMotion ? 'Ograniczone ustawieniami systemu' : 'Błyski szkła i punkty'}</small></span><b>{effectsEnabled && !reducedMotion ? 'WŁ.' : 'WYŁ.'}</b>
           </button>
-          <p>Ustawienia dźwięku i efektów są zapamiętywane lokalnie na urządzeniu.</p>
         </div> : <div className="sg-home-about">
           <div className="sg-home-author-mark"><Gem size={32}/></div>
           <h3>Autorski projekt Sintra Glass</h3>
