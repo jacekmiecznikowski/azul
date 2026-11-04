@@ -818,3 +818,7 @@
 @media(max-width:1100px) {
   .sg .sg-mobile-board .sg-board-label.sg-board-ai-level {display:inline;font-size:9px;}
 }
+
+/* Keep turn information visible on compact player headers too. */
+.sg .sg-mobile-board .sg-board-label.sg-board-status {display:inline-flex;font-size:9px;}
+.sg .sg-board-top {height:auto;min-height:27px;flex-wrap:wrap;row-gap:5px;}
