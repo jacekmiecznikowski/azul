@@ -77,6 +77,7 @@ export interface GameState {
   players: Player[]
   currentPlayer: number
   startingPlayer: number
+  initialStartingPlayer?: number
   nextStartingPlayer: number | null
   firstCenterTaken: boolean
   phase: 'playing' | 'finished'
@@ -252,6 +253,7 @@ export function newGame(options: NewGameOptions): GameState {
   // In the physical game the first player is chosen before the first round.
   // With no real-world "last window washer", draw the starter deterministically from the seed.
   state.startingPlayer = Math.floor(nextRandom(state) * count)
+  state.initialStartingPlayer = state.startingPlayer
   state.currentPlayer = state.startingPlayer
   refillFactories(state)
   addHistory(state, { playerIndex: null, kind: 'start', description: `Rozpoczęto partię ${count} graczy. Pierwszą rundę rozpoczyna ${state.players[state.startingPlayer].name}.` })
