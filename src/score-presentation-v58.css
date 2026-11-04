@@ -664,3 +664,27 @@
 .sg .sg-score-lap {position:absolute;bottom:7px;left:50%;transform:translateX(-50%);padding:1px 2px;background:#eedbb1;color:#16313a;border-radius:2px;font:700 3px/1 'DM Sans',sans-serif;white-space:nowrap;}
 .sg .sg-boardscore-modal-header {padding:0 9px;height:28px;background:#193c46;border-bottom:1px solid #6b8f805c;margin-bottom:8px;}
 .sg .sg-boardscore-modal-header strong {font:800 10px/1 'DM Sans',sans-serif;letter-spacing:1px;color:#d4dfc7;}
+
+/* Large continuous score fields; compact round and penalty rails below. */
+.sg .sg-boardscore-canvas {height:380px;}
+.sg .sg-art-board {height:380px;display:flex;flex-direction:column;gap:8px;}
+.sg .sg-art-orbit {height:282px;flex:0 0 282px;grid-template-columns:repeat(10,minmax(0,1fr));grid-template-rows:repeat(10,minmax(0,1fr));gap:2px;}
+.sg .sg-art-number {font-size:7px;}
+.sg .sg-art-checkpoint .sg-art-number {font-size:8px;}
+.sg .sg-art-marker .sg-pawn-stack {width:14px;height:14px;}
+.sg .sg-art-marker .sg-stacked-pawn {width:12px;height:12px;}
+.sg .sg-art-center {display:block;margin:0;padding:5px 6px;flex:1;border-radius:4px;}
+.sg .sg-art-panels {display:flex;flex-direction:column;gap:6px;}
+.sg .sg-art-panels section {display:grid;grid-template-columns:60px minmax(0,1fr);gap:6px;align-items:center;}
+.sg .sg-art-panels h3 {white-space:normal;margin:0;font-size:5px;line-height:1.4;}
+.sg .sg-art-round-list {grid-template-rows:1fr;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;height:23px;}
+.sg .sg-art-board .sg-art-round {grid-template-columns:7px 1fr;padding:2px;}
+.sg .sg-art-multiplier {display:none;}
+.sg .sg-art-roman {font-size:4px;}
+.sg .sg-art-break-list {grid-template-rows:1fr;grid-template-columns:repeat(9,minmax(0,1fr));height:23px;gap:2px;}
+.sg .sg-art-board .sg-art-break {display:flex;flex-direction:column;justify-content:center;padding:1px;gap:2px;position:relative;}
+.sg .sg-art-board .sg-art-break .sg-art-step {display:none;}
+.sg .sg-art-board .sg-art-break .sg-art-penalty {font-size:5px;}
+.sg .sg-art-break .sg-pawn-stack {position:absolute;bottom:1px;left:2px;transform:scale(.55);transform-origin:bottom left;}
+.sg .sg-boardscore-modal > .sg-boardscore-modal-header {height:28px;min-height:28px;padding:0 9px;margin:0 0 8px;background:transparent;border-bottom:1px solid #4b77746b;}
+.sg .sg-boardscore-modal-header strong {font:800 10px/1 'DM Sans',sans-serif;letter-spacing:1px;color:inherit;}
