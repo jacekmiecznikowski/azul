@@ -963,3 +963,19 @@
 .sg .sg-glass-limit>strong {color:#ffb5b3;}
 .sg .sg-compact-glass-markers {position:absolute;bottom:3px;right:4px;display:flex;gap:3px;}
 .sg .sg-compact-glass-pawn {display:block;width:6px;height:6px;transform:rotate(45deg);border:1px solid #f8f1d7;border-radius:2px;box-sizing:border-box;}
+
+/* The duel uses the same compact score cards as larger games. */
+.sg .sg-compact-scores .sg-compact-columns {display:none;}
+.sg .sg-compact-scores>.sg-compact-players {grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:3px 7px 5px;}
+.sg .sg-compact-scores .sg-score-bonus-label {display:none;}
+.sg .sg-compact-scores .sg-score-rounds {padding-top:4px;padding-bottom:5px;}
+.sg .sg-compact-glass-cell {box-sizing:border-box;min-height:0;padding:7px 2px 7px;}
+/* Fit the glazier inside the header track, not over the reverse-pattern row. */
+.sg .sg-board-windows .sg-window-head {height:100%;min-height:0;box-sizing:border-box;}
+.sg .sg-board-windows .sg-window.sg-window-active .sg-window-glazier {
+  box-sizing:border-box;flex:0 0 13px;width:13px;height:100%;max-height:13px;
+  min-height:0;border-radius:4px;align-self:center;
+}
+.sg .sg-board-windows .sg-window.sg-window-active .sg-window-glazier svg {width:10px;height:10px;max-height:100%;}
+.sg .sg-board .sg-reset.sg-glazier-home {width:31px;height:29px;padding:2px;justify-content:center;}
+.sg .sg-glazier-home-gem>svg:last-child {right:-4px;bottom:-2px;width:17px;height:17px;}
