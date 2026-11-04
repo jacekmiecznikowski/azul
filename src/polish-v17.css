@@ -50,7 +50,7 @@
   backdrop-filter:blur(15px);
 }
 .sg-menu-title {padding:5px 9px 10px;color:#c0ceba;font-size:10px;font-weight:800;letter-spacing:1.7px}
-.sg .sg-menu-popup .sg-menu-item {
+.sg :is(.sg-menu-popup, .sg-settings-controls) .sg-menu-item {
   width:100%;
   min-height:55px;
   height:auto;
@@ -65,18 +65,18 @@
   background:transparent;
   color:#e7f4ed;
 }
-.sg .sg-menu-popup .sg-menu-item:hover:not(:disabled),
-.sg .sg-menu-popup .sg-menu-item:focus-visible {
+.sg :is(.sg-menu-popup, .sg-settings-controls) .sg-menu-item:hover:not(:disabled),
+.sg :is(.sg-menu-popup, .sg-settings-controls) .sg-menu-item:focus-visible {
   border-color:#8eb3ab64;
   background:#476c6d55;
   outline:none;
 }
-.sg .sg-menu-popup .sg-menu-item>svg{color:#dabf8f;flex:none}
-.sg .sg-menu-popup .sg-menu-item>span{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
-.sg .sg-menu-popup .sg-menu-item b{font:700 13px 'DM Sans',sans-serif}
-.sg .sg-menu-popup .sg-menu-item small{font:400 10px 'DM Sans',sans-serif;color:#a5c4c1}
+.sg :is(.sg-menu-popup, .sg-settings-controls) .sg-menu-item>svg{color:#dabf8f;flex:none}
+.sg :is(.sg-menu-popup, .sg-settings-controls) .sg-menu-item>span{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.sg :is(.sg-menu-popup, .sg-settings-controls) .sg-menu-item b{font:700 13px 'DM Sans',sans-serif}
+.sg :is(.sg-menu-popup, .sg-settings-controls) .sg-menu-item small{font:400 10px 'DM Sans',sans-serif;color:#a5c4c1}
 .sg-menu-divider {height:1px;background:#83a7a53d;margin:3px 7px}
-.sg .sg-menu-popup .sg-menu-item:disabled{opacity:.5}
+.sg :is(.sg-menu-popup, .sg-settings-controls) .sg-menu-item:disabled{opacity:.5}
 .sg-menu-switch {
   width:30px;height:18px;border-radius:30px;border:1px solid #62898e;
   background:#2f4e57;position:relative;flex:none;
@@ -207,7 +207,7 @@
   background:#f0e3b9;
 }
 .sg .sg-menu-popup .sg-menu-title:not(:first-child) {padding-top:10px}
-.sg .sg-menu-popup .sg-menu-item:focus-visible {outline:2px solid #e9d49d;outline-offset:1px}
+.sg :is(.sg-menu-popup, .sg-settings-controls) .sg-menu-item:focus-visible {outline:2px solid #e9d49d;outline-offset:1px}
 
 /* The reverse reference belongs only to an unfinished window. A fully completed
    two-sided strip uses the whole central aperture for its completion emblem. */
