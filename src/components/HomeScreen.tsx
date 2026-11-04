@@ -1,5 +1,6 @@
+import { SettingsControls } from './GameMenu'
 import { useState } from 'react'
-import { ArrowRight, BookOpen, Gem, Music2, BookmarkCheck, CirclePlus, GraduationCap, Settings2, Sparkles, UserRound, Volume2, VolumeX, X } from 'lucide-react'
+import { ArrowRight, BookOpen, Gem, BookmarkCheck, CirclePlus, GraduationCap, Settings2, UserRound, X } from 'lucide-react'
 
 interface HomeScreenProps {
   hasSave: boolean
@@ -63,17 +64,7 @@ export function HomeScreen({
           <h2>{panel === 'settings' ? 'Ustawienia' : 'O twórcy'}</h2>
           <button type="button" aria-label="Zamknij" onClick={() => setPanel(null)}><X size={20}/></button>
         </div>
-        {panel === 'settings' ? <div className="sg-home-options">
-          <button type="button" aria-pressed={musicEnabled && !musicUnavailable} onClick={toggleMusic}>
-            <Music2 size={20}/><span><strong>Muzyka w tle</strong><small>{musicUnavailable ? 'Brak pliku muzyki' : musicEnabled ? 'Włączona' : 'Wyłączona'}</small></span><b>{musicEnabled && !musicUnavailable ? 'WŁ.' : 'WYŁ.'}</b>
-          </button>
-          <button type="button" aria-pressed={soundEnabled} onClick={toggleSound}>
-            {soundEnabled ? <Volume2 size={20}/> : <VolumeX size={20}/>}<span><strong>Efekty dźwiękowe</strong><small>Pobieranie i układanie szkła</small></span><b>{soundEnabled ? 'WŁ.' : 'WYŁ.'}</b>
-          </button>
-          <button type="button" aria-pressed={effectsEnabled && !reducedMotion} disabled={reducedMotion} onClick={toggleEffects}>
-            <Sparkles size={20}/><span><strong>Efekty wizualne</strong><small>{reducedMotion ? 'Ograniczone ustawieniami systemu' : 'Błyski szkła i punkty'}</small></span><b>{effectsEnabled && !reducedMotion ? 'WŁ.' : 'WYŁ.'}</b>
-          </button>
-        </div> : <div className="sg-home-about">
+        {panel === 'settings' ? <SettingsControls {...{effectsEnabled, reducedMotion, toggleEffects, musicEnabled, musicUnavailable, toggleMusic, soundEnabled, toggleSound}}/> : <div className="sg-home-about">
           <div className="sg-home-author-mark"><Gem size={32}/></div>
           <h3>Autorski projekt Sintra Glass</h3>
           <p>Cyfrowa adaptacja mechaniki gry Witraże Sintry, rozwijana z myślą o wspólnym stole, rozgrywce solo przeciw AI i grze na telefonie.</p>
