@@ -124,7 +124,8 @@ export function GameBoard({ player, index, isCurrent, isHuman = false, isHumanTu
       <span className={`sg-player-icon sg-player-icon-${index} sg-palace-icon-${player.palaceColor ?? 'red'}`}>{avatars[index]}</span>
       <span className="sg-board-name">{player.name} <small className="sg-palace-label">{({red:'CZERWONY', yellow:'ŻÓŁTY', blue:'NIEBIESKI', white:'BIAŁY'} as const)[player.palaceColor ?? 'red']}</small></span>
       {player.controller !== 'human' && <span className="sg-board-label sg-board-ai-level">AI · {player.difficulty === 'master' ? 'TRENING AI' : player.difficulty === 'expert' ? 'EKSPERT' : player.difficulty === 'hard' ? 'TRUDNY' : player.difficulty === 'easy' ? 'ŁATWY' : 'NORMALNY'}</span>}
-      {(isCurrent || isStartingPlayer) && <span className={`sg-board-label sg-board-status${isCurrent ? ' sg-board-status-active' : ''}`}>{isCurrent ? 'TERAZ GRA' : 'ROZPOCZĄŁ RUNDĘ'}</span>}
+      {isCurrent && <span className="sg-board-label sg-board-status sg-board-status-active">TERAZ GRA</span>}
+      {isStartingPlayer && <span className="sg-board-label sg-board-status">ROZPOCZĄŁ RUNDĘ</span>}
       {hasFirstToken && <span className="sg-start-tile sg-start-on-board" title="Ten gracz zdobył żeton pierwszego gracza i rozpocznie kolejną rundę">+1</span>}
       <strong data-sg-score className="sg-board-score">{player.score}<small> pkt</small></strong>
       {isHuman && <button type="button" className="sg-reset" onClick={onReset} disabled={!canReset}><RotateCcw size={13}/> Cofnij witrażystę</button>}
