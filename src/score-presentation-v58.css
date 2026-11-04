@@ -919,3 +919,28 @@
 .sg .sg-compact-broken-heading {font:800 9px/1.2 'DM Sans',sans-serif;letter-spacing:.7px;color:#cddbd1;padding:7px 9px;border-top:1px solid #83a7a53d;}
 .sg .sg-compact-broken .sg-compact-player {padding:3px 5px;}
 .sg .sg-compact-scores>.sg-score-rounds {margin-top:auto;}
+
+/* A glazier medallion rather than a toolbar-sized reset button. */
+.sg .sg-board .sg-reset.sg-glazier-home {
+  display:inline-flex;align-items:center;gap:6px;padding:2px 7px 2px 3px;
+  border:1px solid #ba9b6970;border-radius:20px;
+  background:linear-gradient(130deg,#294a51,#102e3a);color:#e7d2a1;
+  font:700 9px/1 'DM Sans',sans-serif!important;box-shadow:inset 0 1px 0 #fff1;
+}
+.sg-glazier-home-gem {position:relative;display:grid;place-items:center;width:23px;height:23px;border:1px solid #b897d5;border-radius:50%;background:#634075;color:#f2dcff;}
+.sg-glazier-home-gem>svg:last-child {position:absolute;right:-3px;bottom:-1px;background:#17343e;color:#f1d391;border-radius:50%;}
+.sg .sg-board .sg-glazier-home:hover:not(:disabled) {border-color:#ebcc8d;background:#31545b;box-shadow:0 0 8px #c7a3e445;}
+.sg .sg-board .sg-glazier-home:focus-visible {outline:2px solid #f1d391;outline-offset:3px;}
+.sg .sg-board .sg-glazier-home:disabled {opacity:.45;}
+/* A three-player table has two side seats and an open northern gallery. */
+.sg .sg-felt[data-sg-player-count="3"]>.sg-center {grid-area:1 / 2 / 3 / 3;}
+/* Four compact score cards and four separate penalty cards fit without scrolling. */
+.sg .sg-compact-multiplayer .sg-compact-columns {display:none;}
+.sg .sg-compact-multiplayer .sg-compact-players {grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:3px 7px 5px;}
+.sg .sg-compact-multiplayer .sg-compact-player {padding:4px;gap:3px;font-size:9px;}
+.sg .sg-compact-multiplayer .sg-compact-broken .sg-compact-player {grid-template-columns:1fr;gap:2px;}
+.sg .sg-compact-multiplayer .sg-compact-break {text-align:left;font-size:8px;padding-left:13px;}
+.sg .sg-compact-multiplayer .sg-compact-broken-heading {padding:5px 9px;}
+.sg .sg-compact-multiplayer .sg-compact-turn {font-size:12px;padding-top:5px;}
+.sg .sg-compact-multiplayer .sg-score-bonus-label {display:none;}
+.sg .sg-compact-multiplayer .sg-score-rounds {padding-top:4px;padding-bottom:5px;}
