@@ -15,20 +15,6 @@ export function RoundTracker({ round, colors }: { round: number; colors: GlassCo
       {colors[round - 1] && <span className="sg-round-v54-featured-gem" aria-hidden="true"><GlassPiece color={colors[round - 1]}/></span>}
       <strong className="sg-round-v54-color-name">{(GLASS_COLOR_LABELS_PL[colors[round - 1]] ?? '—').toLocaleUpperCase('pl-PL')}</strong>
     </div>
-    <ol className="sg-round-v52-steps" aria-label="Kolory premii w kolejnych rundach">
-      {colors.map((color, i) => {
-        const number = i + 1
-        const current = number === round
-        const past = number < round
-        return <li key={i}
-          className={`sg-round-v52-step${current ? ' sg-round-v52-active' : past ? ' sg-round-v52-past' : ' sg-round-v52-future'}`}
-          aria-current={current ? 'step' : undefined}
-          aria-label={`Runda ${number}: ${GLASS_COLOR_LABELS_PL[color]}${current ? ', aktualna' : past ? ', zakończona' : ''}`}
-          title={`Runda ${number}: ${GLASS_COLOR_LABELS_PL[color]}`}>
-          <span className="sg-round-v52-index" aria-hidden="true">{number}</span>
-          <span className="sg-round-v52-gem" aria-hidden="true"><GlassPiece color={color}/></span>
-        </li>
-      })}
-    </ol>
+
   </section>
 }
