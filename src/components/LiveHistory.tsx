@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
-import { Bot, Check, History, RotateCcw, Sparkles } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { Check, History, RotateCcw, Sparkles } from 'lucide-react'
 import type { GameEvent, GameState } from '../game/engine'
 import { GLASS_COLOR_LABELS_PL } from '../game/colorLabels'
 
-type Filter = 'all' | 'human' | 'ai'
 
 function PointChange({ value, label }: { value: number; label?: string }) {
   if (!value) return null
@@ -20,7 +19,7 @@ function EventItem({ event, state }: { event: GameEvent; state: GameState }) {
     : event.description
   return <li className={`sg-event sg-event-${event.kind}${event.points ? ' sg-event-scored' : ''}`}>
     <span className={`sg-event-avatar${player ? ` sg-palace-icon-${player.palaceColor ?? 'red'}` : ' sg-event-system'}`} aria-hidden="true">
-      {event.kind === 'take' ? (player?.controller === 'ai' ? <Bot size={13}/> : <Sparkles size={13}/>) : event.kind === 'reset' ? <RotateCcw size={13}/> : <Check size={13}/>}
+      {event.kind === 'take' ? <Sparkles size={13}/> : event.kind === 'reset' ? <RotateCcw size={13}/> : <Check size={13}/>}
     </span>
     <div className="sg-event-body">
       <div className="sg-event-by"><strong>{player?.name ?? 'Gra'}</strong><span>Runda {event.round} · ruch {event.id}</span><PointChange value={event.points ?? 0}/></div>
@@ -49,15 +48,11 @@ function EventItem({ event, state }: { event: GameEvent; state: GameState }) {
 export function LiveHistory({ state, status, onCancel, onDiscard }: {
   state: GameState; status: string; onCancel?: () => void; onDiscard?: () => void
 }) {
-  const [filter, setFilter] = useState<Filter>('all')
   const listRef = useRef<HTMLOListElement>(null)
   const atTop = useRef(true)
-  const events = (state.history ?? []).filter(event => {
-    const player = event.playerIndex === null ? null : state.players[event.playerIndex]
-    return filter === 'all' || player?.controller === filter
-  })
+  const events = state.history ?? []
   const latestId = state.history?.[0]?.id
-  useEffect(() => { if (atTop.current && listRef.current) listRef.current.scrollTop = 0 }, [latestId, filter])
+  useEffect(() => { if (atTop.current && listRef.current) listRef.current.scrollTop = 0 }, [latestId])
   return <section className="sg-history sg-center-card" aria-label="Historia rozgrywki">
     <div className="sg-panel-title"><span><History size={15}/> HISTORIA RUCHÓW</span><small>{state.history?.length ?? 0} wpisów</small></div>
     <div className="sg-history-live" aria-live="polite">
@@ -65,14 +60,9 @@ export function LiveHistory({ state, status, onCancel, onDiscard }: {
       {onCancel && <button type="button" onClick={onCancel}>Anuluj</button>}
       {onDiscard && <button type="button" className="sg-history-discard" onClick={onDiscard}>Stłucz tafle</button>}
     </div>
-    <div className="sg-history-filters" role="group" aria-label="Filtr historii">
-      {([['all','Wszystkie'],['human','Moje'],['ai','Boty']] as const).map(([value, label]) =>
-        <button type="button" key={value} aria-pressed={filter === value} className={filter === value ? 'sg-history-selected' : ''} onClick={() => {atTop.current = true; setFilter(value)}}>{label}</button>)}
-    </div>
     <ol className="sg-history-scroll" ref={listRef} onScroll={e => { atTop.current = e.currentTarget.scrollTop < 24 }}>
       {events.map((event, i) => <EventItem key={`${event.id}-${event.kind}-${i}`} event={event} state={state}/>)}
     </ol>
-    {!events.length && <div className="sg-history-empty">Brak ruchów dla wybranego filtra.</div>}
-    <div className="sg-history-footer">Najnowsze wpisy u góry · kolory oznaczają zmianę punktów</div>
+    {!events.length && <div className="sg-history-empty">Brak ruchów.</div>}
   </section>
 }
