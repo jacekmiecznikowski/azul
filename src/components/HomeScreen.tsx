@@ -31,7 +31,7 @@ export function HomeScreen({
     <section className="sg-home-shell">
       <div className="sg-home-art" aria-hidden="true">
         <div className="sg-home-arch"><div className="sg-home-mosaic">
-          {['rose','slate','citrine','cyan','amber','rose','cyan','amber','slate','citrine','citrine','rose','cyan','slate','amber'].map((color,i) =>
+          {['cyan','citrine','cyan','rose','slate','rose','amber','citrine','amber','rose','slate','rose','cyan','citrine','cyan'].map((color,i) =>
             <span key={i} className={`sg-home-glass sg-pane sg-pane-${color}`}><GlassPiece color={color as GlassColor}/></span>)}
         </div><span className="sg-home-arch-gem"><Gem size={29}/></span></div>
       </div>
