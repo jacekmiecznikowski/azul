@@ -722,3 +722,22 @@
 .sg .sg-art-board .sg-art-break {border-radius:3px;}
 .sg .sg-art-gem .sg-glass.sg-glass-placed.sg-gem-faceted {width:12px;height:12px;}
 .sg .sg-art-orbit::before {content:'';position:absolute;inset:14%;border:1px solid #b9a36d32;border-radius:50%;pointer-events:none;}
+
+/* Responsive double-band frame, with a genuine empty interior. */
+.sg .sg-boardscore-canvas {width:300px;height:230px;}
+.sg .sg-art-board {width:300px;height:230px;border-radius:7px;padding:7px;}
+.sg .sg-art-orbit {display:grid;grid-template-columns:repeat(19,minmax(0,1fr));grid-template-rows:repeat(10,minmax(0,1fr));gap:1.5px;border-radius:0;}
+.sg .sg-art-orbit::before {display:none;}
+.sg .sg-art-board .sg-art-cell {position:relative;left:auto;top:auto;transform:none;width:auto;height:auto;grid-row:var(--field-row);grid-column:var(--field-col);border-radius:2px;}
+.sg .sg-art-center {position:relative;left:auto;top:auto;grid-column:3 / 18;grid-row:3 / 9;width:auto;height:auto;margin:4px;padding:7px 12px;border-radius:5px;}
+.sg .sg-art-number {font-size:5px;}
+.sg .sg-art-checkpoint .sg-art-number {font-size:6px;}
+.sg .sg-art-panels {grid-template-columns:1fr 1.15fr;gap:16px;}
+.sg .sg-art-panels h3 {font-size:5px;}
+.sg .sg-boardscore-canvas.sg-frame-portrait {width:230px;height:300px;}
+.sg .sg-frame-portrait .sg-art-board {width:230px;height:300px;}
+.sg .sg-frame-portrait .sg-art-orbit {grid-template-columns:repeat(10,minmax(0,1fr));grid-template-rows:repeat(19,minmax(0,1fr));}
+.sg .sg-frame-portrait .sg-art-cell {grid-row:var(--field-col);grid-column:var(--field-row);}
+.sg .sg-frame-portrait .sg-art-center {grid-column:3 / 9;grid-row:3 / 18;padding:9px 5px;}
+.sg .sg-frame-portrait .sg-art-panels {gap:6px;grid-template-columns:1fr 1.1fr;}
+.sg .sg-frame-portrait .sg-art-panels h3 {font-size:4px;}
