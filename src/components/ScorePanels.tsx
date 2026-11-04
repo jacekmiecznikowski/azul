@@ -97,12 +97,12 @@ export function DigitalBrokenGlass({ game }: { game: GameState }) {
 
 const PAWN_COLORS = {red:'#de777a', yellow:'#e9c769', blue:'#6ac5df', white:'#d7e2e8'}
 
-export function SharedFieldMarker({players}:{players:Player[]}) {
+export function SharedFieldMarker({players, broken = false}:{players:Player[]; broken?:boolean}) {
   if (!players.length) return null
-  return <span className="sg-pawn-stack" role="img" aria-label={players.map(p=>`${p.name}: ${p.score} pkt`).join('; ')}>
-    {players.map((p,i)=><span key={p.id} className="sg-stacked-pawn" title={`${p.name}: ${p.score} pkt`}
-      style={{background:PAWN_COLORS[p.palaceColor ?? 'red'],left:`${i*2}px`,top:`${-i*1.5}px`,zIndex:i+1}}>
-      {p.score>=100 && <small className="sg-score-lap">+{Math.floor(p.score/100)*100}</small>}
+  return <span className={`sg-pawn-stack${broken ? ' sg-pawns-inline' : ''}`} role="img" aria-label={players.map(p=>broken ? `${p.name}: ${p.brokenSteps}/8 stłuczeń` : `${p.name}: ${p.score} pkt`).join('; ')}>
+    {players.map((p,i)=><span key={p.id} className="sg-stacked-pawn" title={broken ? `${p.name}: ${p.brokenSteps}/8 stłuczeń` : `${p.name}: ${p.score} pkt`}
+      style={{background:PAWN_COLORS[p.palaceColor ?? 'red'],left:broken ? undefined : `${i*1}px`,top:broken ? undefined : `${i*1}px`,zIndex:i+1}}>
+      {!broken && p.score>=100 && <small className="sg-score-lap">+{Math.floor(p.score/100)*100}</small>}
     </span>)}
   </span>
 }
@@ -138,7 +138,7 @@ function PhysicalTrack({game}:{game:GameState}) {
               title={`Pole ${step}: kara ${penalty} punktów`}>
               <span className="sg-art-step">{step===0 ? '◇' : step}</span>
               <span className="sg-art-penalty">{penalty ? `−${penalty}` : '0'}</span>
-              <SharedFieldMarker players={game.players.filter(p=>p.brokenSteps===step)}/>
+              <SharedFieldMarker broken players={game.players.filter(p=>p.brokenSteps===step)}/>
             </div>)}</div>
           </section>
         </div>
