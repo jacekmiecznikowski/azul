@@ -17,7 +17,22 @@ export function scoreTrackPosition(score: number): number {
 /** A continuous, 100-square double rectangular orbit around the original
  * central broken-glass ladder: 54 outer squares + 46 inner squares. */
 export function scoreTrackCoordinates(): ReadonlyArray<readonly [number,number]> {
-  const coordinates: Array<readonly [number,number]> = [[0, 0], [1, 0], [2, 0], [2, 1], [3, 1], [3, 0], [4, 0], [4, 1], [5, 1], [5, 0], [6, 0], [6, 1], [7, 1], [7, 0], [8, 0], [9, 0], [9, 1], [8, 1], [8, 2], [9, 2], [9, 3], [8, 3], [8, 4], [9, 4], [9, 5], [8, 5], [8, 6], [9, 6], [9, 7], [8, 7], [8, 8], [9, 8], [9, 9], [8, 9], [8, 10], [9, 10], [9, 11], [8, 11], [8, 12], [9, 12], [9, 13], [8, 13], [8, 14], [9, 14], [9, 15], [8, 15], [8, 16], [9, 16], [9, 17], [9, 18], [8, 18], [8, 17], [7, 17], [7, 18], [6, 18], [6, 17], [5, 17], [5, 18], [4, 18], [4, 17], [3, 17], [3, 18], [2, 18], [2, 17], [1, 17], [1, 18], [0, 18], [0, 17], [0, 16], [1, 16], [1, 15], [0, 15], [0, 14], [1, 14], [1, 13], [0, 13], [0, 12], [1, 12], [1, 11], [0, 11], [0, 10], [1, 10], [1, 9], [0, 9], [0, 8], [1, 8], [1, 7], [0, 7], [0, 6], [1, 6], [1, 5], [0, 5], [0, 4], [1, 4], [1, 3], [0, 3], [0, 2], [1, 2], [1, 1], [0, 1]]
+  const side: Array<readonly [number,number]> = [[0,0]]
+  let col=0
+  while(col<17) {
+    if(col===4 || col===10) {
+      side.push([1,col],[2,col],[2,col+1],[2,col+2],[1,col+2],[0,col+2])
+      col+=2
+    } else { col++; side.push([0,col]) }
+  }
+  const coordinates: Array<readonly [number,number]> = []
+  for(let rotation=0;rotation<4;rotation++) {
+    for(const point of side.slice(0,-1)) {
+      let [row,column]=point
+      for(let turn=0;turn<rotation;turn++) [row,column]=[column,17-row]
+      coordinates.push([row,column])
+    }
+  }
   return coordinates
 }
 
@@ -146,9 +161,9 @@ function FittedPhysicalContents({game}:{game:GameState}) {
     const element = viewport.current
     if (!element) return
     const observer = new ResizeObserver(([entry]) => {
-      const tall = entry.contentRect.width / entry.contentRect.height < 0.85
+      const tall = false
       setPortrait(tall)
-      setScale(Math.max(0.01,Math.min(entry.contentRect.width / (tall ? 230 : 300),entry.contentRect.height / (tall ? 300 : 230))))
+      setScale(Math.max(0.01,Math.min(entry.contentRect.width / 300,entry.contentRect.height / 300)))
     })
     observer.observe(element)
     return () => observer.disconnect()
