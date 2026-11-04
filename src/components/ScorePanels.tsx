@@ -220,7 +220,7 @@ export function BoardScoringPanel({game, launcherOnly = false}:{game:GameState; 
   </>
 }
 
-export function CompactScores({game}:{game:GameState}) {
+export function CompactScores({game, showBoard = true}:{game:GameState; showBoard?:boolean}) {
   const opening = game.history?.find(e => e.kind === 'start')
   const legacyStarter = game.players.findIndex(p => opening?.description.endsWith(`${p.name}.`))
   const first = game.initialStartingPlayer ?? (legacyStarter >= 0 ? legacyStarter : game.startingPlayer)
@@ -228,7 +228,7 @@ export function CompactScores({game}:{game:GameState}) {
   const current = game.players[game.currentPlayer]
   const starter = game.players[game.firstCenterTaken ? game.nextStartingPlayer ?? game.startingPlayer : game.startingPlayer]
   return <section className={`sg-compact-scores sg-center-card${game.players.length > 2 ? ' sg-compact-multiplayer' : ''}`} aria-label="Wyniki i przebieg gry">
-    <div className="sg-panel-title"><span>PRZY STOLE</span><BoardScoringPanel game={game} launcherOnly/></div>
+    <div className="sg-panel-title"><span>PRZY STOLE</span>{showBoard && <BoardScoringPanel game={game} launcherOnly/>}</div>
     <div className="sg-compact-turn"><PlayerMarker player={current}/><strong>{game.phase === 'finished' ? 'Koniec gry' : `Ruch: ${current.name}`}</strong></div>
     <div className="sg-compact-start">{game.firstCenterTaken ? 'Następna runda' : 'Rozpoczyna'}: <b>{starter.name}</b></div>
     <div className="sg-compact-columns"><span>GRACZ</span><span>PUNKTY</span></div>
