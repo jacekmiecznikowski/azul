@@ -128,7 +128,7 @@ export function GameBoard({ player, index, isCurrent, isHuman = false, isHumanTu
       {isStartingPlayer && <span className="sg-board-label sg-board-status">ROZPOCZĄŁ RUNDĘ</span>}
       {hasFirstToken && <span className="sg-start-tile sg-start-on-board" title="Ten gracz zdobył żeton pierwszego gracza i rozpocznie kolejną rundę">+1</span>}
       <strong data-sg-score className="sg-board-score">{player.score}<small> pkt</small></strong>
-      {isHuman && <button type="button" className="sg-reset" onClick={onReset} disabled={!canReset}><RotateCcw size={13}/> Cofnij witrażystę</button>}
+      {isHuman && <button type="button" className="sg-reset sg-glazier-home" onClick={onReset} disabled={!canReset} aria-label="Cofnij witrażystę na początek" title={canReset ? "Powrót witrażysty na początek — zużywa turę" : "Powrót witrażysty jest teraz niedostępny"}><span className="sg-glazier-home-gem" aria-hidden="true"><Gem size={15}/><RotateCcw size={10}/></span><span>Powrót</span></button>}
     </div>
     <div className="sg-board-windows">
       {ORNAMENT_PAIRS.map((_, pairIndex) => <OrnamentPair key={pairIndex}
