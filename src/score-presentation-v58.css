@@ -979,3 +979,15 @@
 .sg .sg-board-windows .sg-window.sg-window-active .sg-window-glazier svg {width:10px;height:10px;max-height:100%;}
 .sg .sg-board .sg-reset.sg-glazier-home {width:31px;height:29px;padding:2px;justify-content:center;}
 .sg .sg-glazier-home-gem>svg:last-child {right:-4px;bottom:-2px;width:17px;height:17px;}
+
+.sg .sg-art-marker .sg-pawn-stack {width:9px;height:9px;}
+.sg .sg-art-marker .sg-stacked-pawn {width:6px;height:6px;}
+.sg .sg-art-break .sg-pawn-stack.sg-pawns-inline {display:flex;align-items:center;justify-content:flex-end;gap:1px;width:19px;height:6px;transform:none;}
+.sg .sg-pawns-inline .sg-stacked-pawn {position:relative;width:4px;height:4px;flex:none;}
+.sg .sg-art-board .sg-art-break {grid-template-columns:8px 1fr 19px;}
+.sg .sg-home-mosaic {gap:2px;}
+.sg .sg-home-glass.sg-pane {display:grid;place-items:center;border:1px solid #bfa46e;border-radius:2px;background:radial-gradient(ellipse at 22% 12%,#ffffff36,transparent 65%),linear-gradient(145deg,var(--sg-ink),var(--sg-ink-dark));box-shadow:inset 0 0 0 1px #efdeb440,inset 0 0 14px #061c3855;}
+.sg .sg-home-glass:after {inset:0;transform:none;border:0;background:repeating-radial-gradient(ellipse at 0% 0%,transparent 0 27px,#ead7a138 28px 29px,transparent 30px 49px);}
+.sg .sg-home-glass .sg-glass {width:65%;height:auto;aspect-ratio:1;max-width:42px;z-index:1;}
+.sg .sg-home-arch {border-color:#c7ab72;background:linear-gradient(90deg,#506459,#102e3b 6%,#102e3b 94%,#506459);}
+.sg .sg-hotseat-player-fields>input {min-width:0;}
