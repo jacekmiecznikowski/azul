@@ -688,3 +688,21 @@
 .sg .sg-art-break .sg-pawn-stack {position:absolute;bottom:1px;left:2px;transform:scale(.55);transform-origin:bottom left;}
 .sg .sg-boardscore-modal > .sg-boardscore-modal-header {height:28px;min-height:28px;padding:0 9px;margin:0 0 8px;background:transparent;border-bottom:1px solid #4b77746b;}
 .sg .sg-boardscore-modal-header strong {font:800 10px/1 'DM Sans',sans-serif;letter-spacing:1px;color:inherit;}
+
+/* Four rotated repeats give the fifth-point checkpoints a regular rhythm. */
+.sg .sg-boardscore-canvas {height:300px;}
+.sg .sg-art-board {height:300px;display:block;}
+.sg .sg-art-orbit {height:100%;display:grid;grid-template-columns:repeat(14,minmax(0,1fr));grid-template-rows:repeat(14,minmax(0,1fr));gap:2px;}
+.sg .sg-art-center {grid-column:5 / 11;grid-row:5 / 11;display:flex;margin:2px;padding:7px;}
+.sg .sg-art-panels {display:grid;grid-template-columns:1fr 1.15fr;gap:8px;}
+.sg .sg-art-panels section {display:flex;flex-direction:column;gap:0;align-items:stretch;}
+.sg .sg-art-panels h3 {font-size:4.5px;letter-spacing:.3px;white-space:nowrap;margin:0 0 6px;}
+.sg .sg-art-round-list {height:auto;grid-template-columns:1fr;grid-template-rows:repeat(6,minmax(0,1fr));gap:3px;}
+.sg .sg-art-board .sg-art-round {grid-template-columns:9px 1fr;padding:1px 3px;}
+.sg .sg-art-break-list {height:auto;grid-template-columns:1fr;grid-template-rows:repeat(9,minmax(0,1fr));gap:3px;}
+.sg .sg-art-board .sg-art-break {display:grid;grid-template-columns:8px 1fr 12px;padding:1px 3px;gap:2px;}
+.sg .sg-art-board .sg-art-break .sg-art-step {display:block;font:500 4px/1 'DM Sans',sans-serif;}
+.sg .sg-art-board .sg-art-break .sg-art-penalty {font-size:6px;}
+.sg .sg-art-break .sg-pawn-stack {position:relative;bottom:auto;left:auto;transform:scale(.7);transform-origin:center;}
+.sg .sg-art-number {font-size:6px;}
+.sg .sg-art-checkpoint .sg-art-number {font-size:7px;}
