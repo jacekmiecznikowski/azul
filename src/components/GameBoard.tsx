@@ -122,7 +122,7 @@ export function GameBoard({ player, index, isCurrent, isHuman = false, isHumanTu
     {isCurrent && <span className="sg-board-turn-rail" aria-hidden="true"/>}
     <div className="sg-board-top">
       <span className={`sg-player-icon sg-player-icon-${index} sg-palace-icon-${player.palaceColor ?? 'red'}`}>{avatars[index]}</span>
-      <span className="sg-board-name">{player.name} <small className="sg-palace-label">{({red:'CZERWONY', yellow:'ŻÓŁTY', blue:'NIEBIESKI', white:'BIAŁY'} as const)[player.palaceColor ?? 'red']}</small></span>
+      <span className="sg-board-name">{player.name}</span>
       {player.controller !== 'human' && <span className="sg-board-label sg-board-ai-level">AI · {player.difficulty === 'master' ? 'TRENING AI' : player.difficulty === 'expert' ? 'EKSPERT' : player.difficulty === 'hard' ? 'TRUDNY' : player.difficulty === 'easy' ? 'ŁATWY' : 'NORMALNY'}</span>}
       {isCurrent && <span className="sg-board-label sg-board-status sg-board-status-active">TERAZ GRA</span>}
       {isStartingPlayer && <span className="sg-board-label sg-board-status">ROZPOCZĄŁ RUNDĘ</span>}
