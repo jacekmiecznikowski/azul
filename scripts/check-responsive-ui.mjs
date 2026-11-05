@@ -10,7 +10,7 @@ try {
   await server.listen()
   browser = await chromium.launch()
   await mkdir('reports/ui', { recursive: true })
-  for (const [width, height] of [[1920,1080],[1440,900],[1366,768],[1280,720],[1101,621],[1024,768],[844,390],[667,375],[390,844],[320,568]]) {
+  for (const [width, height] of [[1056,1030],[824,694],[1920,1080],[1440,900],[1366,768],[1280,720],[1101,621],[1024,768],[844,390],[667,375],[390,844],[320,568]]) {
     for (const opponents of [1,2,3]) {
       const page = await browser.newPage({ viewport: { width, height } })
       const errors = []
@@ -38,6 +38,25 @@ try {
       }
       await page.evaluate(() => document.fonts.ready)
       const root = width > 1100 && height > 620 ? '.sg-stage' : '.sg-mobile-layout'
+      if (width === 1056 || width === 824) {
+        const geometry = await page.locator(root).evaluate(layout => {
+          const board = layout.querySelector('.sg-mobile-board').getBoundingClientRect()
+          const market = layout.querySelector('.sg-mobile-market > .sg-market').getBoundingClientRect()
+          const cells = [...layout.querySelectorAll('.sg-mobile-penalty-step')]
+          return {
+            boardRatio: board.width / board.height,
+            marketBelow: market.top >= board.bottom - 1,
+            columns: new Set(cells.map(cell => Math.round(cell.getBoundingClientRect().left))).size,
+            readable: cells.length === 9 && cells.every(cell =>
+              cell.clientWidth >= 44 && cell.clientHeight >= 36 &&
+              parseFloat(getComputedStyle(cell.querySelector('strong')).fontSize) >= 14),
+          }
+        })
+        assert(geometry.boardRatio >= 2.4 && geometry.marketBelow,
+          `Player board proportions at ${width}×${height}: ${JSON.stringify(geometry)}`)
+        assert(geometry.columns === 3 && geometry.readable,
+          `Penalty mosaic at ${width}×${height}: ${JSON.stringify(geometry)}`)
+      }
       if (width === 1366 && height === 768 && opponents === 1) {
         await page.locator('.sg-round-announcement').waitFor({state:'hidden',timeout:5000})
         const active = page.locator(`${root} .sg-board.sg-board-your-turn`)
