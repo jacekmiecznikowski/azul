@@ -128,7 +128,7 @@ export function GameBoard({ player, index, isCurrent, isHuman = false, isHumanTu
       {isStartingPlayer && <span className="sg-board-label sg-board-status">ROZPOCZĄŁ RUNDĘ</span>}
       {hasFirstToken && <span className="sg-start-tile sg-start-on-board" title="Ten gracz zdobył żeton pierwszego gracza i rozpocznie kolejną rundę">+1</span>}
       <strong data-sg-score className="sg-board-score">{player.score}<small> pkt</small></strong>
-      {isHuman && <button type="button" className="sg-reset sg-glazier-home" onClick={onReset} disabled={!canReset} aria-label="Cofnij witrażystę na początek" title={canReset ? "Powrót witrażysty na początek — zużywa turę" : "Powrót witrażysty jest teraz niedostępny"}><span className="sg-glazier-home-gem" aria-hidden="true"><Gem size={15}/><RotateCcw size={17}/></span></button>}
+      {isHuman && <button type="button" className="sg-reset sg-glazier-home" onClick={onReset} disabled={!canReset} aria-label="Cofnij znacznik witrażysty na początek" title={canReset ? "Powrót witrażysty na początek — zużywa turę" : "Powrót witrażysty jest teraz niedostępny"}><span className="sg-glazier-home-gem" aria-hidden="true"><Gem size={15}/><RotateCcw size={17}/></span><span>Cofnij znacznik</span></button>}
     </div>
     <div className="sg-board-windows">
       {ORNAMENT_PAIRS.map((_, pairIndex) => <OrnamentPair key={pairIndex}

@@ -822,7 +822,7 @@
   margin:1px 0 2px;align-self:start;padding:1px 4px;
 }
 /* Shared panel finish for game setup and deliberate joker placement. */
-.sg .modal:is(.sg-hotseat-setup,.sg-manual-dialog) {
+.sg .modal:is(.sg-hotseat-setup,.sg-manual-dialog,.keep-modal,.rules-modal,.strategy-lab) {
   background:linear-gradient(145deg,#193e48,#0d2935);
   border:1px solid #c9ae75;border-radius:14px;
   box-shadow:inset 0 0 0 3px #b8d4cc0d,0 20px 70px #020f18bd;
@@ -832,27 +832,27 @@
 .sg .sg-hotseat-setup>.modal-icon,
 .sg .sg-hotseat-setup>.overline,
 .sg .sg-manual-dialog>.sg-manual-eyebrow {display:none;}
-.sg .modal:is(.sg-hotseat-setup,.sg-manual-dialog)>h2 {
+.sg .modal:is(.sg-hotseat-setup,.sg-manual-dialog,.keep-modal,.rules-modal,.strategy-lab)>h2 {
   font:800 12px/1.4 'DM Sans',sans-serif;letter-spacing:1.2px;
   text-transform:uppercase;color:#eed9ab;
   padding:0 32px 13px 0;margin:0 0 16px;
   border-bottom:1px solid #8eb3ab40;
 }
-.sg .modal:is(.sg-hotseat-setup,.sg-manual-dialog)>.close-btn {
+.sg .modal:is(.sg-hotseat-setup,.sg-manual-dialog,.keep-modal,.rules-modal,.strategy-lab)>.close-btn {
   background:#244a53;border:1px solid #88aaa880;border-radius:5px;
   color:#dbe8df;box-shadow:none;
 }
-.sg .modal:is(.sg-hotseat-setup,.sg-manual-dialog) :is(input,select) {
+.sg .modal:is(.sg-hotseat-setup,.sg-manual-dialog,.keep-modal,.rules-modal,.strategy-lab) :is(input,select) {
   background:#102f3b;color:#dce9e3;border:1px solid #739b9b80;border-radius:6px;
   font-family:inherit;
 }
 .sg .sg-hotseat-setup .option-choice {background:#12333e;border:1px solid #739b9b80;border-radius:8px;color:#c7deda;}
 .sg .sg-hotseat-setup .option-choice.chosen {background:#655c3d;border-color:#e1c080;color:#ffe4ad;box-shadow:inset 0 0 0 1px #e1c08055;}
-.sg .modal:is(.sg-hotseat-setup,.sg-manual-dialog) :is(.modal-main,.sg-manual-confirm):not(:disabled) {
+.sg .modal:is(.sg-hotseat-setup,.sg-manual-dialog,.keep-modal,.rules-modal,.strategy-lab) :is(.modal-main,.sg-manual-confirm):not(:disabled) {
   background:linear-gradient(135deg,#f0d99e,#d1b375);border:1px solid #f3dfa9;
   border-radius:7px;color:#17353e;font:800 13px/1.3 'DM Sans',sans-serif;
 }
-.sg .modal:is(.sg-hotseat-setup,.sg-manual-dialog) button:focus-visible {outline:2px solid #8ce7f2;outline-offset:3px;}
+.sg .modal:is(.sg-hotseat-setup,.sg-manual-dialog,.keep-modal,.rules-modal,.strategy-lab) button:focus-visible {outline:2px solid #8ce7f2;outline-offset:3px;}
 
 /* Keep footer contents inside the available height as well as the footer itself. */
 .sg .sg-board-windows .sg-window-foot {container-type:size;align-items:center;}
@@ -970,7 +970,7 @@
   min-height:0;border-radius:4px;align-self:center;
 }
 .sg .sg-board-windows .sg-window.sg-window-active .sg-window-glazier svg {width:10px;height:10px;max-height:100%;}
-.sg .sg-board .sg-reset.sg-glazier-home {width:31px;height:29px;padding:2px;justify-content:center;}
+.sg .sg-board .sg-reset.sg-glazier-home {width:auto;height:29px;padding:2px 9px 2px 3px;justify-content:center;white-space:nowrap;}
 .sg .sg-glazier-home-gem>svg:last-child {right:-4px;bottom:-2px;width:17px;height:17px;}
 
 .sg .sg-art-marker .sg-pawn-stack {width:9px;height:9px;}
@@ -1016,7 +1016,8 @@
 .sg .sg-art-marker .sg-stacked-pawn,
 .sg .sg-pawns-inline .sg-stacked-pawn,
 .sg .sg-compact-glass-pawn,
-.sg .sg-mobile-penalty-pawns .sg-pawn {border:0!important;outline:0;box-shadow:none;}
+.sg .sg-mobile-penalty-pawns .sg-pawn,
+.sg .sg-compact-scores .sg-pawn {border:0!important;outline:0;box-shadow:inset 0 0 0 .5px rgb(245 232 199 / 65%);}
 /* Completed glazing is one aperture, not a five-row pane grid. */
 .sg .sg-board-windows .sg-window-completed .sg-window-lancet {
   display:flex;align-items:center;justify-content:center;min-height:0;
@@ -1042,3 +1043,8 @@
  .sg .sg-mobile-board .sg-window-completed .sg-finished {font-size:7px;letter-spacing:0;}
  .sg .sg-mobile-board .sg-window-completed .sg-finished svg {width:16px;height:16px;}
 }
+
+.sg .keep-modal .keep-options {display:flex;flex-wrap:wrap;gap:8px;}
+.sg .keep-modal .keep-options button {flex:1 1 74px;border:1px solid #739b9b80;border-radius:8px;background:#173943;color:#e8debf;}
+.sg .keep-modal .keep-options button:hover {background:#29484b;border-color:#cfad6a;}
+.sg .rules-modal>.modal-icon,.sg .rules-modal>.overline {display:none;}

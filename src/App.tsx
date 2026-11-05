@@ -398,7 +398,7 @@ export default function App() {
   function chooseFinalGlass(candidates: Move[]) {
     // Keep-color choices are separate from placement choices. Choosing fields
     // must never force which colored pane the player preserves afterwards.
-    if (candidates.length > 1 || (candidates[0]?.kind === 'take' && candidates[0].keepColor)) {
+    if (candidates.length > 1) {
       setFinishing(candidates)
     } else if (candidates.length) commit(candidates[0])
   }
@@ -533,14 +533,14 @@ export default function App() {
               </span>
             </button>)}
           </div>
-          <div className="sg-mobile-status" aria-live="polite">
-            <span>{selection ? `Wskaż kwaterę — ${COLORS_PL[selection.color].toLowerCase()}` : humanTurn ? `Ruch: ${current.name}` : `${current.name} wybiera ruch…`}</span>
+          {(selection || (humanTurn && mobileBoardIndex !== game.currentPlayer)) && <div className="sg-mobile-status" aria-live="polite">
+            {selection && <span>Wskaż kwaterę — {COLORS_PL[selection.color].toLowerCase()}</span>}
             {selection && <button type="button" onClick={() => setSelection(null)}>Anuluj</button>}
             {selection && selectionMoves.some(m => m.kind === 'take' && m.windowIndex === null) &&
               <button type="button" onClick={() => chooseTarget(null)}>Stłucz</button>}
             {humanTurn && mobileBoardIndex !== game.currentPlayer &&
               <button type="button" onClick={() => setMobileBoard(game.currentPlayer)}>Moja tura</button>}
-          </div>
+          </div>}
         </div>
       </div>
       {mobilePanel && <div className="sg-mobile-overlay" onMouseDown={() => setMobilePanel(null)}>
@@ -584,6 +584,18 @@ export default function App() {
         candidates={placementOptions.filter((move): move is Extract<Move, { kind: 'take' }> => move.kind === 'take')}
         picked={sourceOptions.find(option => option.color === selection.color && sourceEquals(option.source, selection.source))?.count ?? 0}
         onClose={() => setPlacementOptions(null)} onConfirm={confirmManualPlacement}/>}
-    {finishing && <div className="modal-backdrop" onMouseDown={() => setFinishing(null)}><div className="modal keep-modal" role="dialog" aria-modal="true" aria-label="Wybierz taflę do zachowania" onMouseDown={e => e.stopPropagation()}><button className="close-btn" onClick={() => setFinishing(null)} aria-label="Zamknij"><X size={18}/></button><div className="modal-icon"><Gem size={24}/></div><h2>Wybierz taflę do okna</h2><p>Jedna tafla zostanie w pałacowym witrażu.</p><div className="keep-options">{finishing.filter(m => m.kind === 'take' && m.keepColor).map(m => m.kind === 'take' && m.keepColor ? <button key={m.keepColor} onClick={() => commit(m)}><GlassPiece color={m.keepColor}/><span>{COLORS_PL[m.keepColor]}</span></button> : null)}</div></div></div>}
+    {finishing && <div className="modal-backdrop" onMouseDown={() => setFinishing(null)}>
+      <section className="modal keep-modal" role="dialog" aria-modal="true" aria-labelledby="keep-heading"
+        onMouseDown={e => e.stopPropagation()}>
+        <button type="button" className="close-btn" onClick={() => setFinishing(null)} aria-label="Zamknij"><X size={18}/></button>
+        <h2 id="keep-heading">Wybierz taflę do okna</h2>
+        <p>Wybrana tafla zostanie w pałacowym witrażu.</p>
+        <div className="keep-options">{finishing.map(move =>
+          move.kind === 'take' && move.keepColor && <button type="button" key={move.keepColor} onClick={() => commit(move)}>
+            <GlassPiece color={move.keepColor}/><span>{COLORS_PL[move.keepColor]}</span>
+          </button>
+        )}</div>
+      </section>
+    </div>}
   </div>
 }

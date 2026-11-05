@@ -46,7 +46,7 @@
   background:radial-gradient(ellipse,#fff 0%,#fff3c4 18%,#edc777aa 44%,transparent 72%);
 }
 .sg.sg-effects-cinematic .sg-board-turn-rail::after {
-  animation:sg-turn-edge 5s linear infinite;
+  animation:sg-turn-edge 1.8s linear infinite;
 }
 .sg .sg-board.sg-board-current .sg-player-icon {
   outline:2px solid #ffe2a0;outline-offset:2px;
