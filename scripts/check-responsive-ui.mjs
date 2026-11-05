@@ -473,12 +473,25 @@ try {
     const compact=root.locator('.sg-compact-scores')
     assert.equal(await compact.locator('.sg-compact-player').count(),4)
     assert(await root.evaluate(el=>el.scrollHeight<=el.clientHeight+1),'Compact scoring must fit without scrolling')
-    await compact.getByRole('button',{name:'Powiększ tor punktów'}).click()
-    const dialog=page.getByRole('dialog',{name:'Powiększona plansza punktacji'})
-    assert.equal(await dialog.locator('.sg-boardscore-cell').count(),100)
-    assert.equal(await dialog.locator('.sg-score-round-tile').count(),6)
-    assert.equal(await dialog.locator('.sg-boardscore-broken-step').count(),9)
-    await page.keyboard.press('Escape')
+    const launcher = compact.getByRole('button',{name:'Powiększ tor punktów'})
+    if (mobile) {
+      assert.equal(await launcher.count(), 0)
+      assert.equal(await compact.locator('.sg-compact-glass-cell').count(), 9)
+      const rounds = compact.locator('.sg-score-round-tile')
+      assert.equal(await rounds.count(), 6)
+      assert(await rounds.last().evaluate(el => {
+        const bounds = el.getBoundingClientRect()
+        const panel = el.closest('.sg-mobile-stats').getBoundingClientRect()
+        return bounds.top >= panel.top && bounds.bottom <= Math.min(panel.bottom, innerHeight) + 1
+      }), 'Last round tile clipped on mobile')
+    } else {
+      await compact.getByRole('button',{name:'Powiększ tor punktów'}).click()
+      const dialog=page.getByRole('dialog',{name:'Powiększona plansza punktacji'})
+      assert.equal(await dialog.locator('.sg-boardscore-cell').count(),100)
+      assert.equal(await dialog.locator('.sg-score-round-tile').count(),6)
+      assert.equal(await dialog.locator('.sg-boardscore-broken-step').count(),9)
+      await page.keyboard.press('Escape')
+    }
     await page.close()
   }
 

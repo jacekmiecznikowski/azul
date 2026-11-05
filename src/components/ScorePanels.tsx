@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Maximize2, X } from 'lucide-react'
-import { BROKEN_TRACK } from '../game/engine'
+import { BROKEN_TRACK, nextClockwisePlayer } from '../game/engine'
 import type { GameState, Player } from '../game/engine'
 import { GLASS_COLOR_LABELS_PL } from '../game/colorLabels'
 import { GlassPiece } from './GameBoard'
@@ -67,34 +67,6 @@ export function ScoreRoundBonuses({ game }: { game: GameState }) {
 }
 
 /** Digital mode: penalties read like the score list, not a second physical board. */
-export function DigitalBrokenGlass({ game }: { game: GameState }) {
-  return <section className="sg-track sg-digital-penalties sg-center-card" aria-label="Cyfrowy tor stłuczonego szkła">
-    <div className="sg-panel-title"><span>STŁUCZONE SZKŁO</span><small>0–8 stłuczeń</small></div>
-    <div className="sg-digital-penalty-list">
-      {game.players.map((player, index) => {
-        const step = Math.max(0, Math.min(8, player.brokenSteps))
-        const penalty = BROKEN_TRACK[step]
-        return <div key={player.id}
-          className={`sg-digital-penalty-row${index === game.currentPlayer ? ' sg-digital-penalty-current' : ''}`}
-          aria-label={`${player.name}: ${step} z 8 stłuczeń, kara ${penalty} punktów`}>
-          <div className="sg-digital-penalty-heading">
-            <PlayerMarker player={player}/>
-            <span>{player.name}</span>
-            <b>{step}<small>/8</small></b>
-            <strong>{penalty ? `−${penalty}` : '0'}<small> pkt</small></strong>
-          </div>
-          <div className="sg-digital-penalty-meter" aria-hidden="true">
-            {Array.from({length:8}, (_, i) =>
-              <i key={i} className={i < step ? 'sg-digital-penalty-filled' : ''}/>
-            )}
-          </div>
-        </div>
-      })}
-    </div>
-    <ScoreRoundBonuses game={game}/>
-  </section>
-}
-
 const PAWN_COLORS = {red:'#b82731', yellow:'#dec06b', blue:'#17548b', white:'#f3f6f4'}
 
 export function SharedFieldMarker({players, broken = false}:{players:Player[]; broken?:boolean}) {
@@ -156,20 +128,17 @@ function PhysicalScoreContents({game}:{game:GameState}) {
 function FittedPhysicalContents({game}:{game:GameState}) {
   const viewport = useRef<HTMLDivElement>(null)
   const [scale,setScale] = useState(0.7)
-  const [portrait,setPortrait] = useState(false)
   useEffect(() => {
     const element = viewport.current
     if (!element) return
     const observer = new ResizeObserver(([entry]) => {
-      const tall = false
-      setPortrait(tall)
       setScale(Math.max(0.01,Math.min(entry.contentRect.width / 300,entry.contentRect.height / 300)))
     })
     observer.observe(element)
     return () => observer.disconnect()
   },[])
   return <div ref={viewport} className="sg-boardscore-fit">
-    <div className={`sg-boardscore-canvas${portrait ? ' sg-frame-portrait' : ''}`} style={{transform:`translate(-50%,-50%) scale(${scale})`}}>
+    <div className="sg-boardscore-canvas" style={{transform:`translate(-50%,-50%) scale(${scale})`}}>
       <PhysicalScoreContents game={game}/>
     </div>
   </div>
@@ -221,10 +190,12 @@ export function BoardScoringPanel({game, launcherOnly = false}:{game:GameState; 
 }
 
 export function CompactScores({game, showBoard = true}:{game:GameState; showBoard?:boolean}) {
-  const opening = game.history?.find(e => e.kind === 'start')
-  const legacyStarter = game.players.findIndex(p => opening?.description.endsWith(`${p.name}.`))
-  const first = game.initialStartingPlayer ?? (legacyStarter >= 0 ? legacyStarter : game.startingPlayer)
-  const ordered = game.players.map((_,offset) => game.players[(first + offset) % game.players.length])
+  const ordered: Player[] = []
+  let index = game.initialStartingPlayer ?? game.startingPlayer
+  for (let seat = 0; seat < game.players.length; seat++) {
+    ordered.push(game.players[index])
+    index = nextClockwisePlayer(index, game.players.length)
+  }
   const current = game.players[game.currentPlayer]
   const starter = game.players[game.firstCenterTaken ? game.nextStartingPlayer ?? game.startingPlayer : game.startingPlayer]
   return <section className={`sg-compact-scores sg-center-card${game.players.length > 2 ? ' sg-compact-multiplayer' : ''}`} aria-label="Wyniki i przebieg gry">

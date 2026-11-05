@@ -3,13 +3,13 @@ import { describe, expect, it } from 'vitest'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { BROKEN_TRACK, newGame } from '../game/engine'
-import { TurnSummary } from '../App'
+import { CompactScores } from '../components/ScorePanels'
 
 describe('v32 middle-panel presentation', () => {
   const game = newGame({ opponents: 3, seed: 213 })
 
   it('removes the status dot solely from the PRZY STOLE title', () => {
-    const markup = renderToStaticMarkup(createElement(TurnSummary, { game }))
+    const markup = renderToStaticMarkup(createElement(CompactScores, { game }))
     expect(markup).toContain('PRZY STOLE')
     expect(markup).not.toContain('sg-live-dot')
     expect(markup).toContain('sg-score-current')

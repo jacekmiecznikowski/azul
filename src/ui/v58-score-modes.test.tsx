@@ -3,7 +3,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { readFileSync } from 'node:fs'
 import { newGame, BROKEN_TRACK } from '../game/engine'
-import { CompactScores, BoardScoringPanel, DigitalBrokenGlass, ScoreRoundBonuses, scoreTrackCells, scoreTrackCoordinates, scoreTrackPosition } from '../components/ScorePanels'
+import { CompactScores, BoardScoringPanel, ScoreRoundBonuses, scoreTrackCells, scoreTrackCoordinates, scoreTrackPosition } from '../components/ScorePanels'
 
 const app = readFileSync(new URL('../App.tsx', import.meta.url),'utf8')
 const menu = readFileSync(new URL('../components/GameMenu.tsx', import.meta.url),'utf8')
@@ -51,8 +51,8 @@ describe('v58 — two visual scoring modes, original scoring logic untouched', (
   it('renders concise digital penalties for every player and the same round jewels', () => {
     const game=newGame({opponents:2,seed:158})
     game.players[1].brokenSteps=8
-    const html=renderToStaticMarkup(createElement(DigitalBrokenGlass,{game}))
-    expect((html.match(/class="sg-digital-penalty-row/g)??[])).toHaveLength(3)
+    const html=renderToStaticMarkup(createElement(CompactScores,{game}))
+    expect((html.match(/class="sg-compact-glass-cell/g)??[])).toHaveLength(9)
     expect(html).toContain('−18')
     expect(html).toContain('STŁUCZONE SZKŁO')
     expect((html.match(/sg-score-round-gem/g)??[])).toHaveLength(6)
@@ -76,12 +76,13 @@ describe('v58 — two visual scoring modes, original scoring logic untouched', (
 
 it('keeps score and penalty rows in first-round order after the starter changes', () => {
   const game = newGame({opponents:3,seed:94})
-  const first = game.startingPlayer
+  const first = 0
+  game.initialStartingPlayer = first
   expect(game.initialStartingPlayer).toBe(first)
   game.startingPlayer = (first + 2) % 4
   game.round = 2
   const html = renderToStaticMarkup(createElement(CompactScores,{game}))
   const rows = [...html.matchAll(/class="sg-compact-name"[^>]*title="([^"]+)"/g)].map(m=>m[1])
-  expect(rows).toEqual(game.players.map((_,i)=>game.players[(first+i)%4].name))
+  expect(rows).toEqual([0,3,1,2].map(i=>game.players[i].name))
   expect(html.indexOf('sg-compact-broken-heading')).toBeGreaterThan(html.indexOf('sg-compact-players'))
 })

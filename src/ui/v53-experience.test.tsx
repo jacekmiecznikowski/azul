@@ -7,7 +7,7 @@ import type { Move } from '../game/engine'
 import { RoundAnnouncement } from '../components/RoundAnnouncement'
 import { GameBoard } from '../components/GameBoard'
 import { ManualPlacementDialog } from '../components/ManualPlacementDialog'
-import { TurnSummary } from '../App'
+import { CompactScores } from '../components/ScorePanels'
 
 const styles = readFileSync(new URL('../experience-polish-v53.css', import.meta.url), 'utf8')
 
@@ -25,13 +25,13 @@ describe('v53 – round announcement, readable status, glazier and manual placem
   })
   it('reports who started and who will start next, with no duplicate token icon', () => {
     const state = newGame({ opponents:3, seed:53 })
-    const started = renderToStaticMarkup(createElement(TurnSummary,{game:state}))
-    expect(started).toContain('Rundę rozpoczyna:')
+    const started = renderToStaticMarkup(createElement(CompactScores,{game:state}))
+    expect(started).toContain('Rozpoczyna:')
     expect(started).not.toContain('sg-turn-token-icon')
     state.firstCenterTaken = true
     state.nextStartingPlayer = 1
-    const next = renderToStaticMarkup(createElement(TurnSummary,{game:state}))
-    expect(next).toContain('Następną rundę rozpocznie:')
+    const next = renderToStaticMarkup(createElement(CompactScores,{game:state}))
+    expect(next).toContain('Następna runda:')
     expect(next).toContain(state.players[1].name)
   })
   it('makes the only glazier window unmistakably distinct, without changing the pane colors', () => {

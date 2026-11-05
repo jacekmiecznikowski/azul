@@ -1,3 +1,4 @@
+import { decodeSavedGame } from './game/savedGame'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { ArrowRight, BookOpen, Check, CirclePlus, Gem, House, Info, Settings2, X } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, legalMoves, newGame, standings } from './game/engine'
@@ -60,7 +61,6 @@ import './turn-market-v56.css'
 import './score-presentation-v58.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
-const PLAYER_AVATARS = ['✦', '✧', '✳', '❖']
 interface Settings { opponents: number; difficulties: Difficulty[]; controllers: Controller[]; names: string[]; palaceSide: PalaceSide }
 const DEFAULT_OPTIONS: Settings = {
   opponents: 3,
@@ -77,9 +77,7 @@ function restore(): GameState | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return null
-    const game = JSON.parse(raw) as GameState
-    if (game.players?.length >= 2 && game.factories && game.roundColors?.length === 6 && game.round >= 1 && game.round <= 6)
-      return { ...game, history: Array.isArray(game.history) ? game.history : [] }
+    return decodeSavedGame(raw)
   } catch { /* Corrupt or old save: start a fresh game. */ }
   return null
 }
@@ -146,25 +144,6 @@ export function Market({ game, selection, disabled, onPick }: {
   </section>
 }
 
-export function TurnSummary({ game }: { game: GameState }) {
-  const current = game.players[game.currentPlayer]
-  return <section className="sg-turn sg-center-card" aria-label="Tura i wyniki">
-    <div className="sg-panel-title"><span>PRZY STOLE</span></div>
-    <div className="sg-turn-player"><span className={`sg-player-icon sg-palace-icon-${current.palaceColor ?? 'red'}`}>{PLAYER_AVATARS[game.currentPlayer]}</span>
-      <div><strong>{game.phase === 'finished' ? 'Koniec rozgrywki' : current.controller === 'human' ? (current.name === 'Ty' ? 'Twój ruch' : `Tura: ${current.name}`) : `Gra ${current.name}`}</strong>
-      <small>{game.phase === 'finished' ? 'Zobacz końcowe wyniki' : current.controller === 'human' ? 'Wybierz tafle i kwaterę' : 'Przeciwnik rozważa ruch…'}</small></div>
-      {current.controller === 'ai' && game.phase === 'playing' && <span className="sg-thinking" aria-label="AI myśli"><i/><i/><i/></span>}
-    </div>
-
-    <div className="sg-scores">{game.players.map((p, i) => <div key={p.id} className={`sg-score-line${game.currentPlayer === i && game.phase === 'playing' ? ' sg-score-current' : ''}`}>
-      <i className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`}/><span>{p.name}</span><b>{p.score}</b></div>)}</div>
-    <div className="sg-turn-first-token" role="status">
-      {game.firstCenterTaken
-        ? <span>Następną rundę rozpocznie: <strong>{game.players[game.nextStartingPlayer ?? game.startingPlayer].name}</strong></span>
-        : <span>Rundę rozpoczyna: <strong>{game.players[game.startingPlayer].name}</strong></span>}
-    </div>
-  </section>
-}
 function SetupModal({ settings, onClose, onStart }: {
   settings: Settings; onClose: () => void; onStart: (settings: Settings) => void
 }) {
@@ -255,7 +234,8 @@ function RulesModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function App() {
-  const [game, setGame] = useState<GameState>(() => restore() ?? newGame({ ...DEFAULT_OPTIONS, botDifficulties: DEFAULT_OPTIONS.difficulties }))
+  const [savedGame] = useState(restore)
+  const [game, setGame] = useState<GameState>(() => savedGame ?? newGame({ ...DEFAULT_OPTIONS, botDifficulties: DEFAULT_OPTIONS.difficulties }))
   const [settings, setSettings] = useState<Settings>(() => ({
     opponents: game.players.length - 1,
     difficulties: DEFAULT_OPTIONS.difficulties.map((difficulty, i) => game.players[i + 1]?.difficulty ?? difficulty),
@@ -274,7 +254,7 @@ export default function App() {
   const [roundReady, setRoundReady] = useState<number | null>(null)
   const [turnNotice, setTurnNotice] = useState<{ key: string; name: string } | null>(null)
   const noticedHumanTurn = useRef<string | null>(null)
-  const [hasSave, setHasSave] = useState(() => restore() !== null)
+  const [hasSave, setHasSave] = useState(savedGame !== null)
   const [viewport, setViewport] = useState(() => typeof window === 'undefined' ? { width: 1600, height: 900 } : { width: window.innerWidth, height: window.innerHeight })
   const [showSetup, setShowSetup] = useState(false)
   const [showRules, setShowRules] = useState(false)
