@@ -18,7 +18,7 @@
   border-radius:0;
 }
 .sg .sg-board-windows .sg-window.sg-window-active .sg-window-head>span:first-child {color:inherit!important;}
-.sg .sg-board-windows .sg-window.sg-window-active .sg-window-lancet {
+.sg .sg-board-windows .sg-window.sg-window-active:not(.sg-window-completed) .sg-window-lancet {
   border:2px solid #c6a46e!important;
   border-bottom-width:1px!important;
   box-shadow:inset 0 0 0 1px #f6e5b64d,inset 0 0 9px #0009!important;
@@ -1019,7 +1019,12 @@
 .sg .sg-mobile-penalty-pawns .sg-pawn,
 .sg .sg-compact-scores .sg-pawn {border:0!important;outline:0;box-shadow:inset 0 0 0 .5px rgb(245 232 199 / 65%);}
 /* Completed glazing is one aperture, not a five-row pane grid. */
-.sg .sg-board-windows .sg-window-completed .sg-window-lancet {
+.sg .sg-board-windows .sg-window.sg-window-completed .sg-window-lancet {
+  border:0;
+  box-shadow:none;
+  border-radius:0;
+  container-type:size;
+  background:radial-gradient(ellipse at center,#24505a 0%,#12323e 52%,#102d38 100%);
   display:flex;align-items:center;justify-content:center;min-height:0;
 }
 .sg .sg-board-windows .sg-window-completed .sg-finished {
@@ -1041,10 +1046,21 @@
  .sg .sg-mobile-player {border-radius:7px;background:#15353f;color:#d5e5df;}
  .sg .sg-mobile-player.sg-mobile-player-selected {background:#344c47;border-color:#dab879;}
  .sg .sg-mobile-board .sg-window-completed .sg-finished {font-size:7px;letter-spacing:0;}
- .sg .sg-mobile-board .sg-window-completed .sg-finished svg {width:16px;height:16px;}
+
 }
 
 .sg .keep-modal .keep-options {display:flex;flex-wrap:wrap;gap:8px;}
 .sg .keep-modal .keep-options button {flex:1 1 74px;border:1px solid #739b9b80;border-radius:8px;background:#173943;color:#e8debf;}
 .sg .keep-modal .keep-options button:hover {background:#29484b;border-color:#cfad6a;}
 .sg .rules-modal>.modal-icon,.sg .rules-modal>.overline {display:none;}
+
+.sg .sg-board-windows .sg-window-completed .sg-finished svg {
+  width:min(75cqw,43cqh,74px);
+  height:auto;
+  filter:drop-shadow(0 2px 2px #051d2899);
+}
+.sg .sg-board-windows .sg-window-completed .sg-finished b {
+  color:#ebddba;
+  font:700 clamp(6px,12cqw,11px)/1.2 'DM Sans',sans-serif;
+  letter-spacing:.06em;
+}

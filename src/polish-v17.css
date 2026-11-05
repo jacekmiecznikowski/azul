@@ -241,23 +241,5 @@
   text-align:center;
   text-shadow:0 1px 5px #0009,0 0 16px #f0d38a69;
 }
-.sg .sg-window-completed .sg-finished svg {
-  width:23px;
-  height:23px;
-  color:#f7df9c;
-  filter:drop-shadow(0 0 9px #f7cf8680);
-}
-.sg .sg-window-completed .sg-finished::before {
-  content:'';
-  position:absolute;
-  width:56px;
-  height:56px;
-  left:50%;
-  top:50%;
-  border:1px solid #c3ac6652;
-  border-radius:50%;
-  transform:translate(-50%,-50%);
-  box-shadow:0 0 20px #a2ccab12;
-}
 @media(prefers-reduced-motion:reduce) {
 }

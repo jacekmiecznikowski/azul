@@ -1,4 +1,4 @@
-import { Gem, RotateCcw, Sparkles } from 'lucide-react'
+import { Gem, RotateCcw } from 'lucide-react'
 import { patternFor, WINDOW_POINTS } from '../game/engine'
 import type { GlassColor, Player, SlotColor, WindowStrip } from '../game/engine'
 
@@ -27,6 +27,26 @@ export function GlassPiece({ color, placed = true, small = false }: {
   </span>
 }
 
+/** The two panes kept in the palace supply the alternating petal colours. */
+function FinishedWindow({ upper, lower }: Pick<WindowStrip, 'upper' | 'lower'>) {
+  return <span className="sg-finished">
+    <svg viewBox="0 0 80 80" aria-hidden="true" focusable="false">
+      <g stroke="#132e37" strokeWidth="1.3" strokeLinejoin="round">
+        {Array.from({length:8}, (_, petal) => <g key={petal}
+          transform={`rotate(${petal * 45} 40 40)`}
+          className={`sg-pane-${(petal % 2 ? lower : upper) ?? 'citrine'}`}>
+          <path d="M40 35 Q26 23 32 12 L40 3 L48 12 Q54 23 40 35Z" fill="var(--sg-ink)"/>
+          <path d="M40 4 L40 32 L33 13Z" fill="#fff" opacity=".3" stroke="none"/>
+          <path d="M40 32 L47 13 Q51 22 40 32Z" fill="var(--sg-ink-dark)" stroke="none"/>
+        </g>)}
+        <path d="M40 31 L49 40 L40 49 L31 40Z" fill="#e8cd92"/>
+        <path d="M40 33 L46 40 L40 40Z" fill="#fff5d0" stroke="none"/>
+      </g>
+    </svg>
+    <b>GOTOWE</b>
+  </span>
+}
+
 function Window({ strip, index, glazier, target, selected, isHumanTurn, onTarget }: {
   strip: WindowStrip; index: number; glazier: number; target: boolean; selected: boolean
   isHumanTurn: boolean; onTarget?: (index: number) => void
@@ -43,7 +63,7 @@ function Window({ strip, index, glazier, target, selected, isHumanTurn, onTarget
     {!complete && <span className="sg-window-reverse" aria-label="Podgląd drugiej strony">
       {reverse.map((color, i) => <i key={i} className={`sg-color-dot sg-color-dot-${color}`}/>)}</span>}
     <span className="sg-window-lancet">
-      {complete ? <span className="sg-finished"><Sparkles size={20}/><b>GOTOWE</b></span>
+      {complete ? <FinishedWindow upper={strip.upper} lower={strip.lower}/>
         : patternFor(strip).map((color, i) =>
           <span key={i} data-sg-pane={i} className={`sg-pane sg-pane-${color}${strip.panes[i] ? ' sg-pane-filled' : ''}`}
             aria-label={`Piętro ${i + 1}: ${strip.panes[i] ? 'wypełnione' : 'puste'}`}>
