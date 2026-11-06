@@ -226,3 +226,18 @@
   .sg .sg-finish-actions button {transition:none}
   .sg .sg-finish-actions button:hover {transform:none}
 }
+
+.sg-finish-actions .sg-board-link {grid-column:1/-1;background:transparent;border:0;color:#d0dfdc;text-decoration:underline;text-underline-offset:4px;padding:10px;cursor:pointer}
+.sg-final-header {padding-bottom:14px;border-bottom:1px solid #b9a16a55}
+.sg-final-dialog .sg-final-player {overflow:hidden;padding:0;background:#102e38}
+.sg-final-player .sg-final-player-head {padding:12px 15px;margin:0;background:linear-gradient(110deg,#214953,#193943)}
+.sg-final-winner .sg-final-player-head {background:linear-gradient(110deg,#514b35,#203d42)}
+.sg-final-player-head span {min-width:0;overflow-wrap:anywhere}
+.sg-final-player-head strong {white-space:nowrap}
+.sg-final-player .sg-final-steps {padding:10px 15px 14px}
+.sg-final-steps .sg-final-glass {background:#ffffff08;border-inline-start:2px solid #a87871;padding:8px 10px;align-items:baseline}
+.sg-final-glass small {display:block;margin-top:3px}
+.sg-final-dialog .sg-final-caption {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sg .sg-finish-actions {flex-wrap:wrap}
+.sg .sg-finish-actions .sg-board-link {flex:1 0 100%}
+.sg-final-caption button,.sg-header-actions .sg-finish-secondary {border:1px solid #62868a;border-radius:7px;background:#1c404a;color:#f4e5c5;padding:8px 12px;cursor:pointer}

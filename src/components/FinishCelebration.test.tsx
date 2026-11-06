@@ -17,7 +17,7 @@ function finish(scores: number[], penalties?: number[]) {
 
 function markup(scores: number[], penalties?: number[]) {
   return renderToStaticMarkup(createElement(FinishCelebration, {
-    state: finish(scores, penalties), onResults: () => {}, onNewGame: () => {},
+    state: finish(scores, penalties), onBoard: () => {}, onResults: () => {}, onNewGame: () => {},
   }))
 }
 
@@ -25,7 +25,7 @@ describe('elegant opt-in game finish', () => {
   it('presents the actual champion and final score in the compact ceremony', () => {
     const state = finish([32, 48, 41])
     const html = renderToStaticMarkup(createElement(FinishCelebration, {
-      state, onResults: () => {}, onNewGame: () => {},
+      state, onBoard: () => {}, onResults: () => {}, onNewGame: () => {},
     }))
     expect(html).toContain('Koniec partii')
     expect(html).toContain('Zwycięzca tej rozgrywki')
@@ -47,7 +47,7 @@ describe('elegant opt-in game finish', () => {
   it('names all real joint winners when score and glass penalties are tied', () => {
     const state = finish([29, 29], [4, 4])
     const html = renderToStaticMarkup(createElement(FinishCelebration, {
-      state, onResults: () => {}, onNewGame: () => {},
+      state, onBoard: () => {}, onResults: () => {}, onNewGame: () => {},
     }))
     expect(html).toContain('Zwycięzcy tej rozgrywki')
     expect(html).toContain(state.players[0].name)

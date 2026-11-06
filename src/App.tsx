@@ -258,6 +258,7 @@ export default function App() {
   const [viewport, setViewport] = useState(() => typeof window === 'undefined' ? { width: 1600, height: 900 } : { width: window.innerWidth, height: window.innerHeight })
   const [showSetup, setShowSetup] = useState(false)
   const [showRules, setShowRules] = useState(false)
+  const [inspectFinalBoard, setInspectFinalBoard] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [showStrategy, setShowStrategy] = useState(false)
   const [mobileBoard, setMobileBoard] = useState<number | null>(null)
@@ -438,7 +439,7 @@ export default function App() {
     setMobileBoard(null)
     setMobilePanel(null)
     play('round')
-    setSelection(null); setFinishing(null); setPlacementOptions(null); setShowSetup(false); setShowResults(false)
+    setSelection(null); setFinishing(null); setPlacementOptions(null); setShowSetup(false); setShowResults(false); setInspectFinalBoard(false)
   }
   function seat(index: number, place: 'north' | 'west' | 'east' | 'south') {
     const player = game.players[index]
@@ -461,6 +462,7 @@ export default function App() {
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span></div>
       <RoundTracker round={game.round} colors={game.roundColors}/>
       <div className="sg-header-actions">
+        {game.phase === 'finished' && inspectFinalBoard && <button type="button" className="sg-finish-secondary" onClick={() => setShowResults(true)}>Wyniki</button>}
         <GlassResources game={game}/>
         <GameMenu effectsEnabled={effectsEnabled} reducedMotion={reducedMotion} toggleEffects={toggleEffects}
           musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}
@@ -573,8 +575,8 @@ export default function App() {
       <span className="sg-human-turn-notice-icon" aria-hidden="true">✦</span>
       <span><strong>TWOJA TURA</strong><small>{turnNotice.name === 'Ty' ? 'Wybierz szkło z warsztatu lub środka' : `${turnNotice.name} — wybierz szkło`}</small></span>
     </div>}
-    {screen === 'game' && finishOverlay.banner && <FinishCelebration state={game} onResults={() => setShowResults(true)} onNewGame={() => setShowSetup(true)}/>}
-    {screen === 'game' && finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
+    {screen === 'game' && finishOverlay.banner && !inspectFinalBoard && <FinishCelebration onBoard={() => setInspectFinalBoard(true)} state={game} onResults={() => setShowResults(true)} onNewGame={() => setShowSetup(true)}/>}
+    {screen === 'game' && finishOverlay.results && <FinalResults state={game} onClose={() => { setInspectFinalBoard(true); setShowResults(false) }}/>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
     {showStrategy && <StrategyLab state={game} onClose={() => setShowStrategy(false)}/>}

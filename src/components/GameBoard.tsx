@@ -39,8 +39,6 @@ function FinishedWindow({ upper, lower }: Pick<WindowStrip, 'upper' | 'lower'>) 
           <path d="M40 4 L40 32 L33 13Z" fill="#fff" opacity=".3" stroke="none"/>
           <path d="M40 32 L47 13 Q51 22 40 32Z" fill="var(--sg-ink-dark)" stroke="none"/>
         </g>)}
-        <path d="M40 31 L49 40 L40 49 L31 40Z" fill="#e8cd92"/>
-        <path d="M40 33 L46 40 L40 40Z" fill="#fff5d0" stroke="none"/>
       </g>
     </svg>
     <b>GOTOWE</b>
