@@ -445,7 +445,7 @@ try {
     const root=page.locator(mobile ? '.sg-mobile-stats' : '.sg-stage .sg-side-left')
     const compact=root.locator('.sg-compact-scores')
     assert.equal(await compact.locator('.sg-compact-player').count(),4)
-    assert(await root.evaluate(el=>el.scrollHeight<=el.clientHeight+1),'Compact scoring must fit without scrolling')
+    assert(await root.evaluate(el=>el.scrollHeight<=el.clientHeight+1),`Compact scoring must fit without scrolling at ${width}x${height}`)
     const launcher = compact.getByRole('button',{name:'Powiększ tor punktów'})
     if (mobile) {
       assert.equal(await launcher.count(), 0)
