@@ -47,10 +47,14 @@ export function decodeSavedGame(raw: string): GameState | null {
   if (!Array.isArray(value.history) || !value.history.every(e => record(e) &&
       typeof e.description === 'string' && (e.playerIndex === null || seat(e.playerIndex)) &&
       integer(e.round, 1, 6) && integer(e.id, 0))) return null
+  const playerIds = new Set(value.players.map(player => player.id))
+  if (playerIds.size !== count) return null
   if (value.finalScores !== undefined && (!Array.isArray(value.finalScores) ||
       value.finalScores.length !== count || !value.finalScores.every(s => record(s) &&
-        typeof s.playerId === 'string' && Array.isArray(s.palaceDetails) &&
-        s.palaceDetails.every(Number.isFinite) && Number.isFinite(s.total)))) return null
+        playerIds.delete(s.playerId) && Array.isArray(s.palaceDetails) &&
+        s.palaceDetails.every(Number.isFinite) &&
+        [s.roundPoints, s.remainingPanes, s.remainingPoints, s.glassPenalty, s.palaceBonus,
+          s.fullyGlazedWindows, s.total, s.totalGlassLost].every(Number.isFinite)))) return null
 
   const game = value as unknown as GameState
   if (game.initialStartingPlayer === undefined) {

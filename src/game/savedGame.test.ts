@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { newGame } from './engine'
+import { finalBreakdown, newGame } from './engine'
 import { decodeSavedGame } from './savedGame'
 
 describe('restoring a local game', () => {
@@ -12,6 +12,14 @@ describe('restoring a local game', () => {
     }
     game.players[0].strips[0].panes.pop()
     expect(decode(game)).toBeNull()
+  })
+  it('rejects a scorecard that leaves a player without a final breakdown', () => {
+    const game = newGame({opponents:1, seed:19})
+    game.phase = 'finished'
+    game.finalScores = game.players.map(player => finalBreakdown(player, game.palaceSide))
+    expect(decodeSavedGame(JSON.stringify(game))).toEqual(game)
+    game.finalScores[1].playerId = game.finalScores[0].playerId
+    expect(decodeSavedGame(JSON.stringify(game))).toBeNull()
   })
   it('migrates the complete opening name even when another name is its suffix', () => {
     const game = newGame({opponents:1,seed:19,playerNames:['Jan','Pan Jan']})
