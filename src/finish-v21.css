@@ -235,7 +235,6 @@
 .sg-final-player-head span {min-width:0;overflow-wrap:anywhere}
 .sg-final-player-head strong {white-space:nowrap}
 .sg-final-player .sg-final-steps {padding:10px 15px 14px}
-.sg-final-steps .sg-final-glass {background:#ffffff08;border-inline-start:2px solid #a87871;padding:8px 10px;align-items:baseline}
 .sg-final-glass small {display:block;margin-top:3px}
 .sg-final-dialog .sg-final-caption {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .sg .sg-finish-actions {flex-wrap:wrap}
