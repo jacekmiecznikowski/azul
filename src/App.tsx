@@ -462,7 +462,7 @@ export default function App() {
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span></div>
       <RoundTracker round={game.round} colors={game.roundColors}/>
       <div className="sg-header-actions">
-        {game.phase === 'finished' && inspectFinalBoard && <button type="button" className="sg-finish-secondary" onClick={() => setShowResults(true)}>Wyniki</button>}
+        {game.phase === 'finished' && inspectFinalBoard && <button type="button" className="sg-finish-secondary" onClick={() => setInspectFinalBoard(false)}>Koniec partii</button>}
         <GlassResources game={game}/>
         <GameMenu effectsEnabled={effectsEnabled} reducedMotion={reducedMotion} toggleEffects={toggleEffects}
           musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}
