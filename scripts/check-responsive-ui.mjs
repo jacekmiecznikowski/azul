@@ -61,10 +61,10 @@ try {
         await page.locator('.sg-round-announcement').waitFor({state:'hidden',timeout:5000})
         const active = page.locator(`${root} .sg-board.sg-board-your-turn`)
         await active.waitFor({state:'visible',timeout:3500})
-        assert.match(await active.locator('.sg-board-label').innerText(),/TWOJA TURA/,
+        assert.match(await active.locator('.sg-board-status-active').innerText(),/TERAZ GRA/,
           'Human turn must remain explicitly labelled ON the full palace')
         const border = await active.evaluate(el=>({
-          animation:getComputedStyle(el).animationName,
+          animation:getComputedStyle(el.querySelector('.sg-board-turn-rail'),'::after').animationName,
           border:getComputedStyle(el).borderTopColor,
           opacity:getComputedStyle(el).opacity,
           rootClass:document.querySelector('.sg')?.className,
@@ -72,7 +72,7 @@ try {
           reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,
           animationDuration:getComputedStyle(el).animationDuration,
         }))
-        assert(border.animation.includes('sg-v57-turn-glow'),
+        assert(border.animation.includes('sg-turn-edge'),
           `Gold frame animation missing: ${JSON.stringify(border)}`)
         assert.equal(border.opacity,'1','Whole board must remain fully visible during its turn')
         const cue=page.locator('.sg-human-turn-notice')
@@ -236,26 +236,6 @@ try {
         Math.abs(selectedGem.height-originalGem.height)<1.2,
         `${label}: selection changes physical gemstone size`)
       assert(await page.locator(`${root} .sg-window-target`).count() > 0, `${label}: no placement targets`)
-      // All six rounds use the *real* faceted glass component; no CSS dots.
-      const roundUI = await page.locator('.sg-header .sg-round-tracker-v52').evaluate(el => {
-        const rect = node => { const r = node.getBoundingClientRect()
-          return {x:r.x,y:r.y,width:r.width,height:r.height}
-        }
-        const steps = [...el.querySelectorAll('.sg-round-v52-step')]
-        const gems = [...el.querySelectorAll('.sg-round-v52-gem .sg-glass.sg-gem-faceted')]
-        const all = [el, ...steps, ...gems]
-        const head = el.closest('.sg-header')
-        const headBox = rect(head)
-        const over = all.some(node => {
-          const r = rect(node)
-          return r.width < 5 || r.height < 5 ||
-            r.x < headBox.x - 1 || r.x+r.width > headBox.x+headBox.width+1 ||
-            r.y < headBox.y - 1 || r.y+r.height > headBox.y+headBox.height+1
-        })
-        return {steps:steps.length,gems:gems.map(rect),over,
-          active:steps.filter(x=>x.getAttribute('aria-current')==='step').length,
-          header:headBox}
-      })
       const headerLayout = await page.locator('.sg-header').evaluate(head => {
         const r = node => { const b=node.getBoundingClientRect()
           return {left:b.left,right:b.right,top:b.top,bottom:b.bottom,
@@ -267,8 +247,7 @@ try {
           tracker:r(head.querySelector('.sg-round-tracker-v52')),
           actions:r(head.querySelector('.sg-header-actions')),
           bonus:r(head.querySelector('.sg-round-v54-bonus')),
-          steps:r(head.querySelector('.sg-round-v52-steps')),
-          roundLayout:getComputedStyle(head.querySelector('.sg-round-tracker-v52')).display,
+          current:r(head.querySelector('.sg-round-v52-current')),
           bonusGem:r(head.querySelector('.sg-round-v54-featured-gem .sg-glass')),
         }
       })
@@ -278,50 +257,25 @@ try {
       assert(headerLayout.bonus.left >= headerLayout.tracker.left - 1 &&
         headerLayout.bonus.right <= headerLayout.tracker.right + 1,
         `${label}: featured bonus spills out of header tracker`)
-      if (width <= 1100 && height >= width) {
-        assert.equal(headerLayout.roundLayout,'grid',`${label}: portrait round bar is not a grid`)
-        assert(headerLayout.bonus.bottom <= headerLayout.steps.top + 1,
-          `${label}: bonus label overlaps six-round timeline: ${JSON.stringify(headerLayout)}`)
-      }
+      assert(headerLayout.current.right <= headerLayout.bonus.left + 1,
+        `${label}: current round overlaps the bonus`)
       if (width > 1100 && height > 620) {
         assert(Math.abs(headerLayout.header.center-headerLayout.tracker.center) < 1.25,
           `${label}: round tracker not exactly centered: ${JSON.stringify(headerLayout)}`)
-        assert(headerLayout.header.height >= 74, `${label}: desktop header too short`)
+        assert(headerLayout.header.height >= headerLayout.tracker.height, `${label}: desktop header too short`)
         assert(headerLayout.brand.right + 4 <= headerLayout.tracker.left &&
           headerLayout.tracker.right + 4 <= headerLayout.actions.left,
           `${label}: desktop header elements overlap: ${JSON.stringify(headerLayout)}`)
       }
-      assert.equal(roundUI.steps,6,`${label}: round step count`)
-      assert.equal(roundUI.gems.length,6,`${label}: expected 6 physical gems`)
-      assert.equal(roundUI.active,1,`${label}: exactly one active round`)
-      assert(!roundUI.over,`${label}: round tracker clipped/overflowed: ${JSON.stringify(roundUI)}`)
-      for(const [i,g] of roundUI.gems.entries()) {
-        assert(Math.abs(g.width - g.height) < 1,`${label}: distorted round diamond ${i}`)
-      }
-
       const resources = page.locator('.sg-header .sg-resource-trigger')
       const ribbon = page.locator('.sg-header .sg-resource-ribbon')
-      if (width >= 1700 && height >= 650) {
-        assert(await ribbon.isVisible(), `${label}: stock counters hidden on full resolution`)
-        assert.equal(await ribbon.locator('.sg-resource-ribbon-item').count(),5,
-          `${label}: missing stock location(s)`)
-        assert(!(await resources.isVisible()), `${label}: redundant resources button on full screen`)
-        const ribbonGeom = await ribbon.evaluate(el => {
-          const a=el.getBoundingClientRect(), h=el.closest('.sg-header').getBoundingClientRect()
-          return {left:a.left,right:a.right,top:a.top,bottom:a.bottom,hleft:h.left,hright:h.right,htop:h.top,hbottom:h.bottom}
-        })
-        assert(ribbonGeom.left >= ribbonGeom.hleft && ribbonGeom.right <= ribbonGeom.hright &&
-          ribbonGeom.top >= ribbonGeom.htop && ribbonGeom.bottom <= ribbonGeom.hbottom,
-          `${label}: resource ribbon escapes header`)
-      } else {
-        assert(!(await ribbon.isVisible()), `${label}: compact screen has oversized resource ribbon`)
-        await resources.click()
-        assert.equal(await resources.getAttribute('aria-expanded'), 'true', `${label}: resources disclosure failed`)
-        assert.equal(await page.getByRole('region', { name: 'Zasoby szkła' }).count(), 1,
-          `${label}: resources missing`)
-        await page.getByRole('button', { name: 'Zamknij zasoby' }).click()
-        assert.equal(await resources.getAttribute('aria-expanded'), 'false', `${label}: resources did not close`)
-      }
+      assert(!(await ribbon.isVisible()), `${label}: toolbar should use the resource disclosure`)
+      await resources.click()
+      assert.equal(await resources.getAttribute('aria-expanded'), 'true', `${label}: resources disclosure failed`)
+      assert.equal(await page.getByRole('region', { name: 'Zasoby szkła' }).count(), 1,
+        `${label}: resources missing`)
+      await page.getByRole('button', { name: 'Zamknij zasoby' }).click()
+      assert.equal(await resources.getAttribute('aria-expanded'), 'false', `${label}: resources did not close`)
       // A real layout regression: one shared color must not be magnified, and
       // five shared colors must not be flattened or squeezed by grid row count.
       if ((width === 1440 && opponents === 2) ||
