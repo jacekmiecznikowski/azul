@@ -1,8 +1,10 @@
+import { BoardScoringPanel } from '../components/ScorePanels'
 import { describe, expect, it } from 'vitest'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { glassInventory, newGame } from '../game/engine'
-import { Market, TurnSummary, PenaltyTrack } from '../App'
+import { Market } from '../App'
+import { CompactScores } from '../components/ScorePanels'
 import { GlassResources } from '../components/GlassResources'
 
 describe('v33 compact central panels', () => {
@@ -24,11 +26,11 @@ describe('v33 compact central panels', () => {
   })
 
   it('retains four active-player scoreboard entries without a duplicated glass legend', () => {
-    const turn = renderToStaticMarkup(createElement(TurnSummary, { game }))
-    const glass = renderToStaticMarkup(createElement(PenaltyTrack, { game }))
-    expect((turn.match(/class="sg-score-line/g) || [])).toHaveLength(4)
+    const turn = renderToStaticMarkup(createElement(CompactScores, { game }))
+    const glass = renderToStaticMarkup(createElement(BoardScoringPanel, { game }))
+    expect((turn.match(/class="sg-compact-player(?: |")/g) || [])).toHaveLength(4)
     expect(glass).not.toContain('sg-track-legend')
-    expect((glass.match(/<div class="sg-track-step(?=[ "])/g) || [])).toHaveLength(9)
-    expect(glass).toContain('sg-track-pawns')
+    expect((glass.match(/class="sg-boardscore-broken-step(?=[ "])/g) || [])).toHaveLength(9)
+    expect(glass).toContain('sg-art-break-list')
   })
 })

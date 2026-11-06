@@ -13,7 +13,7 @@
     inset 0 0 0 2px #fff0c74a,
     0 5px 15px #02131cb8;
 }
-.sg .sg-board.sg-board-your-turn .sg-board-label {
+.sg .sg-board .sg-board-status-active {
   display:inline-flex;
   align-items:center;
   justify-content:center;
@@ -29,15 +29,35 @@
   box-shadow:0 0 8px #e1ba73a8;
   white-space:nowrap;
 }
-/* Quiet, short, ONE-TIME border animation; never animate the board itself. */
-.sg .sg-board.sg-board-current {opacity:1!important;transform:none;}
-.sg.sg-effects-cinematic .sg-board.sg-board-current {
-  animation:sg-v57-turn-glow 1.15s ease-out 1 both!important;
+/* Mask the moving highlight to the actual two-pixel border, including corners. */
+.sg .sg-board.sg-board-current {opacity:1!important;transform:none;overflow:visible;}
+.sg .sg-board-turn-rail {
+  position:absolute;inset:-2px;z-index:2;
+  border-radius:inherit;pointer-events:none;
+  padding:2px;
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  mask-composite:exclude;
 }
-@keyframes sg-v57-turn-glow {
-  0% {outline-color:#d9b87c;box-shadow:0 0 0 1px #d5b5749e,0 0 7px #d5b57453,inset 0 0 0 1px #ffedc42c;}
-  38% {outline-color:#ffe6ae;box-shadow:0 0 0 3px #f5d69dc7,0 0 13px #e8c58e9a,inset 0 0 0 1px #ffedc45c;}
-  100% {outline-color:#e6c688;box-shadow:0 0 0 2px #d8b8799c,0 0 8px #d5b57467,inset 0 0 0 1px #ffedc43d;}
+.sg .sg-board-turn-rail::after {
+  content:'';position:absolute;width:80px;height:12px;
+  offset-path:inset(1px round 12px);offset-distance:0%;offset-rotate:auto;
+  background:radial-gradient(ellipse,#fff 0%,#fff3c4 18%,#edc777aa 44%,transparent 72%);
+}
+.sg.sg-effects-cinematic .sg-board-turn-rail::after {
+  animation:sg-turn-edge 1.8s linear infinite;
+}
+.sg .sg-board.sg-board-current .sg-player-icon {
+  outline:2px solid #ffe2a0;outline-offset:2px;
+  box-shadow:0 0 10px #e9c57188;
+}
+@keyframes sg-turn-edge {
+  from {offset-distance:0%;}
+  to {offset-distance:100%;}
+}
+@media(prefers-reduced-motion:reduce) {
+  .sg.sg-effects-cinematic .sg-board-turn-rail::after {animation:none;background:none;}
 }
 .sg.sg-effects-minimal .sg-board.sg-board-current {
   animation:none!important;
@@ -246,7 +266,7 @@
     padding:10px 16px;
   }
   .sg .sg-human-turn-notice-icon {width:34px;height:34px;font-size:23px;}
-  .sg .sg-board.sg-board-your-turn .sg-board-label {
+  .sg .sg-board .sg-board-status-active {
     padding:3px 5px;
     font-size:9px;
     letter-spacing:.2px;

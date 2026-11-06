@@ -10,7 +10,7 @@ try {
   await server.listen()
   browser = await chromium.launch()
   await mkdir('reports/ui', { recursive: true })
-  for (const [width, height] of [[1920,1080],[1440,900],[1366,768],[1280,720],[1101,621],[1024,768],[844,390],[667,375],[390,844],[320,568]]) {
+  for (const [width, height] of [[1056,1030],[824,694],[1920,1080],[1440,900],[1366,768],[1280,720],[1101,621],[1024,768],[844,390],[667,375],[390,844],[320,568]]) {
     for (const opponents of [1,2,3]) {
       const page = await browser.newPage({ viewport: { width, height } })
       const errors = []
@@ -38,14 +38,33 @@ try {
       }
       await page.evaluate(() => document.fonts.ready)
       const root = width > 1100 && height > 620 ? '.sg-stage' : '.sg-mobile-layout'
+      if (width === 1056 || width === 824) {
+        const geometry = await page.locator(root).evaluate(layout => {
+          const board = layout.querySelector('.sg-mobile-board').getBoundingClientRect()
+          const market = layout.querySelector('.sg-mobile-market > .sg-market').getBoundingClientRect()
+          const cells = [...layout.querySelectorAll('.sg-mobile-penalty-step')]
+          return {
+            boardRatio: board.width / board.height,
+            marketBelow: market.top >= board.bottom - 1,
+            columns: new Set(cells.map(cell => Math.round(cell.getBoundingClientRect().left))).size,
+            readable: cells.length === 9 && cells.every(cell =>
+              cell.clientWidth >= 44 && cell.clientHeight >= 36 &&
+              parseFloat(getComputedStyle(cell.querySelector('strong')).fontSize) >= 14),
+          }
+        })
+        assert(geometry.boardRatio >= 2.4 && geometry.marketBelow,
+          `Player board proportions at ${width}×${height}: ${JSON.stringify(geometry)}`)
+        assert(geometry.columns === 3 && geometry.readable,
+          `Penalty mosaic at ${width}×${height}: ${JSON.stringify(geometry)}`)
+      }
       if (width === 1366 && height === 768 && opponents === 1) {
         await page.locator('.sg-round-announcement').waitFor({state:'hidden',timeout:5000})
         const active = page.locator(`${root} .sg-board.sg-board-your-turn`)
         await active.waitFor({state:'visible',timeout:3500})
-        assert.match(await active.locator('.sg-board-label').innerText(),/TWOJA TURA/,
+        assert.match(await active.locator('.sg-board-status-active').innerText(),/TERAZ GRA/,
           'Human turn must remain explicitly labelled ON the full palace')
         const border = await active.evaluate(el=>({
-          animation:getComputedStyle(el).animationName,
+          animation:getComputedStyle(el.querySelector('.sg-board-turn-rail'),'::after').animationName,
           border:getComputedStyle(el).borderTopColor,
           opacity:getComputedStyle(el).opacity,
           rootClass:document.querySelector('.sg')?.className,
@@ -53,7 +72,7 @@ try {
           reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,
           animationDuration:getComputedStyle(el).animationDuration,
         }))
-        assert(border.animation.includes('sg-v57-turn-glow'),
+        assert(border.animation.includes('sg-turn-edge'),
           `Gold frame animation missing: ${JSON.stringify(border)}`)
         assert.equal(border.opacity,'1','Whole board must remain fully visible during its turn')
         const cue=page.locator('.sg-human-turn-notice')
@@ -217,26 +236,6 @@ try {
         Math.abs(selectedGem.height-originalGem.height)<1.2,
         `${label}: selection changes physical gemstone size`)
       assert(await page.locator(`${root} .sg-window-target`).count() > 0, `${label}: no placement targets`)
-      // All six rounds use the *real* faceted glass component; no CSS dots.
-      const roundUI = await page.locator('.sg-header .sg-round-tracker-v52').evaluate(el => {
-        const rect = node => { const r = node.getBoundingClientRect()
-          return {x:r.x,y:r.y,width:r.width,height:r.height}
-        }
-        const steps = [...el.querySelectorAll('.sg-round-v52-step')]
-        const gems = [...el.querySelectorAll('.sg-round-v52-gem .sg-glass.sg-gem-faceted')]
-        const all = [el, ...steps, ...gems]
-        const head = el.closest('.sg-header')
-        const headBox = rect(head)
-        const over = all.some(node => {
-          const r = rect(node)
-          return r.width < 5 || r.height < 5 ||
-            r.x < headBox.x - 1 || r.x+r.width > headBox.x+headBox.width+1 ||
-            r.y < headBox.y - 1 || r.y+r.height > headBox.y+headBox.height+1
-        })
-        return {steps:steps.length,gems:gems.map(rect),over,
-          active:steps.filter(x=>x.getAttribute('aria-current')==='step').length,
-          header:headBox}
-      })
       const headerLayout = await page.locator('.sg-header').evaluate(head => {
         const r = node => { const b=node.getBoundingClientRect()
           return {left:b.left,right:b.right,top:b.top,bottom:b.bottom,
@@ -248,8 +247,7 @@ try {
           tracker:r(head.querySelector('.sg-round-tracker-v52')),
           actions:r(head.querySelector('.sg-header-actions')),
           bonus:r(head.querySelector('.sg-round-v54-bonus')),
-          steps:r(head.querySelector('.sg-round-v52-steps')),
-          roundLayout:getComputedStyle(head.querySelector('.sg-round-tracker-v52')).display,
+          current:r(head.querySelector('.sg-round-v52-current')),
           bonusGem:r(head.querySelector('.sg-round-v54-featured-gem .sg-glass')),
         }
       })
@@ -259,50 +257,25 @@ try {
       assert(headerLayout.bonus.left >= headerLayout.tracker.left - 1 &&
         headerLayout.bonus.right <= headerLayout.tracker.right + 1,
         `${label}: featured bonus spills out of header tracker`)
-      if (width <= 1100 && height >= width) {
-        assert.equal(headerLayout.roundLayout,'grid',`${label}: portrait round bar is not a grid`)
-        assert(headerLayout.bonus.bottom <= headerLayout.steps.top + 1,
-          `${label}: bonus label overlaps six-round timeline: ${JSON.stringify(headerLayout)}`)
-      }
+      assert(headerLayout.current.right <= headerLayout.bonus.left + 1,
+        `${label}: current round overlaps the bonus`)
       if (width > 1100 && height > 620) {
         assert(Math.abs(headerLayout.header.center-headerLayout.tracker.center) < 1.25,
           `${label}: round tracker not exactly centered: ${JSON.stringify(headerLayout)}`)
-        assert(headerLayout.header.height >= 74, `${label}: desktop header too short`)
+        assert(headerLayout.header.height >= headerLayout.tracker.height, `${label}: desktop header too short`)
         assert(headerLayout.brand.right + 4 <= headerLayout.tracker.left &&
           headerLayout.tracker.right + 4 <= headerLayout.actions.left,
           `${label}: desktop header elements overlap: ${JSON.stringify(headerLayout)}`)
       }
-      assert.equal(roundUI.steps,6,`${label}: round step count`)
-      assert.equal(roundUI.gems.length,6,`${label}: expected 6 physical gems`)
-      assert.equal(roundUI.active,1,`${label}: exactly one active round`)
-      assert(!roundUI.over,`${label}: round tracker clipped/overflowed: ${JSON.stringify(roundUI)}`)
-      for(const [i,g] of roundUI.gems.entries()) {
-        assert(Math.abs(g.width - g.height) < 1,`${label}: distorted round diamond ${i}`)
-      }
-
       const resources = page.locator('.sg-header .sg-resource-trigger')
       const ribbon = page.locator('.sg-header .sg-resource-ribbon')
-      if (width >= 1700 && height >= 650) {
-        assert(await ribbon.isVisible(), `${label}: stock counters hidden on full resolution`)
-        assert.equal(await ribbon.locator('.sg-resource-ribbon-item').count(),5,
-          `${label}: missing stock location(s)`)
-        assert(!(await resources.isVisible()), `${label}: redundant resources button on full screen`)
-        const ribbonGeom = await ribbon.evaluate(el => {
-          const a=el.getBoundingClientRect(), h=el.closest('.sg-header').getBoundingClientRect()
-          return {left:a.left,right:a.right,top:a.top,bottom:a.bottom,hleft:h.left,hright:h.right,htop:h.top,hbottom:h.bottom}
-        })
-        assert(ribbonGeom.left >= ribbonGeom.hleft && ribbonGeom.right <= ribbonGeom.hright &&
-          ribbonGeom.top >= ribbonGeom.htop && ribbonGeom.bottom <= ribbonGeom.hbottom,
-          `${label}: resource ribbon escapes header`)
-      } else {
-        assert(!(await ribbon.isVisible()), `${label}: compact screen has oversized resource ribbon`)
-        await resources.click()
-        assert.equal(await resources.getAttribute('aria-expanded'), 'true', `${label}: resources disclosure failed`)
-        assert.equal(await page.getByRole('region', { name: 'Zasoby szkła' }).count(), 1,
-          `${label}: resources missing`)
-        await page.getByRole('button', { name: 'Zamknij zasoby' }).click()
-        assert.equal(await resources.getAttribute('aria-expanded'), 'false', `${label}: resources did not close`)
-      }
+      assert(!(await ribbon.isVisible()), `${label}: toolbar should use the resource disclosure`)
+      await resources.click()
+      assert.equal(await resources.getAttribute('aria-expanded'), 'true', `${label}: resources disclosure failed`)
+      assert.equal(await page.getByRole('region', { name: 'Zasoby szkła' }).count(), 1,
+        `${label}: resources missing`)
+      await page.getByRole('button', { name: 'Zamknij zasoby' }).click()
+      assert.equal(await resources.getAttribute('aria-expanded'), 'false', `${label}: resources did not close`)
       // A real layout regression: one shared color must not be magnified, and
       // five shared colors must not be flattened or squeezed by grid row count.
       if ((width === 1440 && opponents === 2) ||
@@ -457,89 +430,42 @@ try {
     console.log(`PASS ${width}x${height}: 5/7/9 factories and gems use exactly equal size`)
   }
 
-  // v58: switch between two scoring presentations IN the existing game menu.
-  // The preference survives reload; board track and penalties reflect real state.
-  for (const [width,height] of [[1440,900],[390,844]]) {
+  // Compact scoring is the only default; its contents must fit without scrolling.
+  for (const [width,height] of [[1440,900],[1101,621],[390,844],[844,390],[320,568]]) {
     const page=await browser.newPage({viewport:{width,height}})
-    try {
-      await page.goto('http://127.0.0.1:5179')
-      await page.evaluate(async () => {
-        const {newGame}=await import('/src/game/engine.ts')
-        const state=newGame({opponents:1,seed:258,playerControllers:['human','human']})
-        state.players[0].score=45
-        state.players[0].brokenSteps=4
-        state.players[1].score=27
-        state.players[1].brokenSteps=2
-        localStorage.setItem('sintra-glass-save-v1',JSON.stringify(state))
-        localStorage.setItem('sintra-glass-score-presentation-v1','digital')
-        localStorage.setItem('sintra-glass-visual-effects-v1','false')
-      })
-      await page.reload()
-      await page.getByRole('button',{name:'Kontynuuj partię'}).click()
-      await page.locator('.sg-round-announcement').waitFor({state:'hidden',timeout:5000})
-      const mobile=width<=1100
-      if(mobile) {
-        await page.getByRole('button',{name:'Wyniki'}).click()
-        const digital=page.locator('.sg-mobile-stats.sg-score-mode-digital')
-        assert(await digital.isVisible(),'Mobile digital score panel not visible')
-        assert.equal(await digital.locator('.sg-digital-penalty-row').count(),2)
-        await page.getByRole('button',{name:'Zamknij ×'}).click()
-      } else {
-        assert.equal(await page.locator('.sg-stage .sg-digital-penalty-row').count(),2)
-      }
-
-      await page.getByRole('button',{name:'Otwórz menu gry'}).click()
-      await page.locator('.sg-menu-score-option').filter({hasText:'Planszowy'}).click()
-      assert.equal(await page.evaluate(()=>localStorage.getItem('sintra-glass-score-presentation-v1')),'board')
-      if(mobile) await page.getByRole('button',{name:'Wyniki'}).click()
-      const board=page.locator(mobile ? '.sg-mobile-stats.sg-score-mode-board .sg-physical-scores'
-        : '.sg-stage .sg-side-left.sg-score-mode-board .sg-physical-scores')
-      assert(await board.isVisible(),'Board-style scoring not visible')
-      assert.equal(await board.locator('.sg-boardscore-cell').count(),100)
-      assert.equal(await board.locator('.sg-boardscore-broken-step').count(),9)
-      assert.equal(await board.locator('.sg-score-round-tile').count(),6)
-      assert((await board.innerText()).includes('45'),'Actual points are missing on physical board')
-      await board.getByRole('button',{name:'Powiększ tor punktów'}).click()
+    await page.goto('http://127.0.0.1:5179')
+    await page.evaluate(async()=>{
+      const {newGame}=await import('/src/game/engine.ts')
+      localStorage.setItem('sintra-glass-save-v1',JSON.stringify(newGame({opponents:3,seed:258,playerControllers:['human','human','human','human']})))
+    })
+    await page.reload()
+    await page.getByRole('button',{name:'Kontynuuj partię'}).click()
+    const mobile=width<=1100 || height<=620
+    if(mobile) await page.getByRole('button',{name:'Wyniki'}).click()
+    const root=page.locator(mobile ? '.sg-mobile-stats' : '.sg-stage .sg-side-left')
+    const compact=root.locator('.sg-compact-scores')
+    assert.equal(await compact.locator('.sg-compact-player').count(),4)
+    assert(await root.evaluate(el=>el.scrollHeight<=el.clientHeight+1),`Compact scoring must fit without scrolling at ${width}x${height}`)
+    const launcher = compact.getByRole('button',{name:'Powiększ tor punktów'})
+    if (mobile) {
+      assert.equal(await launcher.count(), 0)
+      assert.equal(await compact.locator('.sg-compact-glass-cell').count(), 9)
+      const rounds = compact.locator('.sg-score-round-tile')
+      assert.equal(await rounds.count(), 6)
+      assert(await rounds.last().evaluate(el => {
+        const bounds = el.getBoundingClientRect()
+        const panel = el.closest('.sg-mobile-stats').getBoundingClientRect()
+        return bounds.top >= panel.top && bounds.bottom <= Math.min(panel.bottom, innerHeight) + 1
+      }), 'Last round tile clipped on mobile')
+    } else {
+      await compact.getByRole('button',{name:'Powiększ tor punktów'}).click()
       const dialog=page.getByRole('dialog',{name:'Powiększona plansza punktacji'})
-      assert(await dialog.isVisible(),'Magnified physical score board did not open')
       assert.equal(await dialog.locator('.sg-boardscore-cell').count(),100)
-      await dialog.getByRole('button',{name:'Zamknij powiększoną punktację'}).click()
-      if(!mobile) {
-        const frame=await page.locator('.sg-stage .sg-window.sg-window-active').first().evaluate(el=>{
-          const base=el.closest('.sg-board-windows').querySelector('.sg-window:not(.sg-window-active)')
-          const get=(root,selector)=>getComputedStyle(root.querySelector(selector)).borderTopColor
-          return {
-            active:getComputedStyle(el).borderTopColor,
-            inner:get(el,'.sg-window-lancet'),
-            otherInner:get(base,'.sg-window-lancet'),
-            foot:get(el,'.sg-window-foot'),
-            otherFoot:get(base,'.sg-window-foot')
-          }
-        })
-        assert.equal(frame.inner,frame.otherInner,'Glazier tinted the internal pane border')
-        assert.equal(frame.foot,frame.otherFoot,'Glazier tinted the footer')
-      }
-
-      await page.reload()
-      await page.getByRole('button',{name:'Kontynuuj partię'}).click()
-      if(mobile) await page.getByRole('button',{name:'Wyniki'}).click()
-      const restored=page.locator(mobile
-        ? '.sg-mobile-stats.sg-score-mode-board .sg-physical-scores'
-        : '.sg-stage .sg-side-left.sg-score-mode-board .sg-physical-scores')
-      assert(await restored.isVisible(),
-        'Physical scoring preference not restored after page reload')
-      if(mobile) await page.getByRole('button',{name:'Zamknij ×'}).click()
-      await page.getByRole('button',{name:'Otwórz menu gry'}).click()
-      await page.locator('.sg-menu-score-option').filter({hasText:'Cyfrowy'}).click()
-      if(mobile) await page.getByRole('button',{name:'Wyniki'}).click()
-      assert.equal(await page.locator(mobile ? '.sg-mobile-stats .sg-digital-penalty-row'
-        : '.sg-stage .sg-digital-penalty-row').count(),2)
-      assert.equal(await page.evaluate(()=>localStorage.getItem('sintra-glass-score-presentation-v1')),'digital')
-      await page.screenshot({path:`reports/ui/score-modes-v58-${width}x${height}.png`,fullPage:true})
-      console.log(`PASS scoring-mode-${width}x${height}: 100 score fields, 9 penalty fields, round gems, zoom & persistence`)
-    } finally {
-      await page.close()
+      assert.equal(await dialog.locator('.sg-score-round-tile').count(),6)
+      assert.equal(await dialog.locator('.sg-boardscore-broken-step').count(),9)
+      await page.keyboard.press('Escape')
     }
+    await page.close()
   }
 
   // Regression: an AI that starts a new round MUST NOT move underneath the

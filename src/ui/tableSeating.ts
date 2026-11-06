@@ -12,7 +12,7 @@ export function seatsForViewer(viewerIndex: number, playerCount: number): TableP
   const places: TableSeat[] = playerCount === 2
     ? ['south', 'north']
     : playerCount === 3
-      ? ['south', 'west', 'north']
+      ? ['south', 'west', 'east']
       : ['south', 'west', 'north', 'east']
   const result: TablePlacement[] = []
   let index = viewerIndex

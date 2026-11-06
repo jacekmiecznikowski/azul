@@ -6,7 +6,7 @@ describe('rotating hot-seat tabletop', () => {
   for (const count of [2, 3, 4]) {
     it(`puts each of ${count} players on the south edge during their turn`, () => {
       const places = count === 2 ? ['south', 'north'] :
-        count === 3 ? ['south', 'west', 'north'] : ['south', 'west', 'north', 'east']
+        count === 3 ? ['south', 'west', 'east'] : ['south', 'west', 'north', 'east']
       for (let current = 0; current < count; current++) {
         const seats = seatsForViewer(current, count)
         expect(seats.map(seat => seat.place)).toEqual(places)

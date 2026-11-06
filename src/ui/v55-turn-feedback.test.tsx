@@ -44,15 +44,46 @@ describe('v57 – consistent market geometry, centered cue, short gold border si
       player:game.players[0],index:0,isCurrent:true,isHuman:true,isHumanTurn:true,
     }))
     expect(html).toContain('sg-board-your-turn')
-    expect(html).toContain('TWOJA TURA')
+    expect(html).not.toContain('TWOJA TURA')
     expect((html.match(/data-sg-window=/g)??[])).toHaveLength(8)
-    expect(css).toContain('.sg .sg-board.sg-board-your-turn')
-    expect(css).toContain('@keyframes sg-v57-turn-glow')
+    expect(css).toContain('.sg .sg-board .sg-board-status-active')
+    expect(css).toContain('@keyframes sg-turn-edge')
     expect(css).toContain('opacity:1!important')
-    expect(css).toContain('animation:sg-v57-turn-glow 1.15s ease-out 1 both!important')
+    expect(css).toContain('animation:sg-turn-edge 1.8s linear infinite')
     expect(css).not.toContain('opacity:.42')
     expect(app).toContain('turn-market-v56.css')
     expect(app).not.toContain("import './turn-feedback-v55.css'")
+  })
+
+  it('keeps AI difficulty visible when starting a round and omits duplicate counters', () => {
+    const game = newGame({opponents:1,seed:156})
+    for (const isCurrent of [false, true]) {
+      const html = renderToStaticMarkup(createElement(GameBoard, {
+        player:{...game.players[1], difficulty:'hard'}, index:1, isCurrent, isStartingPlayer:true,
+      }))
+      expect(html).toContain('TRUDNY')
+      expect(html).toContain('ROZPOCZĄŁ RUNDĘ')
+        expect(html.includes('TERAZ GRA')).toBe(isCurrent)
+      expect(html).not.toContain('class="sg-board-stat"')
+      expect(html).toContain('data-sg-score')
+    }
+  })
+
+  it('uses actual names and the same turn status for both human players', () => {
+    const game = newGame({opponents:1,seed:156})
+    for (const name of ['Ty', 'Karolina']) {
+      for (const isCurrent of [false, true]) {
+        const html = renderToStaticMarkup(createElement(GameBoard, {
+          player:{...game.players[0],name,controller:'human'},index:0,
+          isHuman:true,isHumanTurn:isCurrent,isCurrent,isStartingPlayer:true,
+        }))
+        expect(html).not.toContain('Twoje witraże')
+        expect(html).toContain(`sg-board-name">${name}`)
+        expect(html).toContain('ROZPOCZĄŁ RUNDĘ')
+        expect(html.includes('TERAZ GRA')).toBe(isCurrent)
+        expect(html.includes('sg-board-turn-rail')).toBe(isCurrent)
+      }
+    }
   })
 
   it('keeps the turn toast visible and legible, never blinking the screen', () => {
@@ -82,7 +113,7 @@ describe('v57 – consistent market geometry, centered cue, short gold border si
     }))
     expect(bot).toContain('sg-board-current')
     expect(bot).not.toContain('sg-board-your-turn')
-    expect(css).toContain('.sg.sg-effects-cinematic .sg-board.sg-board-current')
+    expect(css).toContain('.sg.sg-effects-cinematic .sg-board-turn-rail::after')
     expect(css).toContain('.sg.sg-effects-minimal .sg-board.sg-board-current')
   })
 

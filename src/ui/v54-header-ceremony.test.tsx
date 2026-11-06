@@ -15,8 +15,8 @@ describe('v54 desktop center, cinema round and violet glazier', () => {
     expect(html).toContain('sg-round-v54-bonus')
     expect(html).toContain('PREMIOWANY KOLOR')
     expect(html).toContain('sg-round-v54-featured-gem')
-    expect((html.match(/sg-glass-placed sg-gem-faceted/g)||[])).toHaveLength(7)
-    expect((html.match(/sg-round-v52-step sg-round-v52-/g)||[])).toHaveLength(6)
+    expect((html.match(/sg-glass-placed sg-gem-faceted/g)||[])).toHaveLength(1)
+    expect((html.match(/sg-round-v52-step sg-round-v52-/g)||[])).toHaveLength(0)
     expect(html).toContain('NIEBIESKIE')
   })
   it('centers with symmetric header grid and scales controls together', () => {

@@ -8,12 +8,11 @@ const COLOR_PL: Record<GlassColor, string> = {
 
 function Detail({ data, palaceSide }: { data: FinalScoreBreakdown; palaceSide: GameState['palaceSide'] }) {
   return <div className="sg-final-steps">
-    <div><span>Wynik podczas rund (w tym natychmiastowe −18)</span><strong>{data.roundPoints} pkt</strong></div>
+    <div><span>Punkty po rundach</span><strong>{data.roundPoints} pkt</strong></div>
     <div><span>Pozostałe szkło: {data.remainingPanes} tafli ÷ 3</span><strong className="sg-positive">+{data.remainingPoints}</strong></div>
-    <div><span>Końcowa kara z toru stłuczeń</span><strong className="sg-negative">−{data.glassPenalty}</strong></div>
+    <div className="sg-final-glass"><span>Tor stłuczeń · kara końcowa<small>W całej partii utracono {data.totalGlassLost} pkt</small></span><strong className="sg-negative">−{data.glassPenalty}</strong></div>
     <div><span>{palaceSide === 'A' ? `Ornamenty: ${data.palaceDetails.join(' + ')}` : `Strona B: ${data.fullyGlazedWindows} pełnych okien × ${data.dominantColorCount} ${data.dominantColor ? COLOR_PL[data.dominantColor] : ''} witraży`}</span><strong className="sg-positive">+{data.palaceBonus}</strong></div>
     <div className="sg-final-total"><span>ŁĄCZNIE</span><strong>{data.total} pkt</strong></div>
-    <small>Łączne punkty utracone na torze: {data.totalGlassLost} (rozstrzyga remis)</small>
   </div>
 }
 
@@ -38,7 +37,7 @@ export function FinalResults({ state, onClose }: { state: GameState; onClose: ()
           <Detail data={data} palaceSide={state.palaceSide}/>
         </article>
       })}</div>
-      <footer className="sg-final-caption">Zasady: 1 pkt za każde 3 niewykorzystane tafle, kara z toru oraz premia strony {state.palaceSide}. Remis rozstrzyga najmniejsza łączna utrata punktów z toru stłuczeń.</footer>
+      <footer className="sg-final-caption"><span>Przy remisie wygrywa gracz, który stracił mniej punktów na torze stłuczeń.</span><button className="sg-finish-secondary" onClick={onClose}>Wróć do ekranu końcowego</button></footer>
     </div>
   </div>
 }

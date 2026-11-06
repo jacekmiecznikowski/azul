@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowRight, BookOpen, Check, Gem, House, Info, RotateCcw, Settings2, X } from 'lucide-react'
+import { decodeSavedGame } from './game/savedGame'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { ArrowRight, BookOpen, Check, CirclePlus, Gem, House, Info, Settings2, X } from 'lucide-react'
 import { applyMove, availableSources, BROKEN_TRACK, COLORS, legalMoves, newGame, standings } from './game/engine'
 import type { Controller, Difficulty, GameState, GlassColor, Move, PalaceSide, Source } from './game/engine'
 import { chooseAIMove } from './game/ai'
@@ -20,8 +21,7 @@ import { GlassResources } from './components/GlassResources'
 import { GLASS_COLOR_LABELS_PL as COLORS_PL } from './game/colorLabels'
 import { ManualPlacementDialog } from './components/ManualPlacementDialog'
 import { GameMenu } from './components/GameMenu'
-import { BoardScoringPanel, DigitalBrokenGlass } from './components/ScorePanels'
-import type { ScoreDisplayMode } from './components/ScorePanels'
+import { CompactScores } from './components/ScorePanels'
 import { HomeScreen } from './components/HomeScreen'
 import { RoundTracker } from './components/RoundTracker'
 import { RoundAnnouncement } from './components/RoundAnnouncement'
@@ -61,14 +61,12 @@ import './turn-market-v56.css'
 import './score-presentation-v58.css'
 
 const STORAGE_KEY = 'sintra-glass-save-v1'
-const SCORE_MODE_KEY = 'sintra-glass-score-presentation-v1'
-const PLAYER_AVATARS = ['✦', '✧', '✳', '❖']
 interface Settings { opponents: number; difficulties: Difficulty[]; controllers: Controller[]; names: string[]; palaceSide: PalaceSide }
 const DEFAULT_OPTIONS: Settings = {
   opponents: 3,
   difficulties: ['normal', 'normal', 'normal'],
   controllers: ['human', 'ai', 'ai', 'ai'],
-  names: ['Ty', 'Gracz 2', 'Gracz 3', 'Gracz 4'],
+  names: ['Ty', 'Aurora', 'Iris', 'Noctis'],
   palaceSide: 'A',
 }
 interface Selection { source: Source; color: GlassColor }
@@ -79,9 +77,7 @@ function restore(): GameState | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return null
-    const game = JSON.parse(raw) as GameState
-    if (game.players?.length >= 2 && game.factories && game.roundColors?.length === 6 && game.round >= 1 && game.round <= 6)
-      return { ...game, history: Array.isArray(game.history) ? game.history : [] }
+    return decodeSavedGame(raw)
   } catch { /* Corrupt or old save: start a fresh game. */ }
   return null
 }
@@ -116,7 +112,7 @@ export function Market({ game, selection, disabled, onPick }: {
 }) {
   const center = COLORS.map(color => ({ color, count: game.center.filter(x => x === color).length })).filter(item => item.count > 0)
   return <section className="sg-market sg-center-card" aria-label="Warsztaty szkła">
-    <div className="sg-panel-title"><span>WARSZTATY SZKŁA</span><span className="sg-market-title-meta"><small>{game.factories.filter(f => f.length).length} aktywnych</small>{!game.firstCenterTaken && <span className="sg-start-tile sg-market-first-badge" aria-label="Żeton pierwszego gracza jest na środku stołu" title="Żeton pierwszego gracza jest na środku stołu">1</span>}</span></div>
+    <div className="sg-panel-title"><span>WARSZTATY SZKŁA</span><span className="sg-market-title-meta"><small>{game.factories.filter(f => f.length).length} aktywnych</small></span></div>
     <div className="sg-market-layout-v45">
       <div className="sg-market-orbit-v46" data-sg-orbit-count={game.factories.length}>
         <div className="sg-market-factories-v45" role="group" aria-label="Warsztaty szkła">
@@ -141,45 +137,13 @@ export function Market({ game, selection, disabled, onPick }: {
               className={`sg-center-choice${selection?.source.type === 'center' && selection.color === color ? ' sg-token-selected' : ''}`}>
               <GlassPiece color={color}/><b aria-hidden="true">{count}</b>
             </button>) : <span className="sg-center-quiet">✧</span>}</div>
-          {!game.firstCenterTaken && <small className="sg-center-penalty">+1 stłuczenie</small>}
+          {!game.firstCenterTaken && <span className="sg-start-tile sg-center-first-token" aria-label="Żeton pierwszego gracza: plus jedno stłuczenie" title="Pierwszy pobór: znacznik pierwszego gracza i 1 stłuczenie">+1</span>}
         </div>
       </div>
     </div>
   </section>
 }
 
-export function PenaltyTrack({ game }: { game: GameState }) {
-  return <section className="sg-track sg-center-card" aria-label="Tor stłuczonego szkła">
-    <div className="sg-panel-title"><span>STŁUCZONE SZKŁO</span></div>
-    <div className="sg-track-cells" role="group" aria-label="Dziewięć pól toru stłuczonego szkła">{BROKEN_TRACK.map((value, i) =>
-      <div key={i} className={`sg-track-step${i === 8 ? ' sg-track-last' : ''}${game.players.some(p => p.brokenSteps === i) ? ' sg-track-occupied' : ''}`}
-        title={`Pole ${i} z 8, kara ${value} pkt; ${game.players.filter(p => p.brokenSteps === i).map(p => p.name).join(', ') || 'puste'}`}>
-        <span className="sg-track-step-number">{i === 0 ? 'START' : String(i).padStart(2, '0')}</span>
-        <strong>{value === 0 ? '0' : `−${value}`}</strong>
-        <div className="sg-track-pawns">{game.players.map(p => p.brokenSteps === i && <i key={p.id} className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`} title={`${p.name}: pole ${i}`}/>)}</div>
-      </div>)}</div>
-  </section>
-}
-
-export function TurnSummary({ game }: { game: GameState }) {
-  const current = game.players[game.currentPlayer]
-  return <section className="sg-turn sg-center-card" aria-label="Tura i wyniki">
-    <div className="sg-panel-title"><span>PRZY STOLE</span></div>
-    <div className="sg-turn-player"><span className={`sg-player-icon sg-palace-icon-${current.palaceColor ?? 'red'}`}>{PLAYER_AVATARS[game.currentPlayer]}</span>
-      <div><strong>{game.phase === 'finished' ? 'Koniec rozgrywki' : current.controller === 'human' ? (current.name === 'Ty' ? 'Twój ruch' : `Tura: ${current.name}`) : `Gra ${current.name}`}</strong>
-      <small>{game.phase === 'finished' ? 'Zobacz końcowe wyniki' : current.controller === 'human' ? 'Wybierz tafle i kwaterę' : 'Przeciwnik rozważa ruch…'}</small></div>
-      {current.controller === 'ai' && game.phase === 'playing' && <span className="sg-thinking" aria-label="AI myśli"><i/><i/><i/></span>}
-    </div>
-
-    <div className="sg-scores">{game.players.map((p, i) => <div key={p.id} className={`sg-score-line${game.currentPlayer === i && game.phase === 'playing' ? ' sg-score-current' : ''}`}>
-      <i className={`sg-pawn sg-pawn-color-${p.palaceColor ?? 'red'}`}/><span>{p.name}</span><b>{p.score}</b></div>)}</div>
-    <div className="sg-turn-first-token" role="status">
-      {game.firstCenterTaken
-        ? <span>Następną rundę rozpocznie: <strong>{game.players[game.nextStartingPlayer ?? game.startingPlayer].name}</strong></span>
-        : <span>Rundę rozpoczyna: <strong>{game.players[game.startingPlayer].name}</strong></span>}
-    </div>
-  </section>
-}
 function SetupModal({ settings, onClose, onStart }: {
   settings: Settings; onClose: () => void; onStart: (settings: Settings) => void
 }) {
@@ -219,14 +183,14 @@ function SetupModal({ settings, onClose, onStart }: {
                 <option value="human">Człowiek</option>
                 <option value="ai">Bot AI</option>
               </select>
-              {isHuman ? <input
+              {<input
                 aria-label={`Imię gracza ${i + 1}`}
                 value={local.names[i] ?? `Gracz ${i + 1}`}
                 maxLength={28}
                 onChange={e => setLocal(previous => ({
                   ...previous, names: previous.names.map((name,j) => j === i ? e.target.value : name),
                 }))} placeholder={`Gracz ${i + 1}`}/>
-              : <select aria-label={`Poziom trudności bota ${i + 1}`}
+              }{!isHuman && <select aria-label={`Poziom trudności bota ${i + 1}`}
                   value={local.difficulties[i - 1] ?? 'normal'}
                   onChange={e => setLocal(previous => ({
                     ...previous,
@@ -270,12 +234,13 @@ function RulesModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function App() {
-  const [game, setGame] = useState<GameState>(() => restore() ?? newGame({ ...DEFAULT_OPTIONS, botDifficulties: DEFAULT_OPTIONS.difficulties }))
+  const [savedGame] = useState(restore)
+  const [game, setGame] = useState<GameState>(() => savedGame ?? newGame({ ...DEFAULT_OPTIONS, botDifficulties: DEFAULT_OPTIONS.difficulties }))
   const [settings, setSettings] = useState<Settings>(() => ({
     opponents: game.players.length - 1,
     difficulties: DEFAULT_OPTIONS.difficulties.map((difficulty, i) => game.players[i + 1]?.difficulty ?? difficulty),
     controllers: DEFAULT_OPTIONS.controllers.map((controller, i) => game.players[i]?.controller ?? controller),
-    names: DEFAULT_OPTIONS.names.map((name, i) => game.players[i]?.controller === 'human' ? game.players[i].name : name),
+    names: DEFAULT_OPTIONS.names.map((name, i) => game.players[i]?.name ?? name),
     palaceSide: game.palaceSide,
   }))
   const [selection, setSelection] = useState<Selection | null>(null)
@@ -289,22 +254,15 @@ export default function App() {
   const [roundReady, setRoundReady] = useState<number | null>(null)
   const [turnNotice, setTurnNotice] = useState<{ key: string; name: string } | null>(null)
   const noticedHumanTurn = useRef<string | null>(null)
-  const [hasSave, setHasSave] = useState(() => restore() !== null)
+  const [hasSave, setHasSave] = useState(savedGame !== null)
   const [viewport, setViewport] = useState(() => typeof window === 'undefined' ? { width: 1600, height: 900 } : { width: window.innerWidth, height: window.innerHeight })
   const [showSetup, setShowSetup] = useState(false)
   const [showRules, setShowRules] = useState(false)
+  const [inspectFinalBoard, setInspectFinalBoard] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [showStrategy, setShowStrategy] = useState(false)
   const [mobileBoard, setMobileBoard] = useState<number | null>(null)
   const [mobilePanel, setMobilePanel] = useState<'score' | 'history' | null>(null)
-  const [scoreMode,setScoreMode] = useState<ScoreDisplayMode>(() => {
-    try { return localStorage.getItem(SCORE_MODE_KEY) === 'board' ? 'board' : 'digital' }
-    catch { return 'digital' }
-  })
-  useEffect(() => {
-    try { localStorage.setItem(SCORE_MODE_KEY,scoreMode) }
-    catch { /* private browsing: keep this preference for the current session */ }
-  },[scoreMode])
   const [lastHumanIndex, setLastHumanIndex] = useState(() =>
     game.players[game.currentPlayer]?.controller === 'human' ? game.currentPlayer : 0)
   const { enabled: soundEnabled, toggle: toggleSound, play } = useGameAudio()
@@ -339,7 +297,7 @@ export default function App() {
     `${game.players.length}-${viewerIndex}-${mobileBoardIndex}-${game.currentPlayer}-${viewport.width}x${viewport.height}`,
   )
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (screen !== 'game' || game.phase !== 'playing' || announcedRound.current === game.round) return
     const color = game.roundColors[game.round - 1]
     if (!color) return
@@ -441,7 +399,7 @@ export default function App() {
   function chooseFinalGlass(candidates: Move[]) {
     // Keep-color choices are separate from placement choices. Choosing fields
     // must never force which colored pane the player preserves afterwards.
-    if (candidates.length > 1 || (candidates[0]?.kind === 'take' && candidates[0].keepColor)) {
+    if (candidates.length > 1) {
       setFinishing(candidates)
     } else if (candidates.length) commit(candidates[0])
   }
@@ -481,7 +439,7 @@ export default function App() {
     setMobileBoard(null)
     setMobilePanel(null)
     play('round')
-    setSelection(null); setFinishing(null); setPlacementOptions(null); setShowSetup(false); setShowResults(false)
+    setSelection(null); setFinishing(null); setPlacementOptions(null); setShowSetup(false); setShowResults(false); setInspectFinalBoard(false)
   }
   function seat(index: number, place: 'north' | 'west' | 'east' | 'south') {
     const player = game.players[index]
@@ -500,18 +458,19 @@ export default function App() {
   }
 
   return <div className={`sg${screen === "home" ? " sg-in-home" : ""}${roundTiming.cinematic ? " sg-effects-cinematic" : " sg-effects-minimal"}`}>
-    <header className="sg-header">
+    <header className="sg-header sg-toolbar-modern">
       <div className="sg-brand"><span className="sg-brand-symbol"><Gem size={20}/></span><span>SINTRA <b>GLASS</b></span></div>
       <RoundTracker round={game.round} colors={game.roundColors}/>
       <div className="sg-header-actions">
+        {game.phase === 'finished' && inspectFinalBoard && <button type="button" className="sg-finish-secondary" onClick={() => setInspectFinalBoard(false)}>Koniec partii</button>}
         <GlassResources game={game}/>
-        <GameMenu scoreMode={scoreMode} onScoreModeChange={setScoreMode} effectsEnabled={effectsEnabled} reducedMotion={reducedMotion} toggleEffects={toggleEffects}
+        <GameMenu effectsEnabled={effectsEnabled} reducedMotion={reducedMotion} toggleEffects={toggleEffects}
           musicEnabled={musicEnabled} musicUnavailable={musicUnavailable} toggleMusic={toggleMusic}
           soundEnabled={soundEnabled} toggleSound={toggleSound}
           openStrategy={() => setShowStrategy(true)} openRules={() => setShowRules(true)}/>
         <button type="button" className="sg-home-return" onClick={() => { clearEffects(); announcedRound.current = null; setRoundAnnouncement(null); setRoundReady(null); setTurnNotice(null); setScreen('home'); setSelection(null); setFinishing(null); setPlacementOptions(null); setMobilePanel(null) }} aria-label="Menu główne" title="Menu główne"><House size={16}/><span>Główne</span></button>
-        <button type="button" className="sg-new" onClick={() => setShowSetup(true)}>
-          <RotateCcw size={16}/> Nowa gra
+        <button type="button" className="sg-new" aria-label="Nowa gra" title="Nowa gra" onClick={() => setShowSetup(true)}>
+          <CirclePlus size={16}/><span>Nowa gra</span>
         </button>
       </div>
     </header>
@@ -519,10 +478,8 @@ export default function App() {
       <div className="sg-felt" data-sg-player-count={game.players.length} style={{ zoom: desktopTable.scale, width: desktopTable.width, minWidth: desktopTable.width, height: desktopTable.height, '--sg-long': `${desktopTable.boardLong}px` } as React.CSSProperties}>
         {tableSeats.filter(seatInfo => seatInfo.place !== 'south').map(seatInfo => seat(seatInfo.playerIndex, seatInfo.place))}
         <div className="sg-center">
-          <div className={`sg-side-left sg-score-mode-${scoreMode}`}>
-            {scoreMode === 'board'
-              ? <BoardScoringPanel game={game}/>
-              : <><TurnSummary game={game}/><DigitalBrokenGlass game={game}/></>}
+          <div className="sg-side-left sg-score-mode-simple">
+            <CompactScores game={game}/>
           </div>
           <Market game={game} selection={selection} disabled={!humanCanPlay || !!finishing} onPick={chooseSource}/>
           <LiveHistory state={game} status={status} onCancel={selection ? () => setSelection(null) : undefined}
@@ -578,14 +535,14 @@ export default function App() {
               </span>
             </button>)}
           </div>
-          <div className="sg-mobile-status" aria-live="polite">
-            <span>{selection ? `Wskaż kwaterę — ${COLORS_PL[selection.color].toLowerCase()}` : humanTurn ? `Ruch: ${current.name}` : `${current.name} wybiera ruch…`}</span>
+          {(selection || (humanTurn && mobileBoardIndex !== game.currentPlayer)) && <div className="sg-mobile-status" aria-live="polite">
+            {selection && <span>Wskaż kwaterę — {COLORS_PL[selection.color].toLowerCase()}</span>}
             {selection && <button type="button" onClick={() => setSelection(null)}>Anuluj</button>}
             {selection && selectionMoves.some(m => m.kind === 'take' && m.windowIndex === null) &&
               <button type="button" onClick={() => chooseTarget(null)}>Stłucz</button>}
             {humanTurn && mobileBoardIndex !== game.currentPlayer &&
               <button type="button" onClick={() => setMobileBoard(game.currentPlayer)}>Moja tura</button>}
-          </div>
+          </div>}
         </div>
       </div>
       {mobilePanel && <div className="sg-mobile-overlay" onMouseDown={() => setMobilePanel(null)}>
@@ -595,10 +552,8 @@ export default function App() {
           <div className="sg-mobile-overlay-heading"><strong>{mobilePanel === 'score' ? 'Wyniki i stłuczone szkło' : 'Historia ruchów'}</strong>
             <button type="button" onClick={() => setMobilePanel(null)}>Zamknij ×</button></div>
           {mobilePanel === 'score'
-            ? <div className={`sg-mobile-stats sg-score-mode-${scoreMode}`}>
-                {scoreMode === 'board'
-                  ? <BoardScoringPanel game={game}/>
-                  : <><TurnSummary game={game}/><DigitalBrokenGlass game={game}/></>}
+            ? <div className="sg-mobile-stats sg-score-mode-simple">
+                <CompactScores game={game} showBoard={false}/>
               </div>
             : <LiveHistory state={game} status={status}
                 onCancel={selection ? () => setSelection(null) : undefined}
@@ -620,7 +575,7 @@ export default function App() {
       <span className="sg-human-turn-notice-icon" aria-hidden="true">✦</span>
       <span><strong>TWOJA TURA</strong><small>{turnNotice.name === 'Ty' ? 'Wybierz szkło z warsztatu lub środka' : `${turnNotice.name} — wybierz szkło`}</small></span>
     </div>}
-    {screen === 'game' && finishOverlay.banner && <FinishCelebration state={game} onResults={() => setShowResults(true)} onNewGame={() => setShowSetup(true)}/>}
+    {screen === 'game' && finishOverlay.banner && !inspectFinalBoard && <FinishCelebration onBoard={() => setInspectFinalBoard(true)} state={game} onResults={() => setShowResults(true)} onNewGame={() => setShowSetup(true)}/>}
     {screen === 'game' && finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
@@ -631,6 +586,18 @@ export default function App() {
         candidates={placementOptions.filter((move): move is Extract<Move, { kind: 'take' }> => move.kind === 'take')}
         picked={sourceOptions.find(option => option.color === selection.color && sourceEquals(option.source, selection.source))?.count ?? 0}
         onClose={() => setPlacementOptions(null)} onConfirm={confirmManualPlacement}/>}
-    {finishing && <div className="modal-backdrop" onMouseDown={() => setFinishing(null)}><div className="modal keep-modal" role="dialog" aria-modal="true" aria-label="Wybierz taflę do zachowania" onMouseDown={e => e.stopPropagation()}><button className="close-btn" onClick={() => setFinishing(null)} aria-label="Zamknij"><X size={18}/></button><div className="modal-icon"><Gem size={24}/></div><h2>Wybierz taflę do okna</h2><p>Jedna tafla zostanie w pałacowym witrażu.</p><div className="keep-options">{finishing.filter(m => m.kind === 'take' && m.keepColor).map(m => m.kind === 'take' && m.keepColor ? <button key={m.keepColor} onClick={() => commit(m)}><GlassPiece color={m.keepColor}/><span>{COLORS_PL[m.keepColor]}</span></button> : null)}</div></div></div>}
+    {finishing && <div className="modal-backdrop" onMouseDown={() => setFinishing(null)}>
+      <section className="modal keep-modal" role="dialog" aria-modal="true" aria-labelledby="keep-heading"
+        onMouseDown={e => e.stopPropagation()}>
+        <button type="button" className="close-btn" onClick={() => setFinishing(null)} aria-label="Zamknij"><X size={18}/></button>
+        <h2 id="keep-heading">Wybierz taflę do okna</h2>
+        <p>Wybrana tafla zostanie w pałacowym witrażu.</p>
+        <div className="keep-options">{finishing.map(move =>
+          move.kind === 'take' && move.keepColor && <button type="button" key={move.keepColor} onClick={() => commit(move)}>
+            <GlassPiece color={move.keepColor}/><span>{COLORS_PL[move.keepColor]}</span>
+          </button>
+        )}</div>
+      </section>
+    </div>}
   </div>
 }
