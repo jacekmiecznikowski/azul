@@ -1,4 +1,4 @@
-import { applyMove, availableSources, legalMoves, patternFor, remainingSlots, WINDOW_POINTS } from './engine'
+import { applyMove, availableSources, BROKEN_TRACK, finalBreakdown, legalMoves, patternFor, remainingSlots, WINDOW_POINTS } from './engine'
 import { chooseLearnedMove } from './learnedPolicy'
 import type { Difficulty, GameState, Move, Player } from './engine'
 
@@ -14,9 +14,16 @@ function progress(player: Player): number {
 function evaluate(state: GameState, next: GameState, move: Move, difficulty: Difficulty): number {
   const oldPlayer = state.players[state.currentPlayer]
   const player = next.players[state.currentPlayer]
-  let value = (player.score - oldPlayer.score) * 2.8 + (progress(player) - progress(oldPlayer)) * 1.6
-  value -= (player.brokenSteps - oldPlayer.brokenSteps) * 2.6
-  value -= (player.glassLost - oldPlayer.glassLost) * 0.15
+  // Paid -18 penalties are already in score. Reserve the outstanding track
+  // cost at the SAME rate so wrapping 7 -> 0 cannot distort the move value.
+  if (next.phase === 'finished') {
+    return (player.score - finalBreakdown(oldPlayer, state.palaceSide).total) * 2.8
+  }
+  const netPoints = player.score - oldPlayer.score -
+    (BROKEN_TRACK[player.brokenSteps] - BROKEN_TRACK[oldPlayer.brokenSteps])
+  let value = netPoints * 2.8 + (progress(player) - progress(oldPlayer)) * 1.6
+  value += (finalBreakdown(player, state.palaceSide).palaceBonus -
+    finalBreakdown(oldPlayer, state.palaceSide).palaceBonus) * 0.9
   if (move.kind === 'reset') {
     value -= 2.0
     const optionsBefore = availableSources(state).length
@@ -32,6 +39,7 @@ function evaluate(state: GameState, next: GameState, move: Move, difficulty: Dif
       const strip = oldPlayer.strips[move.windowIndex]
       const placed = Math.min(count, remainingSlots(strip, move.color))
       value += placed * 1.3
+      value -= (move.slots ?? []).filter(i => patternFor(strip)[i] === 'wild').length * 0.65
       value += (move.windowIndex < 5 ? (5 - move.windowIndex) * 0.11 : 0)
       // Advanced AI plans for windows whose completion scores again for earlier ones.
       if (difficulty === 'hard') {
@@ -72,7 +80,7 @@ function boardEstimate(state: GameState, index: number): number {
   const player = state.players[index]
   if (state.phase === 'finished') return player.score * 3.4
   let estimate = player.score * 3.4
-  estimate -= [0, 1, 2, 4, 6, 8, 11, 14, 18][player.brokenSteps] * 2.55
+  estimate -= BROKEN_TRACK[player.brokenSteps] * 3.4
   const marketColors = new Map<string, number>()
   for (const color of state.center) marketColors.set(color, (marketColors.get(color) ?? 0) + 1)
   for (const factory of state.factories) for (const color of factory) marketColors.set(color, (marketColors.get(color) ?? 0) + 1)
@@ -124,10 +132,20 @@ function positionValue(state: GameState, root: number): number {
   const rivals = state.players.map((_, i) => i === root ? -Infinity : boardEstimate(state, i))
   return ourValue - Math.max(...rivals) * 0.65 - rivals.filter(Number.isFinite).reduce((a, b) => a + b, 0) * 0.055
 }
+/** Stop at a round boundary: the reducer refills from the hidden bag, but
+ * those future tiles must never influence search or positional evaluation. */
+function searchTransition(state: GameState, move: Move): GameState {
+  const next = applyMove(state, move)
+  if (next.round !== state.round) {
+    next.factories = next.factories.map(() => [])
+    next.center = []
+  }
+  return next
+}
 function expertMove(state: GameState, moves: Move[]): Move {
   const root = state.currentPlayer
   const first = moves.map(move => {
-    const next = applyMove(state, move)
+    const next = searchTransition(state, move)
     return { move, next, quick: positionValue(next, root) + evaluate(state, next, move, 'hard') * 0.30 }
   }).sort((a, b) => b.quick - a.quick)
   // Lookahead is purposely bounded even at a crowded 4-player table.
@@ -136,9 +154,9 @@ function expertMove(state: GameState, moves: Move[]): Move {
   let bestValue = -Infinity
   for (const candidate of shortlist) {
     let future = positionValue(candidate.next, root)
-    if (candidate.next.phase !== 'finished' && candidate.next.currentPlayer !== root) {
+    if (candidate.next.phase !== 'finished' && candidate.next.round === state.round && candidate.next.currentPlayer !== root) {
       const responses = legalMoves(candidate.next).map(move => {
-        const after = applyMove(candidate.next, move)
+        const after = searchTransition(candidate.next, move)
         return { after, rank: evaluate(candidate.next, after, move, 'hard') + (boardEstimate(after, candidate.next.currentPlayer) - boardEstimate(candidate.next, candidate.next.currentPlayer)) * 0.4 }
       }).sort((a, b) => b.rank - a.rank).slice(0, 2)
       if (responses.length) {
@@ -149,7 +167,7 @@ function expertMove(state: GameState, moves: Move[]): Move {
             const replies = legalMoves(r.after)
             let bestReply = -Infinity
             for (const reply of replies) {
-              const response = applyMove(r.after, reply)
+              const response = searchTransition(r.after, reply)
               const value = positionValue(response, root)
               if (value > bestReply) bestReply = value
             }

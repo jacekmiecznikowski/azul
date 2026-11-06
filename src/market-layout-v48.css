@@ -1,0 +1,89 @@
+/* v48: final desk layout. Resolve a stale v45 desktop 64px bottom reserve
+   (more specific than v47's inset), and use the ENTIRE available board. */
+@media (min-width:1101px) and (min-height:621px) {
+  .sg .sg-center .sg-market .sg-market-layout-v45 {
+    top:28px;
+    right:7px;
+    bottom:7px;
+    left:7px;
+    height:auto;
+    min-height:0;
+    overflow:visible;
+  }
+  .sg .sg-center .sg-market .sg-market-orbit-v46 {
+    --sg-disc-size:clamp(44px, min(22cqb, 16cqi), 106px);
+  }
+
+}
+.sg .sg-market .sg-market-orbit-v46::before {
+  inset:11% 8.5%;
+  border-color:#b79c6d70;
+  box-shadow:inset 0 0 0 1px #84beb918,0 0 0 3px #8d976916;
+}
+.sg .sg-market .sg-market-orbit-v46::after {
+  inset:35% 35%;
+  opacity:.68;
+}
+.sg .sg-market .sg-market-factories-v45 .sg-orbit-position-v46 {
+  touch-action:manipulation;
+}
+.sg .sg-market .sg-factory-v45 .sg-factory-grid {
+  width:88%;
+  height:88%;
+  gap:0;
+}
+.sg .sg-market .sg-center-pile.sg-center-v45 {
+  width:37%;
+  height:30%;
+}
+.sg .sg-turn-first-token {
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  flex:0 0 auto;
+  gap:6px;
+  min-width:0;
+  margin:2px 7px 0;
+  padding:3px 5px;
+  height:22px;
+  border-top:1px solid #6d95865e;
+  color:#afcac5;
+  font:600 10px/1.15 'DM Sans',sans-serif;
+}
+.sg .sg-turn-first-token span:last-child {
+  min-width:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.sg .sg-turn-first-token strong { color:#f2ddae; }
+.sg .sg-turn-token-icon {
+  flex:0 0 16px;
+  display:grid;
+  place-items:center;
+  width:16px;
+  height:16px;
+  border:1px solid #d1ac73;
+  border-radius:4px;
+  color:#122d39;
+  background:#f1ddb4;
+  font:800 10px/1 'DM Sans',sans-serif;
+}
+.sg .sg-header-actions .sg-resource-trigger {
+  min-width:80px;
+}
+.sg .sg-resource-trigger strong { display:none; }
+.sg .sg-resource-popover-title strong { letter-spacing:.2px; }
+/* No stock total or first-player text inside the resource dropdown. */
+.sg .sg-resource-total, .sg .sg-resource-start { display:none; }
+@media (max-width:1100px), (max-height:620px) {
+  .sg .sg-header-actions .sg-resource-trigger {
+    min-width:33px;
+    padding:0 7px;
+  }
+  .sg .sg-turn-first-token {
+    height:auto;
+    min-height:21px;
+    font-size:9px;
+  }
+}

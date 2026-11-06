@@ -1,4 +1,4 @@
-import { BROKEN_TRACK, WINDOW_POINTS, patternFor, availableSources, legalMoves } from './engine'
+import { BROKEN_TRACK, WINDOW_POINTS, patternFor, availableSources, legalMoves, applyMove } from './engine'
 import type { GameState, GlassColor, Move, WindowStrip } from './engine'
 import learned from './trained-weights.json'
 
@@ -51,7 +51,7 @@ export function moveFeatures(state: GameState, move: Move): number[] {
     f.firstToken = first
     const matchingMarket = allSources.reduce((sum, s) => sum + (s.color === move.color ? s.count : 0), 0)
     f.marketAvailability = Math.min(2, matchingMarket / 4)
-    f.leaveToCenter = move.source.type === 'factory' ? -(4 - picked) / 3 : 0
+    f.leaveToCenter = move.source.type === 'factory' ? -(state.factories[move.source.index].length - picked) / 3 : 0
     if (move.windowIndex === null) {
       f.penaltyCost = -effectivePenalty(p.brokenSteps, picked + first) / 8
       f.brokenCount = -picked / 3
@@ -110,6 +110,17 @@ export function moveRating(state: GameState, move: Move, weights: Weights = TRAI
 export function chooseLearnedMove(state: GameState, weights: Weights = TRAINED_WEIGHTS): Move | null {
   const moves = legalMoves(state)
   if (!moves.length) return null
+  // Once every choice ends the game, use the actual final tally, including
+  // palace B's kept color and the remaining-pane bonus, not training weights.
+  if (state.round === 6 && moves.every(move => move.kind === 'take') &&
+    new Set([...state.center, ...state.factories.flat()]).size === 1 &&
+    state.factories.filter(factory => factory.length).length + Number(state.center.length > 0) === 1) {
+    return moves.reduce((best, move) => {
+      const a = applyMove(state, best).players[state.currentPlayer]
+      const b = applyMove(state, move).players[state.currentPlayer]
+      return b.score > a.score || b.score === a.score && b.glassLost < a.glassLost ? move : best
+    })
+  }
   let best = moves[0]
   let score = -Infinity
   for (const m of moves) {

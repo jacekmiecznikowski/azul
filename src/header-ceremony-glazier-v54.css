@@ -1,0 +1,429 @@
+/* Sintra v54: true center-aligned command bar, immersive round ceremony,
+   vivid violet glazier. Dimensions are intentionally consistent by breakpoint. */
+
+/* Desktop: equal side columns keep the bonus at the EXACT viewport center,
+   regardless of how wide the stock and action buttons become. */
+@media (min-width:1101px) and (min-height:621px) {
+  .sg .sg-header {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(345px,430px) minmax(0,1fr);
+    align-items:center;
+    height:76px;
+    min-height:76px;
+    max-height:76px;
+    padding:0 16px;
+    gap:12px;
+    background:
+      linear-gradient(90deg,#10343c40,transparent 27%,#173e463a 50%,transparent 73%,#10343c40),
+      linear-gradient(180deg,#122e38,#091c28);
+    border-bottom:1px solid #b4a0786b;
+    box-shadow:inset 0 1px 0 #fff3ce13,0 4px 24px #030e16b8;
+  }
+  .sg .sg-stage {height:calc(100dvh - 76px);}
+  .sg .sg-header .sg-brand {justify-self:start;min-width:0;gap:10px;font-size:14px;letter-spacing:1.5px;}
+  .sg .sg-header .sg-brand-symbol {width:39px;height:39px;border-radius:10px;}
+  .sg .sg-header .sg-round-tracker-v52 {
+    justify-self:center;
+    width:100%;
+    height:61px;
+    min-height:61px;
+    max-height:61px;
+    padding:6px 11px;
+    display:grid;
+    grid-template-columns:69px minmax(0,1fr);
+    grid-template-rows:32px 15px;
+    column-gap:8px;
+    row-gap:1px;
+    border-radius:12px;
+    border-color:#d7ba7d91;
+    background:linear-gradient(160deg,#204853 0%,#153743 45%,#0c2b37 100%);
+    box-shadow:inset 0 1px 0 #fff0c93b,inset 0 0 0 1px #071d29,0 3px 18px #05151d80;
+  }
+  .sg .sg-header .sg-round-v52-current {
+    grid-column:1;
+    grid-row:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:2px;
+    padding:0 9px 0 0;
+    border-right:1px solid #bdab7b75;
+  }
+  .sg .sg-header .sg-round-v52-caption {font-size:9px;letter-spacing:1.15px;}
+  .sg .sg-header .sg-round-v52-count {font-size:22px;line-height:1;}
+  .sg .sg-header .sg-round-v52-count small {font-size:11px;}
+  .sg .sg-header .sg-round-v52-steps {
+    grid-row:2;
+    grid-column:1 / -1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    min-width:0;
+    height:15px;
+    gap:6px;
+    padding:0;
+  }
+  .sg .sg-header .sg-round-v52-step {
+    box-sizing:border-box;
+    width:39px;
+    min-width:0;
+    height:16px;
+    min-height:16px;
+    flex-direction:row;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+    padding:1px 4px;
+    border-radius:5px;
+  }
+  .sg .sg-header .sg-round-v52-index {font-size:8px;}
+  .sg .sg-header .sg-round-v52-gem {--sg-round-gem:13px;width:13px;height:13px;flex-basis:13px;}
+  .sg .sg-header .sg-round-v52-step::after {display:none;}
+  .sg .sg-header .sg-header-actions {
+    justify-self:end;
+    justify-content:flex-end;
+    align-items:center;
+    gap:7px;
+    min-width:0;
+    flex-wrap:nowrap;
+  }
+  .sg .sg-header .sg-header-actions > button,
+  .sg .sg-header .sg-header-actions .sg-menu-trigger,
+  .sg .sg-header .sg-header-actions .sg-resource-trigger {
+    height:44px;
+    min-height:44px;
+    padding:0 12px;
+    border:1px solid #7798957e;
+    border-radius:10px;
+    background:linear-gradient(180deg,#1a3b48,#102c3a);
+    color:#e8efea;
+    box-shadow:inset 0 1px 0 #fff3d018,0 2px 6px #06131b80;
+    font-size:11px;
+    white-space:nowrap;
+    gap:6px;
+  }
+  .sg .sg-header .sg-header-actions > button:hover,
+  .sg .sg-header .sg-header-actions .sg-menu-trigger:hover,
+  .sg .sg-header .sg-header-actions .sg-resource-trigger:hover {
+    border-color:#deb77d;
+    background:linear-gradient(180deg,#27535a,#1a3946);
+  }
+  .sg .sg-header .sg-header-actions .sg-new {
+    border-color:#d1af718f;
+    background:linear-gradient(180deg,#423c35,#242e34);
+    color:#f4dfb8;
+  }
+  .sg .sg-header .sg-resource-ribbon {
+    height:45px;
+    min-height:45px;
+    border-radius:10px;
+    background:linear-gradient(180deg,#204650,#12323e);
+  }
+  .sg .sg-header .sg-resource-ribbon-item {
+    min-width:78px;
+    padding:4px 6px;
+    gap:6px;
+  }
+  .sg .sg-header .sg-resource-ribbon-item svg {width:15px;height:15px;}
+  .sg .sg-header .sg-resource-ribbon-label {font-size:9px;}
+  .sg .sg-header .sg-resource-ribbon-value {font-size:17px;}
+}
+.sg .sg-header .sg-round-v54-bonus {
+  grid-column:2;
+  grid-row:1;
+  align-self:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-width:0;
+  overflow:hidden;
+}
+.sg .sg-header .sg-round-v54-bonus-label {
+  flex:0 1 auto;
+  color:#b6d5cd;
+  font:800 8px/1.1 'DM Sans',sans-serif;
+  letter-spacing:.7px;
+  white-space:nowrap;
+}
+.sg .sg-header .sg-round-v54-featured-gem {
+  flex:0 0 26px;
+  display:grid;
+  place-items:center;
+  width:26px;
+  height:26px;
+}
+.sg .sg-header .sg-round-v54-featured-gem .sg-glass.sg-glass-placed.sg-gem-faceted {
+  width:26px;
+  height:26px;
+  max-width:none;
+  max-height:none;
+  min-width:0;
+  min-height:0;
+  margin:0;
+  transform:none;
+  aspect-ratio:1;
+  filter:drop-shadow(0 0 4px #e2cc927a);
+}
+.sg .sg-header .sg-round-v54-color-name {
+  flex:0 0 auto;
+  color:#f6d8a1;
+  font:800 10px/1.2 'DM Sans',sans-serif;
+  letter-spacing:.25px;
+  white-space:nowrap;
+}
+@media (min-width:1101px) and (max-width:1360px) and (min-height:621px) {
+  .sg .sg-header {grid-template-columns:minmax(0,1fr) 350px minmax(0,1fr);gap:8px;padding:0 10px;}
+  .sg .sg-header .sg-round-tracker-v52 {padding:6px 7px;}
+  .sg .sg-header .sg-round-v54-bonus-label {font-size:7px;letter-spacing:0;}
+  .sg .sg-header .sg-round-v54-color-name {font-size:9px;}
+  .sg .sg-header .sg-header-actions {gap:4px;}
+  .sg .sg-header .sg-header-actions > button,
+  .sg .sg-header .sg-header-actions .sg-menu-trigger,
+  .sg .sg-header .sg-header-actions .sg-resource-trigger {padding:0 8px;font-size:10px;}
+  .sg .sg-header .sg-brand {font-size:12px;letter-spacing:.8px;}
+}
+/* Between the ribbon and full desktop, the existing resources menu is cleaner
+   than letting a five-column stock panel overlap navigation. */
+@media (min-width:1700px) and (max-width:1819px) and (min-height:650px) {
+  .sg .sg-header .sg-resource-ribbon {display:none;}
+  .sg .sg-header .sg-resource-trigger {display:flex;}
+}
+@media (min-width:1820px) and (min-height:650px) {
+  .sg .sg-header .sg-resource-ribbon-item {min-width:78px;}
+}
+
+/* Portrait: place the central premium line above a compact six-step timeline.
+   Keep the earlier two-row header instead of squashing buttons into one row. */
+@media (max-width:1100px), (max-height:620px) {
+  .sg .sg-header .sg-round-tracker-v52 {
+    display:grid;
+    grid-template-columns:58px minmax(0,1fr);
+    grid-template-rows:22px 12px;
+    width:100%;
+    height:43px;
+    min-height:43px;
+    max-height:43px;
+    gap:1px 5px;
+    padding:3px 7px;
+  }
+  .sg .sg-header .sg-round-v52-current {
+    grid-row:1;grid-column:1;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    border-right:1px solid #ad93666f;
+    gap:0;
+    padding:0 5px 0 0;
+  }
+  .sg .sg-header .sg-round-v52-caption {font-size:7px;letter-spacing:.6px;}
+  .sg .sg-header .sg-round-v52-count {font-size:15px;}
+  .sg .sg-header .sg-round-v52-steps {
+    grid-column:1/-1;
+    grid-row:2;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:5px;
+    padding:0;
+    height:12px;
+    width:100%;
+  }
+  .sg .sg-header .sg-round-v52-step {
+    width:31px;
+    max-width:none;
+    height:12px;
+    min-height:12px;
+    flex-direction:row;
+    padding:0 2px;
+    gap:2px;
+    border-radius:3px;
+  }
+  .sg .sg-header .sg-round-v52-index {font-size:7px;}
+  .sg .sg-header .sg-round-v52-gem {--sg-round-gem:10px;width:10px;height:10px;flex-basis:10px;}
+  .sg .sg-header .sg-round-v54-bonus {gap:5px;justify-content:center;}
+  .sg .sg-header .sg-round-v54-bonus-label {font-size:7px;letter-spacing:0;}
+  .sg .sg-header .sg-round-v54-featured-gem {width:19px;height:19px;flex-basis:19px;}
+  .sg .sg-header .sg-round-v54-featured-gem .sg-glass.sg-glass-placed.sg-gem-faceted {
+    width:19px;height:19px;
+  }
+  .sg .sg-header .sg-round-v54-color-name {font-size:9px;}
+}
+@media (orientation:portrait) and (max-width:1100px),
+       (orientation:portrait) and (max-height:620px) {
+  .sg .sg-header {
+    height:90px;
+    min-height:90px;
+    max-height:90px;
+    grid-template-rows:42px 44px;
+    padding:0 8px 3px;
+    border-bottom-color:#ad976c65;
+  }
+  .sg .sg-header .sg-round-tracker-v52 {
+    /* v32 declared display:flex!important on the old tracker.
+       Explicitly restore the two-row grid in portrait. */
+    display:grid!important;
+  }
+  .sg .sg-header .sg-brand-symbol {width:30px;height:30px;}
+  .sg .sg-header .sg-header-actions button {height:32px;}
+}
+@media (max-width:1100px) and (orientation:landscape),
+       (max-height:620px) and (orientation:landscape) {
+  .sg .sg-header {height:52px;min-height:52px;max-height:52px;gap:6px;}
+  .sg .sg-header .sg-round-tracker-v52 {
+    flex:0 0 auto;
+    width:min(340px,46vw);
+    height:44px;min-height:44px;max-height:44px;
+  }
+  .sg .sg-header .sg-brand {font-size:10px;letter-spacing:.6px;}
+  .sg .sg-header .sg-header-actions {gap:3px;}
+  .sg .sg-header .sg-header-actions button {height:31px;padding:0 6px;}
+  .sg .sg-mobile-layout {height:calc(100dvh - 52px);}
+}
+@media (max-width:720px) and (orientation:landscape) {
+  .sg .sg-header .sg-round-tracker-v52 {width:min(245px,45vw);grid-template-columns:49px minmax(0,1fr);}
+  .sg .sg-header .sg-round-v52-steps {gap:1px;}
+  .sg .sg-header .sg-round-v52-step {width:24px;}
+  .sg .sg-header .sg-round-v54-bonus-label {display:none;}
+  .sg .sg-header .sg-round-v54-color-name {font-size:8px;}
+  .sg .sg-header .sg-round-v54-featured-gem,
+  .sg .sg-header .sg-round-v54-featured-gem .sg-glass.sg-glass-placed.sg-gem-faceted {width:16px;height:16px;flex-basis:16px;}
+}
+@media (max-width:520px) and (orientation:portrait) {
+  .sg .sg-header .sg-round-v54-bonus-label {font-size:0;letter-spacing:0;flex:0 0 auto;}
+  .sg .sg-header .sg-round-v54-bonus-label::before {
+    content:'PREMIA';
+    font:800 8px/1 'DM Sans',sans-serif;
+    letter-spacing:.4px;
+  }
+  .sg .sg-header .sg-round-tracker-v52 .sg-round-v54-color-name {
+    font-size:10px;
+    letter-spacing:0;
+  }
+}
+@media (max-width:380px) and (orientation:portrait) {
+  .sg .sg-header .sg-round-v54-bonus-label {display:none;}
+  .sg .sg-header .sg-round-v54-color-name {font-size:9px;}
+}
+
+/* Ceremony: focus on the announcing stained glass; everything behind it
+   becomes an indistinct dark, blurred backdrop for the 2.7s ceremony. */
+.sg .sg-round-announcement {
+  z-index:90;
+  pointer-events:auto;
+  background:rgba(3,11,21,.82);
+  -webkit-backdrop-filter:blur(10px) brightness(.36) saturate(.58);
+  backdrop-filter:blur(10px) brightness(.36) saturate(.58);
+}
+.sg .sg-round-announcement-card {
+  width:min(760px,86vw);
+  min-height:min(550px,63dvh);
+  max-height:86dvh;
+  box-sizing:border-box;
+  padding:clamp(32px,6vh,60px) clamp(26px,5vw,68px);
+  border:3px solid #e5c588;
+  border-radius:28px;
+  background:
+    radial-gradient(ellipse at 50% 15%,#4b796e8a,transparent 63%),
+    linear-gradient(160deg,#204b58,#102d3c 67%,#071d2b);
+  box-shadow:inset 0 0 0 2px #ffedc549,inset 0 0 60px #061723dd,
+    0 25px 100px #000d,0 0 75px #e6c3794f;
+}
+.sg .sg-round-announcement-card::before {inset:12px;border-radius:19px;}
+.sg .sg-round-announcement-kicker {font-size:clamp(12px,1.5vw,17px);letter-spacing:4px;}
+.sg .sg-round-announcement-heading {gap:26px;margin:28px 0 12px;}
+.sg .sg-round-announcement-heading span {font-size:clamp(38px,5.2vw,72px);}
+.sg .sg-round-announcement-heading strong {font-size:clamp(91px,11vw,144px);}
+.sg .sg-round-announcement-separator {font-size:20px;margin:7px 0 20px;}
+.sg .sg-round-announcement-separator::before,
+.sg .sg-round-announcement-separator::after {width:92px;}
+.sg .sg-round-announcement-label {font-size:clamp(12px,1.4vw,17px);letter-spacing:2.8px;}
+.sg .sg-round-announcement-bonus {gap:25px;margin-top:19px;font-size:clamp(17px,2.2vw,27px);}
+.sg .sg-round-announcement-gem {width:105px;height:105px;}
+.sg .sg-round-announcement-gem .sg-glass.sg-glass-placed.sg-gem-faceted {
+  width:105px;height:105px;min-width:105px;min-height:105px;
+}
+@media (max-width:1100px), (max-height:650px) {
+  .sg .sg-round-announcement-card {
+    width:min(580px,90vw);
+    min-height:min(430px,63dvh);
+    max-height:84dvh;
+    padding:clamp(20px,3vh,35px);
+  }
+  .sg .sg-round-announcement-heading {gap:15px;margin:12px 0 5px;}
+  .sg .sg-round-announcement-heading span {font-size:clamp(28px,5vw,50px);}
+  .sg .sg-round-announcement-heading strong {font-size:clamp(65px,13vw,99px);}
+  .sg .sg-round-announcement-separator {margin:6px 0 10px;}
+  .sg .sg-round-announcement-bonus {margin-top:10px;gap:14px;}
+  .sg .sg-round-announcement-gem {width:70px;height:70px;}
+  .sg .sg-round-announcement-gem .sg-glass.sg-glass-placed.sg-gem-faceted {
+    width:70px;height:70px;min-width:70px;min-height:70px;
+  }
+}
+@media (max-height:460px) {
+  .sg .sg-round-announcement-card {
+    width:min(500px,82vw);
+    min-height:min(270px,74dvh);
+    max-height:78dvh;
+    padding:11px 20px;
+    border-radius:16px;
+  }
+  .sg .sg-round-announcement-kicker {font-size:10px;letter-spacing:1.4px;}
+  .sg .sg-round-announcement-heading {margin:2px 0;gap:12px;}
+  .sg .sg-round-announcement-heading span {font-size:29px;}
+  .sg .sg-round-announcement-heading strong {font-size:61px;}
+  .sg .sg-round-announcement-separator {margin:0;font-size:12px;}
+  .sg .sg-round-announcement-label {font-size:10px;letter-spacing:1px;}
+  .sg .sg-round-announcement-bonus {margin-top:4px;font-size:13px;}
+  .sg .sg-round-announcement-gem {width:45px;height:45px;}
+  .sg .sg-round-announcement-gem .sg-glass.sg-glass-placed.sg-gem-faceted {
+    width:45px;height:45px;min-width:45px;min-height:45px;
+  }
+}
+/* A royal violet locator, with pearly joker-like glow but no change to
+   the underlying floor palette, socket dimensions, or player board scoring. */
+.sg .sg-board-windows .sg-window.sg-window-active {
+  border:1px solid #cc96ff!important;
+  outline:2px solid #ae72f2;
+  outline-offset:-2px;
+  background:linear-gradient(90deg,#74459f7a,#27364d 15%,#132d3c 84%,#6f46987c);
+  box-shadow:
+    inset 0 0 0 2px #c99bffad,
+    inset 0 0 21px #9651d96b,
+    0 0 0 2px #b878f2bd,
+    0 0 16px #b47cf0ec,
+    0 0 28px #a16ee49c!important;
+}
+.sg .sg-board-windows .sg-window.sg-window-active .sg-window-head {
+  color:#f4e1ff;
+  background:linear-gradient(100deg,#5f388c66,#39274d3b,#5f388c66);
+  border-radius:5px;
+}
+.sg .sg-board-windows .sg-window.sg-window-active .sg-window-head>span:first-child {color:#e0b9ff;}
+.sg .sg-board-windows .sg-window.sg-window-active .sg-window-glazier {
+  color:#ffe9ff;
+  border:1px solid #f0caff;
+  background:radial-gradient(circle at 30% 15%,#d9b6fc,#7936b5 60%,#4b235f 100%);
+  box-shadow:inset 0 1px 0 #fff4ff9c,0 0 11px #d29afffa,0 0 3px #f6e0ff;
+}
+.sg .sg-board-windows .sg-window.sg-window-active .sg-window-lancet {
+  border-color:#d5abf6;
+  box-shadow:inset 0 0 0 1px #ddb2ff9c,inset 0 0 13px #201331bb;
+}
+.sg .sg-board-windows .sg-window.sg-window-active .sg-window-foot {border-color:#c994f1;}
+.sg .sg-board-windows .sg-window.sg-window-active.sg-window-target {
+  animation:none;
+  box-shadow:inset 0 0 0 2px #ebc7ff,0 0 0 2px #dd9cff,0 0 22px #e0a8ffe9!important;
+}
+@media (max-width:1100px), (max-height:620px) {
+  .sg .sg-board-windows .sg-window.sg-window-active {
+    box-shadow:inset 0 0 0 1px #dfb7ffe8,0 0 0 1px #ca87ff,0 0 11px #b06cf2b8!important;
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .sg .sg-round-announcement,
+  .sg .sg-round-announcement-card,
+  .sg .sg-round-announcement-gem .sg-glass.sg-glass-placed.sg-gem-faceted {animation:none;}
+}

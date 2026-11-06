@@ -35,6 +35,7 @@
   max-width:none;
   max-height:none;
 }
+.sg .sg-market {container-name:sg-market;}
 /* Market fits left workshops + right, separate middle pile. This uses the
    currently empty horizontal area instead of miniaturizing 2x2 tiles around
    a circle. 5/7/9 workshops all retain the original source index. */
@@ -58,7 +59,9 @@
   position:relative;
   left:auto;top:auto;
   transform:none;
-  display:grid;place-items:center;
+  display:grid;place-items:stretch;
+  grid-template-columns:minmax(0,1fr);
+  grid-template-rows:minmax(0,1fr);
   width:100%;height:100%;
   min-width:0;min-height:0;
   box-sizing:border-box;
@@ -98,9 +101,11 @@
   touch-action:manipulation;
 }
 .sg .sg-market .sg-factory-v45 .sg-market-token .sg-glass.sg-gem-faceted {
-  width:min(var(--sg-play-gem),92%);
-  height:auto;aspect-ratio:1;
-  max-width:100%;max-height:100%;
+  /* Definite dimensions break the percentage/auto intrinsic sizing cycle
+     in a centered grid item containing only absolutely positioned facets. */
+  width:var(--sg-play-gem);
+  height:var(--sg-play-gem);aspect-ratio:1;
+  max-width:92%;max-height:100%;
   margin:auto;
   flex:none;
 }
@@ -196,7 +201,7 @@
   --sg-play-gem:24px;
 }
 .sg .sg-mobile-market .sg-market .sg-market-layout-v45 {
-  inset:21px 5px 21px;
+  inset:29px 5px 21px;
   gap:5px;
 }
 .sg .sg-mobile-market .sg-market-factories-v45{gap:3px;}
@@ -215,7 +220,7 @@
 /* When an Android screen provides a very narrow market card, its workshops
    get their own scrollable vertical space. The gems are never shrunk to
    10px just to keep a decorative ring that the rules do not require. */
-@container (max-width:300px){
+@container sg-market (max-width:300px){
   .sg .sg-market-layout-v45{
     display:flex!important;
     flex-direction:column;

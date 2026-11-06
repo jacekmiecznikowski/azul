@@ -1,0 +1,279 @@
+/* v57 — fixed tabletop geometry, quiet turn status for human and AI. */
+
+/* Every current player gets the same gold frame. */
+.sg .sg-board.sg-board-current {
+  position:relative;
+  border:2px solid #f3d596;
+  outline:2px solid #efcf8a;
+  outline-offset:1px;
+  box-shadow:
+    0 0 0 2px #cfab63aa,
+    0 0 15px #e4b76f93,
+    0 0 29px #e4b66e46,
+    inset 0 0 0 2px #fff0c74a,
+    0 5px 15px #02131cb8;
+}
+.sg .sg-board .sg-board-status-active {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  padding:4px 9px;
+  border-radius:7px;
+  background:linear-gradient(145deg,#f6e2a8,#d8b46d);
+  border:1px solid #fff2c6;
+  color:#15303b;
+  font:900 11px/1.05 'DM Sans',sans-serif;
+  letter-spacing:.6px;
+  text-shadow:none;
+  box-shadow:0 0 8px #e1ba73a8;
+  white-space:nowrap;
+}
+/* Mask the moving highlight to the actual two-pixel border, including corners. */
+.sg .sg-board.sg-board-current {opacity:1!important;transform:none;overflow:visible;}
+.sg .sg-board-turn-rail {
+  position:absolute;inset:-2px;z-index:2;
+  border-radius:inherit;pointer-events:none;
+  padding:2px;
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  mask-composite:exclude;
+}
+.sg .sg-board-turn-rail::after {
+  content:'';position:absolute;width:80px;height:12px;
+  offset-path:inset(1px round 12px);offset-distance:0%;offset-rotate:auto;
+  background:radial-gradient(ellipse,#fff 0%,#fff3c4 18%,#edc777aa 44%,transparent 72%);
+}
+.sg.sg-effects-cinematic .sg-board-turn-rail::after {
+  animation:sg-turn-edge 1.8s linear infinite;
+}
+.sg .sg-board.sg-board-current .sg-player-icon {
+  outline:2px solid #ffe2a0;outline-offset:2px;
+  box-shadow:0 0 10px #e9c57188;
+}
+@keyframes sg-turn-edge {
+  from {offset-distance:0%;}
+  to {offset-distance:100%;}
+}
+@media(prefers-reduced-motion:reduce) {
+  .sg.sg-effects-cinematic .sg-board-turn-rail::after {animation:none;background:none;}
+}
+.sg.sg-effects-minimal .sg-board.sg-board-current {
+  animation:none!important;
+  outline-color:#d7bd86;
+  box-shadow:0 0 0 1px #d5b87992,inset 0 0 0 1px #f5db9a3a;
+}
+.sg .sg-mobile-player.sg-mobile-player-current-human {
+  border:2px solid #e6cb88;
+  box-shadow:inset 0 0 0 1px #ffe9b978,0 0 10px #e5bf7996;
+}
+
+/* Visible, readable notification in addition to the PERSISTENT badge on board.
+   Unlike v55 it is not a flashing full-screen glow, and remains readable for 2s. */
+.sg .sg-human-turn-notice {
+  position:fixed;
+  z-index:100;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  width:max-content;
+  min-width:300px;
+  max-width:min(90vw,480px);
+  min-height:100px;
+  padding:15px 24px;
+  border:2px solid #f3d48f;
+  border-radius:15px;
+  background:linear-gradient(150deg,#285862f7,#123642fb 78%);
+  box-shadow:inset 0 0 0 1px #fff2c542,0 9px 35px #031722d9,
+    0 0 14px #e7bd7280;
+  color:#f7e5b9;
+  text-align:left;
+  pointer-events:none;
+  animation:sg-v57-turn-toast 2.0s ease-out both;
+}
+.sg .sg-human-turn-notice-icon {
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  width:42px;
+  height:42px;
+  border:1px solid #f6da9f;
+  border-radius:12px;
+  background:#a0804655;
+  font-size:28px;
+  color:#f9df9e;
+}
+.sg .sg-human-turn-notice>span:last-child {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:5px;
+}
+.sg .sg-human-turn-notice strong {
+  color:#fff2cd;
+  font:900 clamp(17px,2vw,22px)/1.05 'DM Sans',sans-serif;
+  letter-spacing:1.5px;
+  white-space:nowrap;
+}
+.sg .sg-human-turn-notice small {
+  font:600 11px/1.2 'DM Sans',sans-serif;
+  color:#b9dcd2;
+}
+@keyframes sg-v57-turn-toast {
+  0% {opacity:0;transform:translate(-50%,-50%) scale(.985);}
+  12%,80% {opacity:1;transform:translate(-50%,-50%) scale(1);}
+  100% {opacity:0;transform:translate(-50%,-50%) scale(1);}
+}
+
+/* Keep the effects switch from v55: no blackout or animation when disabled.
+   Only the broken v55 palace glow and scale rules have been rolled back. */
+.sg .sg-round-announcement.sg-round-announcement--minimal {
+  inset:0;
+  position:fixed;
+  z-index:90;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:clamp(74px,11vh,110px) 8px 0;
+  background:transparent!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  animation:none!important;
+  pointer-events:none;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-card {
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  width:min(370px,94vw);
+  min-height:0;
+  max-height:none;
+  gap:10px;
+  padding:9px 15px;
+  border:1px solid #c1a477;
+  border-radius:11px;
+  background:#153640f5;
+  box-shadow:0 4px 13px #06182395;
+  animation:none!important;
+  opacity:1!important;
+  transform:none!important;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-card::before,
+.sg .sg-round-announcement--minimal .sg-round-announcement-card::after,
+.sg .sg-round-announcement--minimal .sg-round-announcement-kicker,
+.sg .sg-round-announcement--minimal .sg-round-announcement-separator,
+.sg .sg-round-announcement--minimal .sg-round-announcement-label {display:none;}
+.sg .sg-round-announcement--minimal .sg-round-announcement-heading {
+  margin:0; gap:4px;flex:0 0 auto;white-space:nowrap;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-heading span {
+  font-size:13px;letter-spacing:0;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-heading strong {
+  font-size:22px;line-height:1;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-bonus {
+  margin:0;gap:5px;font-size:10px;letter-spacing:0;
+}
+.sg .sg-round-announcement--minimal .sg-round-announcement-gem,
+.sg .sg-round-announcement--minimal .sg-round-announcement-gem .sg-glass.sg-glass-placed.sg-gem-faceted {
+  width:25px;height:25px;min-width:25px;min-height:25px;
+  filter:none;animation:none!important;
+}
+@media(max-height:460px) {
+  .sg .sg-round-announcement--minimal {padding-top:52px;}
+  .sg .sg-round-announcement--minimal .sg-round-announcement-card {padding:5px 12px;}
+}
+
+/* Same panel dimensions and the SAME physical factory / diamond size
+   for 2, 3 and 4 players. The viewport zoom scales all variants equally. */
+@media (min-width:1101px) and (min-height:621px) {
+  .sg .sg-felt {grid-template-rows:310px minmax(0,1fr) 310px;}
+  .sg .sg-felt .sg-seat-north .sg-seat-rotation,
+  .sg .sg-felt .sg-seat-south .sg-seat-rotation {height:310px;}
+  .sg .sg-center {grid-template-columns:235px minmax(0,1fr) 255px;}
+  .sg .sg-center .sg-market .sg-market-orbit-v46 {--sg-disc-size:89px!important;}
+  .sg .sg-center .sg-market .sg-factory-v45 .sg-factory-grid {width:94%;height:94%;}
+  .sg .sg-board-windows .sg-pane-socket {
+    width:calc(var(--sg-unified-gem-size,29px) * 1.064);
+    height:calc(var(--sg-unified-gem-size,29px) * 1.064);
+  }
+  .sg .sg-board-windows .sg-pane-socket .sg-pane-empty-diamond {inset:3%;}
+}
+/* Strong, unambiguous gold selection drawn WITHIN the diamond hit shape.
+   Old inset-only shadow was hidden by the facets and clipped by clip-path. */
+.sg .sg-market .sg-factory-v45.sg-factory-is-selected {
+  border:2px solid #f6d88e!important;
+  box-shadow:0 0 0 2px #f6d38caf,0 0 16px #ffda8eb8,
+    inset 0 0 0 2px #f3d399b3!important;
+}
+.sg .sg-market .sg-factory-v45 .sg-market-token.sg-token-selected::before,
+.sg .sg-market .sg-factory-v45 .sg-market-token:focus-visible::before {
+  inset:0!important;
+  background:linear-gradient(130deg,#fff7c9,#d79a45 52%,#ffedaa)!important;
+  filter:drop-shadow(0 0 3px #fff0ac);
+}
+.sg .sg-market .sg-factory-v45 .sg-market-token.sg-token-selected .sg-glass.sg-gem-faceted,
+.sg .sg-market .sg-factory-v45 .sg-market-token:focus-visible .sg-glass.sg-gem-faceted {
+  /* Never shrink the selected physical glass relative to the window socket.
+     Selection is expressed by an exterior halo and highlighted workshop rim. */
+  transform:none!important;
+  filter:brightness(1.18) drop-shadow(0 0 3px #fff5c3) drop-shadow(0 0 8px #f7d18b);
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice.sg-token-selected::before,
+.sg .sg-market .sg-center-v45 .sg-center-choice:focus-visible::before {
+  content:'';
+  position:absolute;
+  left:calc(50% - 4px);
+  top:50%;
+  z-index:0;
+  display:block;
+  width:calc(var(--sg-unified-gem-size,28px) * 1.17);
+  height:calc(var(--sg-unified-gem-size,28px) * 1.17);
+  transform:translate(-50%,-50%);
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  background:linear-gradient(140deg,#fff5bf,#e7ab51,#ffefb3);
+  pointer-events:none;
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice.sg-token-selected .sg-glass.sg-gem-faceted,
+.sg .sg-market .sg-center-v45 .sg-center-choice:focus-visible .sg-glass.sg-gem-faceted {
+  z-index:1;
+  filter:brightness(1.12) drop-shadow(0 0 4px #fff0b4);
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice.sg-token-selected b,
+.sg .sg-market .sg-center-v45 .sg-center-choice:focus-visible b {
+  z-index:2;
+  color:#ffe8ad;
+  text-shadow:0 0 5px #d7a658b8;
+}
+
+/* Preserve physically consistent touch sizes at every mobile breakpoint.
+   Make the notification fit, but never give up the clear palace label. */
+@media(max-width:1100px), (max-height:620px) {
+  .sg .sg-human-turn-notice {
+    top:50%;
+    min-width:225px;
+    min-height:75px;
+    padding:10px 16px;
+  }
+  .sg .sg-human-turn-notice-icon {width:34px;height:34px;font-size:23px;}
+  .sg .sg-board .sg-board-status-active {
+    padding:3px 5px;
+    font-size:9px;
+    letter-spacing:.2px;
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .sg .sg-board.sg-board-current,
+  .sg.sg-effects-cinematic .sg-board.sg-board-current,
+  .sg .sg-human-turn-notice {animation:none!important;}
+}

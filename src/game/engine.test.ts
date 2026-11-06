@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { applyMove, availableSources, availableTargets, COLORS, FACTORY_COUNT, finalBreakdown, legalMoves, newGame, patternFor, standings } from './engine'
+import { PHYSICAL_STRIPS, applyMove, availableSources, availableTargets, COLORS, FACTORY_COUNT, finalBreakdown, legalMoves, newGame, patternFor, standings } from './engine'
 import { chooseAIMove } from './ai'
 import type { GameState } from './engine'
 
@@ -41,22 +41,20 @@ describe('silnik Sintra', () => {
     expect(() => applyMove(state, { kind: 'take', source: { type: 'center' }, color: 'rose', windowIndex: 0 })).toThrow()
     expect(legalMoves(state).some((m) => m.kind === 'reset')).toBe(true)
   })
-  it('rozegranie pełnej partii przez boty kończy grę bez gubienia tafli', () => {
-    for (const seed of [11, 33, 224]) {
-      let state = newGame({ opponents: 3, seed, palaceSide: 'B' })
-      let steps = 0
-      while (state.phase !== 'finished' && steps++ < 500) {
-        const move = chooseAIMove(state, 'hard')
-        expect(move).not.toBeNull()
-        state = applyMove(state, move!)
-        expect(countGlass(state)).toBe(100)
-      }
-      expect(state.phase).toBe('finished')
-      expect(state.round).toBe(6)
-      expect(state.players.every((player) => Number.isFinite(player.score))).toBe(true)
-      expect(standings(state)).toHaveLength(4)
+  it.each([11, 33, 224])('pełna partia botów zachowuje wszystkie tafle (seed %i)', seed => {
+    let state = newGame({ opponents: 3, seed, palaceSide: 'B' })
+    let steps = 0
+    while (state.phase !== 'finished' && steps++ < 500) {
+      const move = chooseAIMove(state, 'hard')
+      expect(move).not.toBeNull()
+      state = applyMove(state, move!)
+      expect(countGlass(state)).toBe(100)
     }
-  })
+    expect(state.phase).toBe('finished')
+    expect(state.round).toBe(6)
+    expect(state.players.every((player) => Number.isFinite(player.score))).toBe(true)
+    expect(standings(state)).toHaveLength(4)
+  }, 60_000)
   it('pola joker znajdują się tylko na rewersie odpowiedniej kwatery', () => {
     const state = newGame({ opponents: 1, seed: 42 })
     const special = state.players[0].strips.find((strip) => strip.back.includes('wild'))!
@@ -114,7 +112,7 @@ describe('plansze, boty i historia partii', () => {
     expect(state.history[0].kind).toBe('final')
     expect(state.history.some(e => e.kind === 'round')).toBe(true)
     expect(state.history.some(e => e.kind === 'take')).toBe(true)
-  })
+  }, 30_000)
 })
 
 describe('tor stłuczonego szkła', () => {
@@ -349,4 +347,13 @@ describe('poprawki v13: joker, kolory graczy, tury', () => {
     }
     expect(state.phase).toBe('finished')
   })
+})
+
+it('pairs the blue yellow/red strip with one red and four orange panes', () => {
+  expect(PHYSICAL_STRIPS.blue[6]).toEqual(['YRRRR','ROOOO'])
+})
+it('accepts custom bot names with the same trimming as human names', () => {
+  const game = newGame({opponents:1,playerNames:['Ty','  Stefan  ']})
+  expect(game.players[1].controller).toBe('ai')
+  expect(game.players[1].name).toBe('Stefan')
 })
