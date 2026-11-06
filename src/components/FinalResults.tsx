@@ -37,7 +37,7 @@ export function FinalResults({ state, onClose }: { state: GameState; onClose: ()
           <Detail data={data} palaceSide={state.palaceSide}/>
         </article>
       })}</div>
-      <footer className="sg-final-caption"><span>Przy remisie wygrywa gracz, który stracił mniej punktów na torze stłuczeń.</span><button className="sg-finish-secondary" onClick={onClose}>Wróć do planszy</button></footer>
+      <footer className="sg-final-caption"><span>Przy remisie wygrywa gracz, który stracił mniej punktów na torze stłuczeń.</span><button className="sg-finish-secondary" onClick={onClose}>Wróć do ekranu końcowego</button></footer>
     </div>
   </div>
 }

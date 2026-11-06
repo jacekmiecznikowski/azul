@@ -576,7 +576,7 @@ export default function App() {
       <span><strong>TWOJA TURA</strong><small>{turnNotice.name === 'Ty' ? 'Wybierz szkło z warsztatu lub środka' : `${turnNotice.name} — wybierz szkło`}</small></span>
     </div>}
     {screen === 'game' && finishOverlay.banner && !inspectFinalBoard && <FinishCelebration onBoard={() => setInspectFinalBoard(true)} state={game} onResults={() => setShowResults(true)} onNewGame={() => setShowSetup(true)}/>}
-    {screen === 'game' && finishOverlay.results && <FinalResults state={game} onClose={() => { setInspectFinalBoard(true); setShowResults(false) }}/>}
+    {screen === 'game' && finishOverlay.results && <FinalResults state={game} onClose={() => setShowResults(false)}/>}
     {showSetup && <SetupModal settings={settings} onClose={() => setShowSetup(false)} onStart={startNew}/>}
     {showRules && <RulesModal onClose={() => setShowRules(false)}/>}
     {showStrategy && <StrategyLab state={game} onClose={() => setShowStrategy(false)}/>}
