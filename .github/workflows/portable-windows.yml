@@ -6,14 +6,15 @@ on:
   push:
     paths:
       - '.github/workflows/portable-windows.yml'
-      - 'src/styles.css'
+      - 'src/**'
+      - 'index.html'
       - 'public/*.ttf'
       - 'src-tauri/**'
       - 'scripts/verify-portable-assets.cjs'
       - 'package.json'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   portable:
@@ -69,3 +70,26 @@ jobs:
           path: portable/
           if-no-files-found: error
           retention-days: 30
+      - name: Index portable executable artifact for this exact commit
+        # Artifact uploaded above remains available even if indexing is blocked by repo permissions.
+        continue-on-error: true
+        if: success()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $artifact = @{
+            commit = $env:GITHUB_SHA
+            run_id = [int64]$env:GITHUB_RUN_ID
+            artifact_name = 'SintraGlass-Portable-Win64'
+            file = 'SintraGlass.exe'
+            workflow_url = "https://github.com/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
+            generated_utc = (Get-Date).ToUniversalTime().ToString('o')
+          } | ConvertTo-Json -Compress
+          $encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($artifact))
+          $path = "reports/portable-builds/$env:GITHUB_SHA.json"
+          $message = "chore(ci): index portable EXE build $env:GITHUB_SHA [skip ci]"
+          $body = @{message=$message;content=$encoded;branch=$env:GITHUB_REF_NAME} | ConvertTo-Json -Compress
+          $body | gh api "repos/$env:GITHUB_REPOSITORY/contents/$path" -X PUT --input -
+

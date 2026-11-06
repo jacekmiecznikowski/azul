@@ -1,0 +1,231 @@
+/* v51 — one visual diameter and one coordinate origin for every playable
+   diamond, regardless of whether it is empty, installed or on the table. */
+.sg .sg-board-windows .sg-pane {
+  display:block;
+  position:relative;
+  box-sizing:border-box;
+  padding:0;
+  margin:0;
+  border-left:1px solid color-mix(in srgb,var(--sg-ink),#6a4d2c 58%);
+  border-right:1px solid color-mix(in srgb,var(--sg-ink),#6a4d2c 58%);
+}
+.sg .sg-board-windows .sg-pane-socket {
+  position:absolute;
+  z-index:3;
+  top:50%;
+  left:50%;
+  display:block;
+  box-sizing:border-box;
+  width:calc(var(--sg-unified-gem-size,28px) * 1.19);
+  height:calc(var(--sg-unified-gem-size,28px) * 1.19);
+  max-width:none;
+  max-height:none;
+  aspect-ratio:1;
+  margin:0;
+  padding:0;
+  transform:translate(-50%,-50%);
+}
+.sg .sg-board-windows .sg-pane-socket .sg-glass.sg-gem-faceted {
+  position:absolute;
+  z-index:4;
+  left:50%;
+  top:50%;
+  box-sizing:border-box;
+  display:block;
+  width:var(--sg-unified-gem-size,28px);
+  height:var(--sg-unified-gem-size,28px);
+  max-width:none;
+  max-height:none;
+  min-width:0;
+  min-height:0;
+  margin:0;
+  padding:0;
+  aspect-ratio:1;
+  transform:translate(-50%,-50%);
+}
+.sg .sg-board-windows .sg-pane-socket .sg-pane-empty-diamond {
+  position:absolute;
+  z-index:2;
+  inset:8%;
+  box-sizing:border-box;
+  width:auto;
+  height:auto;
+  margin:0;
+  transform:none;
+}
+.sg .sg-board-windows .sg-window-lancet {
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  grid-template-rows:repeat(5,minmax(0,1fr));
+  padding:0 1px;
+  gap:0;
+  border-left-width:2px;
+  border-right-width:2px;
+}
+.sg .sg-board-windows .sg-window:not(.sg-window-target) {
+  background:linear-gradient(90deg,#a98e6045,#102c3b 7%,#0b2938 50%,#102c3b 93%,#a98e6045);
+}
+.sg .sg-mobile-board .sg-window-lancet {
+  border-left-width:1px;
+  border-right-width:1px;
+}
+
+/* Market factories: exactly the same element diameter, no width limits tied
+   to a separate play-gem or to a given table color. */
+.sg .sg-market .sg-factory-v45 .sg-factory-grid {
+  width:90%;
+  height:90%;
+}
+.sg .sg-market .sg-factory-v45 .sg-market-token .sg-glass.sg-gem-faceted {
+  width:var(--sg-unified-gem-size,28px);
+  height:var(--sg-unified-gem-size,28px);
+  max-width:none;
+  max-height:none;
+  min-width:0;
+  min-height:0;
+  margin:0;
+  aspect-ratio:1;
+  transform:none;
+}
+
+/* The actual shared center: transparent positioning only. No oval, panel,
+   separate decorative border or rectangular backgrounds. */
+.sg .sg-market .sg-center-pile.sg-center-v45,
+.sg .sg-mobile-market .sg-center-pile.sg-center-v45 {
+  box-sizing:border-box;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  z-index:3;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  width:58%;
+  height:60%;
+  min-width:0;
+  min-height:0;
+  max-width:none;
+  max-height:none;
+  margin:0;
+  padding:0;
+  gap:0;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  outline:0;
+  box-shadow:none;
+  overflow:visible;
+  pointer-events:none;
+}
+.sg .sg-market .sg-market-orbit-v46::after {display:none;}
+.sg .sg-market .sg-center-tokens.sg-center-tokens-v45 {
+  display:flex;
+  flex:0 1 auto;
+  align-items:center;
+  justify-content:center;
+  align-content:center;
+  flex-direction:row;
+  flex-wrap:wrap;
+  width:100%;
+  height:auto;
+  max-width:none;
+  min-height:0;
+  margin:0;
+  padding:0;
+  gap:3px;
+  overflow:visible;
+  pointer-events:none;
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice,
+.sg .sg-mobile-market .sg-center-v45 .sg-center-choice {
+  position:relative;
+  display:grid;
+  place-items:center;
+  flex:0 0 calc(var(--sg-unified-gem-size,28px) + 13px);
+  box-sizing:border-box;
+  width:calc(var(--sg-unified-gem-size,28px) + 13px);
+  height:calc(var(--sg-unified-gem-size,28px) + 4px);
+  min-width:0;
+  min-height:0;
+  max-width:none;
+  max-height:none;
+  margin:0;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  outline:0;
+  overflow:visible;
+  pointer-events:auto;
+  cursor:pointer;
+  touch-action:manipulation;
+  container-type:normal;
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice .sg-glass.sg-gem-faceted,
+.sg .sg-mobile-market .sg-center-v45 .sg-center-choice .sg-glass.sg-gem-faceted {
+  position:relative;
+  display:block;
+  width:var(--sg-unified-gem-size,28px);
+  height:var(--sg-unified-gem-size,28px);
+  min-width:0;
+  min-height:0;
+  max-width:none;
+  max-height:none;
+  margin:0 8px 0 0;
+  padding:0;
+  aspect-ratio:1;
+  transform:none;
+  flex:none;
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice b {
+  position:absolute;
+  right:0;
+  top:50%;
+  transform:translateY(-50%);
+  font:800 11px/1 'DM Sans',sans-serif;
+  color:#f8e7c7;
+  text-shadow:0 1px 3px #041720;
+  pointer-events:none;
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice.sg-token-selected,
+.sg .sg-market .sg-center-v45 .sg-center-choice:focus-visible,
+.sg .sg-market .sg-center-v45 .sg-center-choice:not(:disabled):hover {
+  border:0;
+  background:transparent;
+  box-shadow:none;
+  outline:none;
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice.sg-token-selected .sg-glass,
+.sg .sg-market .sg-center-v45 .sg-center-choice:focus-visible .sg-glass {
+  filter:drop-shadow(0 0 5px #ffe2a0);
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice:not(:disabled):hover .sg-glass {
+  filter:drop-shadow(0 0 4px #e2bd79);
+}
+.sg .sg-market .sg-center-v45 .sg-center-penalty {
+  display:block;
+  flex:0 0 auto;
+  margin:4px 0 0;
+  color:#e8c387;
+  font:600 9px/1.1 'DM Sans',sans-serif;
+  white-space:nowrap;
+  text-shadow:0 1px 3px #061d23;
+}
+.sg .sg-market .sg-center-v45 .sg-center-quiet {
+  display:none;
+}
+@container sg-market (max-width:300px) {
+  .sg .sg-market .sg-center-pile.sg-center-v45 {
+    width:58%;
+    height:60%;
+  }
+  .sg .sg-market .sg-center-tokens.sg-center-tokens-v45 {
+    display:flex;
+    flex-wrap:wrap;
+    grid-template-columns:none;
+    grid-auto-rows:auto;
+  }
+}

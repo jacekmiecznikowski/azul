@@ -5,6 +5,7 @@ const MUSIC_KEY = 'sintra-glass-ambient-music-v1'
 // Supply public/background.mp3 locally; don't publish third-party music without permission.
 const MUSIC_URL = `${import.meta.env.BASE_URL}background.mp3`
 const BACKGROUND_VOLUME = 0.20
+const MOBILE_MUSIC_VOLUME = 0.12
 
 /** Loops the user's own MP3. Effects remain independent in useGameAudio. */
 export function useAmbientMusic() {
@@ -20,7 +21,8 @@ export function useAmbientMusic() {
     const audio = new Audio(MUSIC_URL)
     audio.loop = true
     audio.preload = 'auto'
-    audio.volume = BACKGROUND_VOLUME
+    audio.volume = typeof window !== 'undefined' && window.matchMedia?.('(max-width: 1100px) and (pointer: coarse)').matches
+      ? MOBILE_MUSIC_VOLUME : BACKGROUND_VOLUME
     audio.addEventListener('error', () => {
       if (audioRef.current === audio) audioRef.current = null
       setUnavailable(true)

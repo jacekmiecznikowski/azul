@@ -7,12 +7,13 @@ import type { GameState } from '../game/engine'
  * A compact celebratory end screen. Detailed scoring stays opt-in:
  * final results only open when the player explicitly clicks the button.
  */
-export function FinishCelebration({ state, onResults, onNewGame }: {
+export function FinishCelebration({ state, onResults, onNewGame, onBoard }: {
   state: GameState
   onResults: () => void
+  onBoard: () => void
   onNewGame: () => void
 }) {
-  const resultsButton = useRef<HTMLButtonElement>(null)
+  const newGameButton = useRef<HTMLButtonElement>(null)
   const ordered = standings(state)
   const leader = ordered[0]
   const winners = ordered.filter(player =>
@@ -20,7 +21,7 @@ export function FinishCelebration({ state, onResults, onNewGame }: {
   const tie = winners.length > 1
 
   useEffect(() => {
-    resultsButton.current?.focus()
+    newGameButton.current?.focus()
   }, [])
 
   return <div className="sg-finish-overlay">
@@ -44,12 +45,13 @@ export function FinishCelebration({ state, onResults, onNewGame }: {
         <i/><i/><i/><i/><i/>
       </div>
       <div className="sg-finish-actions">
-        <button type="button" className="sg-finish-primary" ref={resultsButton} onClick={onResults}>
-          <ListChecks size={18}/> Zobacz podliczenie <ArrowRight size={16}/>
+        <button type="button" className="sg-finish-primary" ref={newGameButton} onClick={onNewGame}>
+          Nowa partia <ArrowRight size={16}/>
         </button>
-        <button type="button" className="sg-finish-secondary" onClick={onNewGame}>
-          Nowa partia
+        <button type="button" className="sg-finish-secondary" onClick={onResults}>
+          <ListChecks size={16}/> Zobacz podliczenie
         </button>
+        <button type="button" className="sg-board-link" onClick={onBoard}>Wróć do planszy</button>
       </div>
       <span className="sg-finish-foot">SINTRA GLASS <span>✦</span> WITRAŻE SINTRY</span>
     </section>

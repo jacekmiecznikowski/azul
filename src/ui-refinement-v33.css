@@ -1,0 +1,143 @@
+/* v33 — compact physical tabletop. Keep seat markers elsewhere intact.
+   Fix the clipped left rail at native laptop resolutions. */
+@media (min-width:1101px) and (min-height:621px) {
+  .sg .sg-center .sg-side-left {
+    justify-content:flex-start;gap:6px;min-height:0;
+  }
+  .sg .sg-center .sg-side-left > .sg-turn {
+    flex:0 0 122px;height:122px;min-height:0;max-height:122px;
+    padding-bottom:2px;overflow:hidden;
+  }
+  .sg .sg-center .sg-turn > .sg-panel-title,
+  .sg .sg-center .sg-track > .sg-panel-title,
+  .sg .sg-center .sg-market > .sg-panel-title,
+  .sg .sg-center .sg-history > .sg-panel-title {
+    height:25px;min-height:25px;max-height:25px;
+    padding:0 9px;
+  }
+  .sg .sg-center .sg-turn-player {
+    flex:0 0 43px;height:43px;min-height:0;
+    gap:7px;padding:4px 7px;
+  }
+  .sg .sg-center .sg-turn-player .sg-player-icon {
+    flex:0 0 25px;width:25px;height:25px;font-size:14px;
+  }
+  .sg .sg-center .sg-turn-player strong {font-size:14px;line-height:1.05;}
+  .sg .sg-center .sg-turn-player small {
+    font-size:9px;margin-top:2px;line-height:1.05;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .sg .sg-center .sg-scores {
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-rows:repeat(2,20px);grid-auto-rows:20px;
+    gap:3px 4px;padding:3px 7px;min-height:0;
+  }
+  .sg .sg-center .sg-score-line {
+    height:20px;min-height:0;min-width:0;padding:1px 5px;
+    line-height:1;font-size:10px;overflow:hidden;
+  }
+  .sg .sg-center .sg-score-line span{
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
+  }
+  .sg .sg-center .sg-score-line b {font-size:11px;}
+  .sg .sg-center .sg-side-left > .sg-track{
+    flex:1 1 0;height:auto;min-height:0;max-height:none;
+    overflow:hidden;
+  }
+  .sg .sg-center .sg-track-cells {
+    flex:1 1 auto;min-height:0;
+    grid-template-rows:repeat(3,minmax(0,1fr));
+    gap:4px;padding:5px 7px 7px;
+  }
+  .sg .sg-center .sg-track .sg-track-legend {display:none;}
+  .sg .sg-center .sg-track-step {padding:2px;}
+  .sg .sg-center .sg-track-pawns {
+    display:flex;flex-wrap:wrap;justify-content:flex-end;
+    gap:2px;min-height:0;right:4px;bottom:4px;
+  }
+  .sg .sg-center .sg-track-pawns .sg-pawn {
+    width:8px;height:8px;min-width:8px;min-height:8px;
+    box-shadow:0 0 0 1px #dbefe9a8,0 0 5px #0006;
+  }
+  /* The middle card shares the same title height as the left and right cards. */
+  .sg .sg-center .sg-market{padding-top:25px;padding-bottom:62px;}
+  .sg .sg-center .sg-market > .sg-panel-title{
+    height:25px;min-height:25px;max-height:25px;min-width:0;
+  }
+  .sg .sg-center .sg-market-circle {
+    width:min(calc(100cqi - 16px),calc(100cqb - 10px),420px);
+  }
+  .sg .sg-center .sg-factory {
+    width:clamp(38px,16cqi,67px);height:clamp(38px,16cqi,67px);
+  }
+  .sg .sg-center .sg-inventory.sg-inventory-v33{
+    height:41px;min-height:41px;
+    left:8px;right:8px;bottom:22px;
+  }
+  .sg .sg-center .sg-market-title-meta {gap:5px;}
+  .sg .sg-center .sg-market-title-meta small{
+    white-space:nowrap;font-size:9px;
+  }
+}
+/* The old glass-tower dashboard is replaced by five locations,
+   including the real six round-bonus tiles. Never display a misleading
+   100/100 as a sixth item. */
+.sg .sg-inventory.sg-inventory-v33 {
+  position:absolute;box-sizing:border-box;
+  display:flex;align-items:stretch;min-width:0;overflow:hidden;
+  padding:3px 5px;border:1px solid #739a917c;border-radius:9px;
+  background:linear-gradient(115deg,#153944,#1b4750 45%,#102e3a);
+  box-shadow:inset 0 1px 0 #e7dcc32d,0 4px 9px #001a1f55;
+}
+.sg .sg-inventory-v33 .sg-stock-ledger{
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+  align-items:stretch;gap:0;width:100%;min-width:0;
+}
+.sg .sg-inventory-v33 .sg-stock-place{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:1px;min-width:0;min-height:0;
+  padding:2px 3px;text-align:center;
+}
+.sg .sg-inventory-v33 .sg-stock-place + .sg-stock-place {
+  border-left:1px solid #9dc7b043;
+}
+.sg .sg-inventory-v33 .sg-stock-place small {
+  display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;font:700 9px/1.1 'DM Sans',sans-serif;
+  color:#b5d7d3;letter-spacing:.1px;
+}
+.sg .sg-inventory-v33 .sg-stock-place strong{
+  font:800 15px/1 'DM Sans',sans-serif;color:#eff4e5;
+}
+.sg .sg-inventory-v33 .sg-stock-tower svg{
+  position:absolute;left:4px;top:50%;width:17px;height:24px;
+  transform:translateY(-50%);opacity:.85;pointer-events:none;
+}
+.sg .sg-inventory-v33 .sg-stock-tower small,
+.sg .sg-inventory-v33 .sg-stock-tower strong{padding-left:12px;}
+.sg .sg-inventory-v33 .sg-stock-rounds strong{color:#ecd6a6;}
+@media (min-width:1101px) and (min-height:621px) {
+  /* Even at the lowest physical-table viewport leave history room.
+     The counts are five equal slots with no horizontal overflow. */
+  .sg .sg-center .sg-inventory-v33 .sg-stock-place small {font-size:9px;}
+  .sg .sg-center .sg-inventory-v33 .sg-stock-place strong {font-size:15px;}
+}
+/* Compact phone / narrow window: title stays readable; inventory remains
+   hidden by design because the market is selectable on a short screen. */
+@media (max-width:1100px), (max-height:620px) {
+  .sg .sg-mobile-market .sg-inventory.sg-inventory-v33 {display:none!important;}
+  .sg .sg-mobile-market .sg-panel-title > span:first-child{
+    min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    letter-spacing:.5px;
+  }
+  .sg .sg-mobile-market .sg-market-title-meta{
+    flex:0 0 auto;white-space:nowrap;gap:5px;
+  }
+}
+/* On tiny displays, ensure the 1 token does not push the active count out. */
+@media (max-width:700px) {
+  .sg .sg-mobile-market .sg-market-title-meta small{font-size:8px;}
+  .sg .sg-mobile-market .sg-market-first-badge{
+    width:17px;height:17px;min-width:17px;min-height:17px;font-size:10px;
+  }
+}

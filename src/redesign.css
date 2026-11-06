@@ -118,7 +118,7 @@ body { background:#07151b; }
 .sg-window-kept>span>i{width:5px;height:5px;transform:rotate(45deg);border:1px solid #689ba3;opacity:.6;}
 .sg-window-engraving,.sg-board-engraving{font-size:8px;letter-spacing:2px;color:#b19c71;opacity:.8;text-align:center;}
 .sg-board-engraving{height:10px;min-height:10px;display:flex;align-items:center;justify-content:center;gap:10px;}
-.sg-window-target{border-color:#f8dc81!important;box-shadow:0 0 0 2px #efc75d,0 0 16px #e7d1728c,inset 0 0 0 2px #a0eac765;cursor:pointer!important;animation:sg-glow 1.4s infinite alternate;}
+.sg-window-target{border-color:#f8dc81!important;box-shadow:0 0 0 2px #efc75d,0 0 16px #e7d1728c,inset 0 0 0 2px #a0eac765;cursor:pointer!important;}
 .sg-window-target:hover{background:#366470;}
 .sg-window-active:not(.sg-window-target){border-color:#e1c48b;}
 .sg-finished{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#e9d19f;font-size:11px;letter-spacing:1px;}

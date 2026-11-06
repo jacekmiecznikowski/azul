@@ -77,6 +77,7 @@ export interface GameState {
   players: Player[]
   currentPlayer: number
   startingPlayer: number
+  initialStartingPlayer?: number
   nextStartingPlayer: number | null
   firstCenterTaken: boolean
   phase: 'playing' | 'finished'
@@ -140,7 +141,7 @@ export const PHYSICAL_STRIPS: Record<PalaceColor, readonly (readonly [string, st
     ['OOBBB', 'OOOOO'], // #4
     ['RRWWW', 'RRRRR'], // #5
     ['BBBBB', 'BBRRR'], // #6
-    ['YRRRR', 'OOOOO'], // #7
+    ['YRRRR', 'ROOOO'], // #7
     ['OWWWW', 'WBBBB'], // #8
   ],
   white: [
@@ -241,7 +242,7 @@ export function newGame(options: NewGameOptions): GameState {
   state.players = Array.from({ length: count }, (_, i) => {
     const controller: Controller = i === 0 || options.playerControllers?.[i] === 'human' ? 'human' : 'ai'
     const providedName = options.playerNames?.[i]?.trim().slice(0, 28)
-    const name = controller === 'human' ? providedName || (i === 0 ? 'Ty' : `Gracz ${i + 1}`) : aiLabels[i]
+    const name = providedName || (controller === 'human' ? (i === 0 ? 'Ty' : `Gracz ${i + 1}`) : aiLabels[i])
     return {
     id: `player-${i}`, name, controller,
     difficulty: controller === 'human' ? undefined : (options.botDifficulties?.[i - 1] ?? options.difficulty ?? 'normal'), score: 0,
@@ -252,6 +253,7 @@ export function newGame(options: NewGameOptions): GameState {
   // In the physical game the first player is chosen before the first round.
   // With no real-world "last window washer", draw the starter deterministically from the seed.
   state.startingPlayer = Math.floor(nextRandom(state) * count)
+  state.initialStartingPlayer = state.startingPlayer
   state.currentPlayer = state.startingPlayer
   refillFactories(state)
   addHistory(state, { playerIndex: null, kind: 'start', description: `Rozpoczęto partię ${count} graczy. Pierwszą rundę rozpoczyna ${state.players[state.startingPlayer].name}.` })

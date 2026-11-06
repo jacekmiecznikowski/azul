@@ -1,0 +1,271 @@
+/* v32: common titles across the four central desktop cards.
+   Do not hide turn indicators in the player tabs, portraits or scoreboards. */
+@media (min-width:1101px) and (min-height:621px) {
+  .sg .sg-center .sg-turn > .sg-panel-title,
+  .sg .sg-center .sg-track > .sg-panel-title,
+  .sg .sg-center .sg-market > .sg-panel-title,
+  .sg .sg-center .sg-history > .sg-panel-title {
+    box-sizing:border-box;
+    height:27px;min-height:27px;max-height:27px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 11px;
+    border-bottom:1px solid #69978c66;
+    line-height:1;
+    gap:7px;
+  }
+  .sg .sg-center .sg-panel-title > span:first-child{
+    font-size:10px;line-height:1;letter-spacing:1px;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .sg .sg-center .sg-panel-title small{font-size:10px;line-height:1.2;}
+}
+/* mobile market has its own compact rhythm; this is not a desktop title scaled down */
+@media (max-width:1100px), (max-height:620px) {
+  .sg .sg-mobile-market .sg-panel-title{
+    min-height:23px;height:23px;max-height:23px;
+    padding:0 8px;display:flex;align-items:center;
+  }
+  .sg .sg-mobile-market .sg-market {padding-top:24px;}
+  .sg .sg-mobile-market .sg-panel-title > span:first-child{font-size:9px;line-height:1;}
+}
+
+/* Step 3: nine illustrated glass-loss milestones, with pawn positions
+   integrated into the track itself. Legend identifies colors only. */
+.sg .sg-track-cells{
+  gap:4px;
+  padding:7px 9px 4px;
+}
+.sg .sg-track-step{
+  overflow:hidden;position:relative;
+  border:1px solid #4c777776;
+  border-radius:7px;
+  background:radial-gradient(ellipse at 30% 0%,#3d68602d,#12344042 75%);
+  box-shadow:inset 0 1px 0 #c5ded113;
+}
+.sg .sg-track-step::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,#e2cb995e,transparent 85%);
+}
+.sg .sg-track-step.sg-track-occupied{
+  border-color:#b9bc8c;
+  background:linear-gradient(160deg,#365e5d,#1a3d47);
+  box-shadow:inset 0 0 0 1px #d6c99b25,0 0 8px #c6c48b13;
+}
+.sg .sg-track-step.sg-track-last{
+  border-color:#a36b78;
+  background:linear-gradient(150deg,#53343f,#2e2839);
+}
+.sg .sg-track-step.sg-track-last strong{color:#ffc1ab;}
+.sg .sg-track-step .sg-track-step-number{
+  position:absolute;left:5px;top:3px;
+  font:700 8px/1 'DM Sans',sans-serif;letter-spacing:.2px;
+  color:#8eaeac;
+}
+.sg .sg-track-step strong{
+  font:700 clamp(13px,3.2cqb,19px)/1 'Playfair Display',serif;
+  color:#f0dfbc;
+}
+.sg .sg-track-pawns{
+  position:absolute;bottom:3px;right:4px;
+  gap:2px;display:flex;align-items:center;
+}
+.sg .sg-track-legend{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  padding:4px 9px 7px;gap:4px 8px;
+}
+.sg .sg-track-legend > span{
+  overflow:hidden;min-width:0;display:flex;align-items:center;gap:6px;
+  font-size:10px;line-height:1.15;color:#c7d9d1;
+}
+.sg .sg-track-legend > span > span{
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+/* Step 5: replace the spreadsheet of five counters + 100/100 with one
+   cut-glass tower and three useful stock readings. */
+.sg .sg-inventory-v32 {
+  display:flex;align-items:center;
+  gap:10px;padding:4px 9px;min-width:0;
+  background:linear-gradient(110deg,#102d39,#174750 49%,#102e3c);
+  border:1px solid #759b938c;
+  border-radius:9px;
+  box-shadow:inset 0 1px 0 #e7d8ad27,0 5px 12px #00192354;
+}
+.sg .sg-inventory-v32 .sg-inventory-tower{
+  flex:0 0 auto;display:flex;align-items:center;gap:6px;
+  padding-right:10px;border-right:1px solid #89b3a54d;
+}
+.sg .sg-inventory-v32 .sg-inventory-tower svg{
+  display:block;height:29px;width:23px;filter:drop-shadow(0 1px 4px #78d3d446);
+}
+.sg .sg-inventory-v32 .sg-inventory-tower-caption{
+  display:flex!important;flex-direction:column;gap:0;align-items:start;
+  font:700 11px/1.1 'DM Sans',sans-serif;color:#e6d5a5;
+}
+.sg .sg-inventory-v32 .sg-inventory-tower-caption small{
+  font-size:8px;letter-spacing:1px;color:#acd2cf;
+}
+.sg .sg-inventory-v32 .sg-inventory-tower-caption strong{
+  font-size:14px;line-height:1;color:#f1dfb3;
+}
+.sg .sg-inventory-v32 .sg-inventory-stats{
+  flex:1;min-width:0;display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;
+}
+.sg .sg-inventory-v32 .sg-inventory-stats>span{
+  position:relative;border:0;display:flex;flex-direction:column;
+  justify-content:center;gap:2px;padding:0 2px;
+}
+.sg .sg-inventory-v32 .sg-inventory-stats>span+span::before{
+  content:'';position:absolute;top:10%;left:-4px;height:80%;width:1px;background:#85b9aa38;
+}
+.sg .sg-inventory-v32 .sg-inventory-stats small{
+  font-size:clamp(8px,1cqi,11px);letter-spacing:.25px;color:#a9d1cb;
+}
+.sg .sg-inventory-v32 .sg-inventory-stats b{
+  font-size:clamp(12px,1.8cqi,19px);color:#ecf1e5;line-height:1;
+}
+@media (min-width:1101px) and (min-height:621px){
+  .sg .sg-center .sg-inventory-v32{
+    height:39px;min-height:39px;
+    bottom:22px;
+    padding:2px 8px;
+  }
+  .sg .sg-center .sg-market{padding-bottom:65px;}
+}
+/* Step 4: portrait uses intentional game-board panels instead of a
+   landscape strip, and its six-round widget is always legible. */
+@media (orientation:portrait) and (max-width:1100px),
+       (orientation:portrait) and (max-height:620px) {
+  .sg .sg-header{
+    display:grid;grid-template-columns:minmax(0,1fr) auto;
+    grid-template-rows:37px 39px;
+    grid-template-areas:'brand actions' 'round round';
+    height:78px;min-height:78px;max-height:78px;
+    gap:0 7px;padding:0 8px 3px;align-items:center;
+  }
+  .sg .sg-header .sg-brand{grid-area:brand;min-width:0;font-size:12px;letter-spacing:.7px;}
+  .sg .sg-header .sg-header-actions{grid-area:actions;min-width:0;gap:4px;}
+  .sg .sg-header .sg-header-actions button{font-size:9px;padding:0 7px;height:28px;}
+  .sg .sg-header .sg-header-round{
+    grid-area:round;display:flex!important;align-items:center;
+    justify-content:space-between;gap:9px;height:37px;min-height:37px;
+    border:1px solid #6c988a88;border-radius:8px;
+    padding:3px 10px;background:linear-gradient(100deg,#1d4651,#102b39);
+  }
+  .sg .sg-header .sg-header-round>span{font-size:10px;letter-spacing:1.1px;white-space:nowrap;}
+  .sg .sg-header .sg-header-round strong{font-size:16px;white-space:nowrap;}
+  .sg .sg-header .sg-header-round .sg-round-colors{display:none!important;}
+  .sg .sg-header .sg-header-round .sg-round-mobile-colors{
+    display:flex!important;flex:1 1 auto;align-items:center;
+    justify-content:space-around;gap:3px;padding-left:9px;
+    border-left:1px solid #709e9880;min-width:0;
+  }
+  .sg .sg-header .sg-round-mobile-color{
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+    justify-content:center;min-width:22px;height:32px;flex:0 1 35px;
+    border:1px solid transparent;border-radius:5px;padding:2px;
+    opacity:.83;
+  }
+  .sg .sg-header .sg-round-mobile-color small{
+    font-size:9px;font-weight:800;line-height:10px;color:#bbd8d0;
+  }
+  .sg .sg-header .sg-round-mobile-color .sg-color-dot{
+    display:block;position:static;width:11px;height:11px;
+    min-width:11px;min-height:11px;transform:rotate(45deg);
+  }
+  .sg .sg-header .sg-round-mobile-color-active{
+    border-color:#e9d69c;background:#8c765336;opacity:1;
+  }
+  .sg .sg-header .sg-round-mobile-color-active small{color:#ffdf9c;}
+  .sg .sg-mobile-layout{
+    height:calc(100dvh - 78px);overflow-y:auto;overflow-x:hidden;
+    display:flex;flex-direction:column;gap:7px;padding:5px 7px 12px;
+    scrollbar-color:#548984 #0e3037;scrollbar-width:thin;
+  }
+  .sg .sg-mobile-players{
+    flex:0 0 auto;min-height:37px;display:flex;flex-wrap:wrap;gap:4px;
+  }
+  .sg .sg-mobile-player{min-height:37px;}
+  .sg .sg-mobile-game{
+    display:flex;flex-direction:column;flex:0 0 auto;
+    min-height:0;gap:9px;width:100%;
+  }
+  .sg .sg-mobile-board{
+    width:100%;height:clamp(390px,54dvh,650px);min-height:390px;flex:0 0 auto;
+  }
+  .sg .sg-mobile-board>.sg-board{width:100%;height:100%;}
+  .sg .sg-mobile-board .sg-board-windows{min-height:0;}
+  .sg .sg-mobile-market{
+    width:100%;height:auto;flex:0 0 auto;min-height:0;gap:7px;
+    display:flex;flex-direction:column;
+  }
+  .sg .sg-mobile-market .sg-market{
+    height:clamp(300px,38dvh,465px);flex:0 0 auto;
+    padding:31px 12px 23px;
+    min-height:300px;min-width:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .sg .sg-mobile-market .sg-panel-title{
+    height:28px;min-height:28px;max-height:28px;
+    padding:0 10px;
+  }
+  .sg .sg-mobile-market .sg-panel-title>span:first-child{font-size:10px;}
+  .sg .sg-mobile-market .sg-market-circle{
+    width:min(calc(88cqi - 14px),calc(100cqb - 52px),380px);
+    max-width:calc(100% - 20px);height:auto;aspect-ratio:1;
+  }
+  .sg .sg-mobile-market .sg-factory{
+    width:clamp(36px,17cqi,59px);height:clamp(36px,17cqi,59px);
+  }
+  .sg .sg-mobile-market .sg-inventory{display:none!important;}
+  .sg .sg-mobile-market .sg-first-token{height:20px;min-height:20px;bottom:0;}
+  .sg .sg-mobile-penalty-strip{
+    display:grid;flex:0 0 auto;width:100%;height:auto;min-height:0;
+    grid-template-columns:repeat(9,minmax(0,1fr));
+    grid-template-rows:20px 47px;gap:4px;
+    padding:7px;border:1px solid #659288ad;border-radius:10px;
+    background:linear-gradient(120deg,#153b44,#0c2a35);
+  }
+  .sg .sg-mobile-penalty-label{
+    grid-column:1/-1;width:auto;height:20px;
+    display:flex;align-items:center;justify-content:flex-start;
+    padding-left:4px;letter-spacing:1px;font-size:10px;font-weight:800;
+    color:#e5d9b7;
+  }
+  .sg .sg-mobile-penalty-step{
+    min-width:0;min-height:43px;display:flex;flex-direction:column;
+    justify-content:space-between;align-items:center;gap:1px;
+    padding:3px 2px;border:1px solid #6b969257;border-radius:7px;
+    color:#d8e8dd;background:linear-gradient(155deg,#244853,#193844);
+  }
+  .sg .sg-mobile-penalty-step small{font-size:8px;color:#96beb9;line-height:9px;}
+  .sg .sg-mobile-penalty-step strong{font:800 13px/1 'Playfair Display',serif;color:#f0e2be;}
+  .sg .sg-mobile-penalty-pawns{display:flex;min-height:6px;gap:2px;align-items:center;}
+  .sg .sg-mobile-penalty-pawns .sg-pawn{height:6px;width:6px;min-width:6px;min-height:6px;}
+  .sg .sg-mobile-penalty-occupied{border-color:#dcc48a;background:#355a58;}
+  .sg .sg-mobile-penalty-final{background:#513744;border-color:#ad7983;}
+  .sg .sg-mobile-penalty-final strong{color:#ffbda7;}
+  .sg .sg-mobile-status{
+    display:flex;width:100%;height:30px;min-height:30px;
+    flex:0 0 30px;font-size:11px;padding:0 9px;
+    border:1px solid #588a8385;
+  }
+  .sg .sg-mobile-overlay-dialog{width:min(96vw,680px);height:min(78dvh,680px);}
+  .sg .sg-mobile-stats{grid-template-columns:1fr 1fr;gap:8px;}
+}
+@media (orientation:portrait) and (max-width:550px) {
+  .sg .sg-mobile-players{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));}
+  .sg .sg-mobile-player{padding:3px 4px;font-size:10px;}
+  .sg .sg-mobile-panel-button{grid-column:span 2;min-height:28px;}
+  .sg .sg-mobile-board{height:clamp(370px,53dvh,560px);min-height:370px;}
+  .sg .sg-mobile-market .sg-market{height:340px;}
+  .sg .sg-mobile-penalty-strip{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-rows:20px repeat(3,42px);
+    gap:4px;
+  }
+  .sg .sg-mobile-penalty-step{min-height:40px;}
+  .sg .sg-mobile-stats{grid-template-columns:minmax(0,1fr);overflow:auto;}
+  .sg .sg-mobile-overlay-dialog{overflow-y:auto;}
+  .sg .sg-header .sg-header-actions .sg-new{min-width:0;}
+}

@@ -1,4 +1,4 @@
-import { Gem, RotateCcw, Sparkles } from 'lucide-react'
+import { Gem, RotateCcw } from 'lucide-react'
 import { patternFor, WINDOW_POINTS } from '../game/engine'
 import type { GlassColor, Player, SlotColor, WindowStrip } from '../game/engine'
 
@@ -15,9 +15,33 @@ export function ornamentBonus(completedSides: number): number {
 export function GlassPiece({ color, placed = true, small = false }: {
   color: SlotColor; placed?: boolean; small?: boolean
 }) {
-  return <span className={`sg-glass sg-glass-${color}${placed ? ' sg-glass-placed' : ' sg-glass-guide'}${small ? ' sg-glass-small' : ''}`}
+  return <span className={`sg-glass sg-glass-${color}${placed ? ' sg-glass-placed sg-gem-faceted' : ' sg-glass-guide'}${small ? ' sg-glass-small' : ''}`}
+    role="img"
+    aria-label={color === 'wild' ? 'Joker' : `${placed ? 'Ułożona tafla' : 'Potrzebny kolor'}: ${colors[color]}`}
     title={color === 'wild' ? 'Dowolny kolor' : `${placed ? 'Tafla' : 'Potrzebny kolor'}: ${colors[color]}`}>
     <span className="sg-glass-inner"/>
+    {placed && <><span className="sg-gem-facet sg-gem-facet-top" aria-hidden="true"/>
+      <span className="sg-gem-facet sg-gem-facet-left" aria-hidden="true"/>
+      <span className="sg-gem-facet sg-gem-facet-right" aria-hidden="true"/>
+      <span className="sg-gem-facet sg-gem-facet-bottom" aria-hidden="true"/></>}
+  </span>
+}
+
+/** The two panes kept in the palace supply the alternating petal colours. */
+function FinishedWindow({ upper, lower }: Pick<WindowStrip, 'upper' | 'lower'>) {
+  return <span className="sg-finished">
+    <svg viewBox="0 0 80 80" aria-hidden="true" focusable="false">
+      <g stroke="#132e37" strokeWidth="1.3" strokeLinejoin="round">
+        {Array.from({length:8}, (_, petal) => <g key={petal}
+          transform={`rotate(${petal * 45} 40 40)`}
+          className={`sg-pane-${(petal % 2 ? lower : upper) ?? 'citrine'}`}>
+          <path d="M40 35 Q26 23 32 12 L40 3 L48 12 Q54 23 40 35Z" fill="var(--sg-ink)"/>
+          <path d="M40 4 L40 32 L33 13Z" fill="#fff" opacity=".3" stroke="none"/>
+          <path d="M40 32 L47 13 Q51 22 40 32Z" fill="var(--sg-ink-dark)" stroke="none"/>
+        </g>)}
+      </g>
+    </svg>
+    <b>GOTOWE</b>
   </span>
 }
 
@@ -29,23 +53,27 @@ function Window({ strip, index, glazier, target, selected, isHumanTurn, onTarget
   const reverse = strip.side === 0 ? strip.back : strip.front
   const canPick = isHumanTurn && target
   return <button type="button" disabled={!canPick} onClick={() => onTarget?.(index)}
-    data-sg-window={index} className={`sg-window${complete ? ' sg-window-completed' : ''}${canPick ? ' sg-window-target' : ''}${glazier === index ? ' sg-window-active' : ''}${selected ? ' sg-window-selecting' : ''}`}
+    data-sg-window={index} data-sg-glazier={glazier === index ? 'true' : undefined} className={`sg-window${complete ? ' sg-window-completed' : ''}${canPick ? ' sg-window-target' : ''}${glazier === index ? ' sg-window-active' : ''}${selected ? ' sg-window-selecting' : ''}`}
     title={`Kwatera ${index + 1}; ${WINDOW_POINTS[index]} pkt${canPick ? '; kliknij, aby ułożyć tafle' : ''}`}>
     <span className="sg-window-head"><span>{String(index + 1).padStart(2, '0')}</span>
-      <span className="sg-window-glazier">{glazier === index ? <Gem size={12}/> : null}</span>
+      <span className="sg-window-glazier" title={glazier === index ? 'Tu stoi witrażysta' : undefined}>{glazier === index ? <Gem size={14} strokeWidth={2.4}/> : null}</span>
       <span>{complete ? '✓' : strip.side === 0 ? 'A' : 'B'}</span></span>
     {!complete && <span className="sg-window-reverse" aria-label="Podgląd drugiej strony">
       {reverse.map((color, i) => <i key={i} className={`sg-color-dot sg-color-dot-${color}`}/>)}</span>}
     <span className="sg-window-lancet">
-      {complete ? <span className="sg-finished"><Sparkles size={20}/><b>GOTOWE</b></span>
+      {complete ? <FinishedWindow upper={strip.upper} lower={strip.lower}/>
         : patternFor(strip).map((color, i) =>
-          <span key={i} data-sg-pane={i} className={`sg-pane${strip.panes[i] ? ' sg-pane-filled' : ''}`}>
-            <GlassPiece color={strip.panes[i] ?? color} placed={!!strip.panes[i]}/>
+          <span key={i} data-sg-pane={i} className={`sg-pane sg-pane-${color}${strip.panes[i] ? ' sg-pane-filled' : ''}`}
+            aria-label={`Piętro ${i + 1}: ${strip.panes[i] ? 'wypełnione' : 'puste'}`}>
+            <span className="sg-pane-lead" aria-hidden="true"/>
+            <span className="sg-pane-socket">
+              {strip.panes[i] ? <GlassPiece color={strip.panes[i]}/> : <span className="sg-pane-empty-diamond" aria-hidden="true"/>}
+            </span>
           </span>)}
     </span>
     <span className="sg-window-foot"><span className="sg-window-kept">
-      <span>{strip.upper ? <GlassPiece color={strip.upper} small/> : <i/>}</span>
-      <span>{strip.lower ? <GlassPiece color={strip.lower} small/> : <i/>}</span>
+      <span className="sg-kept-slot" title={strip.upper ? 'Górna ozdoba: szkło ułożone' : 'Górna ozdoba: pusta'}>{strip.upper ? <GlassPiece color={strip.upper} small/> : <i className="sg-kept-empty"/>}</span>
+      <span className="sg-kept-slot" title={strip.lower ? 'Dolna ozdoba: szkło ułożone' : 'Dolna ozdoba: pusta'}>{strip.lower ? <GlassPiece color={strip.lower} small/> : <i className="sg-kept-empty"/>}</span>
     </span><b>{WINDOW_POINTS[index]} <small>PKT</small></b></span>
   </button>
 }
@@ -107,18 +135,18 @@ export function GameBoard({ player, index, isCurrent, isHuman = false, isHumanTu
   canReset?: boolean; onReset?: () => void; isStartingPlayer?: boolean; hasFirstToken?: boolean
   palaceSide?: 'A' | 'B'
 }) {
-  const completed = player.strips.filter(s => s.side === 2).length
-  return <section data-sg-board={index} className={`sg-board sg-player-${index} sg-palace-${player.palaceColor ?? 'red'}${isCurrent ? ' sg-board-current' : ''}${isHuman ? ' sg-board-human' : ''}`}
+  return <section data-sg-board={index} className={`sg-board sg-player-${index} sg-palace-${player.palaceColor ?? 'red'}${isCurrent ? ' sg-board-current' : ''}${isHuman ? ' sg-board-human' : ''}${isHumanTurn ? ' sg-board-your-turn' : ''}`}
     aria-label={`Plansza gracza ${player.name} (${player.palaceColor === 'red' ? 'czerwona' : player.palaceColor === 'yellow' ? 'żółta' : player.palaceColor === 'blue' ? 'niebieska' : 'biała'})`}>
+    {isCurrent && <span className="sg-board-turn-rail" aria-hidden="true"/>}
     <div className="sg-board-top">
       <span className={`sg-player-icon sg-player-icon-${index} sg-palace-icon-${player.palaceColor ?? 'red'}`}>{avatars[index]}</span>
-      <span className="sg-board-name">{isHuman && player.name === 'Ty' ? 'Twoje witraże' : player.name} <small className="sg-palace-label">{({red:'CZERWONY', yellow:'ŻÓŁTY', blue:'NIEBIESKI', white:'BIAŁY'} as const)[player.palaceColor ?? 'red']}</small></span>
-      <span className="sg-board-label">{isCurrent ? 'TERAZ GRA' : isStartingPlayer ? 'ROZPOCZĄŁ RUNDĘ' : player.controller === 'human' ? 'GRACZ LOKALNY' : `AI · ${player.difficulty === 'master' ? 'TRENING AI' : player.difficulty === 'expert' ? 'EKSPERT' : player.difficulty === 'hard' ? 'TRUDNY' : player.difficulty === 'easy' ? 'ŁATWY' : 'NORMALNY'}`}</span>
-      {hasFirstToken && <span className="sg-start-tile sg-start-on-board" title="Ten gracz zdobył żeton pierwszego gracza i rozpocznie kolejną rundę">1</span>}
-      <span className="sg-board-stat">{completed}/8 <small>okien</small></span>
-      <span data-sg-break className="sg-board-stat">{player.brokenSteps}/8 <small>stłuczeń</small></span>
+      <span className="sg-board-name">{player.name}</span>
+      {player.controller !== 'human' && <span className="sg-board-label sg-board-ai-level">AI · {player.difficulty === 'master' ? 'TRENING AI' : player.difficulty === 'expert' ? 'EKSPERT' : player.difficulty === 'hard' ? 'TRUDNY' : player.difficulty === 'easy' ? 'ŁATWY' : 'NORMALNY'}</span>}
+      {isCurrent && <span className="sg-board-label sg-board-status sg-board-status-active">TERAZ GRA</span>}
+      {isStartingPlayer && <span className="sg-board-label sg-board-status">ROZPOCZĄŁ RUNDĘ</span>}
+      {hasFirstToken && <span className="sg-start-tile sg-start-on-board" title="Ten gracz zdobył żeton pierwszego gracza i rozpocznie kolejną rundę">+1</span>}
       <strong data-sg-score className="sg-board-score">{player.score}<small> pkt</small></strong>
-      {isHuman && <button type="button" className="sg-reset" onClick={onReset} disabled={!canReset}><RotateCcw size={13}/> Cofnij witrażystę</button>}
+      {isHuman && <button type="button" className="sg-reset sg-glazier-home" onClick={onReset} disabled={!canReset} aria-label="Cofnij znacznik witrażysty na początek" title={canReset ? "Powrót witrażysty na początek — zużywa turę" : "Powrót witrażysty jest teraz niedostępny"}><span className="sg-glazier-home-gem" aria-hidden="true"><Gem size={15}/><RotateCcw size={17}/></span><span>Cofnij znacznik</span></button>}
     </div>
     <div className="sg-board-windows">
       {ORNAMENT_PAIRS.map((_, pairIndex) => <OrnamentPair key={pairIndex}
@@ -126,6 +154,5 @@ export function GameBoard({ player, index, isCurrent, isHuman = false, isHumanTu
         targets={targets} selected={selected} isHumanTurn={isHuman && isHumanTurn}
         onTarget={onTarget} palaceSide={palaceSide}/>)}
     </div>
-    <div className="sg-board-engraving"><span>✥</span><span>SINTRA · PRACOWNIA WITRAŻY</span><span>✥</span></div>
   </section>
 }

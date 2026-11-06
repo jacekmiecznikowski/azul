@@ -37,11 +37,11 @@ describe('local human and bot game configuration', () => {
     const game = newGame({
       opponents:3, seed:12345,
       playerControllers:['human','ai','human','ai'],
-      playerNames:['Kasia','IGNORED','Marek','IGNORED'],
+      playerNames:['Kasia','Ada','Marek','Leon'],
       botDifficulties:['hard','expert','master'],
     })
     expect(game.players.map(p=>p.controller)).toEqual(['human','ai','human','ai'])
-    expect(game.players.map(p=>p.name)).toEqual(['Kasia','Aurora','Marek','Noctis'])
+    expect(game.players.map(p=>p.name)).toEqual(['Kasia','Ada','Marek','Leon'])
     expect(game.players.map(p=>p.difficulty)).toEqual([undefined,'hard',undefined,'master'])
   })
 

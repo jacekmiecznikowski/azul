@@ -44,8 +44,23 @@ export function GameMenu({
       <Settings2 size={16}/><span>Menu</span><ChevronDown size={13} className={open ? 'sg-menu-chevron-open' : ''}/>
     </button>
     {open && <div className="sg-menu-popup" role="group" aria-label="Menu gry">
+      <SettingsControls {...{effectsEnabled, reducedMotion, toggleEffects, musicEnabled, musicUnavailable, toggleMusic, soundEnabled, toggleSound}}/>
+      <div className="sg-menu-divider"/>
+      <span className="sg-menu-title">POMOC I ANALIZA</span>
+      <button type="button" className="sg-menu-item" onClick={() => { setOpen(false); openStrategy() }}>
+        <BrainCircuit size={17}/><span><b>Strategia</b><small>Wskazówki i laboratorium AI</small></span>
+      </button>
+      <button type="button" className="sg-menu-item" onClick={() => { setOpen(false); openRules() }}>
+        <BookOpen size={17}/><span><b>Zasady gry</b><small>Jak grać w Sintrę</small></span>
+      </button>
+    </div>}
+  </div>
+}
+
+export function SettingsControls({effectsEnabled, reducedMotion, toggleEffects, musicEnabled, musicUnavailable, toggleMusic, soundEnabled, toggleSound}: Omit<GameMenuProps, "openStrategy" | "openRules">) {
+return <div className="sg-settings-controls">
       <span className="sg-menu-title">DŹWIĘK I WYGLĄD</span>
-      <button type="button" className="sg-menu-item sg-music-toggle" onClick={toggleMusic}
+      <button type="button" className="sg-menu-item sg-setting-music" onClick={toggleMusic}
         aria-pressed={musicEnabled && !musicUnavailable} aria-label="Muzyka w tle"
         title={musicUnavailable ? 'Nie znaleziono pliku public/background.mp3' : 'Włącz lub wyłącz muzykę w tle'}>
         <Music2 size={17}/>
@@ -62,17 +77,11 @@ export function GameMenu({
       <button type="button" className="sg-menu-item sg-menu-effects" onClick={toggleEffects}
         disabled={reducedMotion} aria-pressed={effectsEnabled && !reducedMotion}>
         <Sparkles size={17}/>
-        <span><b>Efekty wizualne</b><small>{reducedMotion ? 'Ograniczone przez ustawienia systemowe' : 'Błyski szkła, odpryski i punkty'}</small></span>
+        <span><b>Efekty wizualne</b><small>{reducedMotion
+          ? 'Minimum animacji — ustawienia systemowe'
+          : effectsEnabled ? 'Rundy, tury, błyski szkła i punkty'
+          : 'Minimalne komunikaty bez animacji'}</small></span>
         <i className="sg-menu-switch" aria-hidden="true"/>
       </button>
-      <div className="sg-menu-divider"/>
-      <span className="sg-menu-title">POMOC I ANALIZA</span>
-      <button type="button" className="sg-menu-item" onClick={() => { setOpen(false); openStrategy() }}>
-        <BrainCircuit size={17}/><span><b>Strategia</b><small>Wskazówki i laboratorium AI</small></span>
-      </button>
-      <button type="button" className="sg-menu-item" onClick={() => { setOpen(false); openRules() }}>
-        <BookOpen size={17}/><span><b>Zasady gry</b><small>Jak grać w Sintrę</small></span>
-      </button>
-    </div>}
-  </div>
+</div>
 }

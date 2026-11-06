@@ -1,0 +1,124 @@
+/* v49 — stable glass geometry.
+ * Shared center tiles keep the SAME size at 1, 2, 3, 4 or 5 colors.
+ * No grid-auto-rows based on item count; no width/height:auto distortion.
+ * All faceted diamonds remain strictly square and centered.
+ */
+.sg .sg-market .sg-market-orbit-v46 {
+  /* A single measurement for EVERY loose gem, whether it is in a round
+     workshop or in the shared oval. The playable glass markup is identical. */
+  --sg-shared-gem: min(var(--sg-play-gem), calc(var(--sg-disc-size) * 0.60));
+}
+.sg .sg-market .sg-center-pile.sg-center-v45 {
+  width:41%;
+  height:46%;
+  min-width:0;
+  min-height:0;
+  padding:2%;
+  gap:3px;
+  border-radius:46% / 50%;
+  overflow:hidden;
+}
+.sg .sg-market .sg-center-tokens.sg-center-tokens-v45 {
+  display:flex;
+  flex:1 1 0;
+  flex-direction:row;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-content:center;
+  align-items:center;
+  gap:4px;
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  overflow:hidden;
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice {
+  box-sizing:border-box;
+  display:flex;
+  flex:0 0 calc((100% - 4px) / 2);
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  width:calc((100% - 4px) / 2);
+  height:min(35px,calc((100% - 8px) / 3));
+  min-width:0;
+  min-height:0;
+  max-width:none;
+  max-height:none;
+  padding:2px 4px;
+  border-radius:6px;
+  container-type:size;
+  overflow:hidden;
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice .sg-glass.sg-gem-faceted {
+  box-sizing:border-box;
+  flex:0 0 auto;
+  display:block;
+  width:min(var(--sg-shared-gem), 77cqb, 49cqi);
+  height:min(var(--sg-shared-gem), 77cqb, 49cqi);
+  aspect-ratio:1;
+  max-width:none;
+  max-height:none;
+  min-width:0;
+  min-height:0;
+  margin:0;
+  transform:none;
+  border-radius:0;
+}
+.sg .sg-market .sg-center-v45 .sg-center-choice b {
+  flex:0 0 auto;
+  font-size:clamp(9px, 1.7cqb, 12px);
+  line-height:1;
+}
+.sg .sg-market .sg-factory-v45 .sg-market-token .sg-glass.sg-gem-faceted {
+  width:min(var(--sg-shared-gem), 91cqi, 91cqb);
+  height:min(var(--sg-shared-gem), 91cqi, 91cqb);
+  min-width:0;
+  min-height:0;
+  max-width:none;
+  max-height:none;
+  aspect-ratio:1;
+  transform:none;
+}
+.sg .sg-market .sg-center-v45 .sg-center-quiet {
+  flex:1 1 100%;
+  min-height:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+/* On mobile the center is physically smaller, but its gems still stay square
+   and don't become wide lozenges when the count changes. */
+.sg .sg-mobile-market .sg-center-pile.sg-center-v45 {
+  width:43%;
+  height:44%;
+  padding:1.5%;
+}
+.sg .sg-mobile-market .sg-center-v45 .sg-center-choice {
+  min-height:0;
+  gap:1px;
+  padding:1px 2px;
+}
+.sg .sg-mobile-market .sg-center-v45 .sg-center-choice .sg-glass.sg-gem-faceted {
+  width:min(var(--sg-shared-gem), 77cqb, 49cqi);
+  height:min(var(--sg-shared-gem), 77cqb, 49cqi);
+  max-width:none;
+  max-height:none;
+}
+/* Override the older tiny-panel grid reassertion without resizing gems
+   according to the number of visible center colors. */
+@container sg-market (max-width:300px) {
+  .sg .sg-market .sg-center-tokens.sg-center-tokens-v45 {
+    display:flex;
+    flex-wrap:wrap;
+    align-content:center;
+    justify-content:center;
+    grid-template-columns:none;
+    grid-auto-rows:auto;
+  }
+  .sg .sg-market .sg-center-pile.sg-center-v45 {
+    width:43%;
+    height:41%;
+  }
+}
