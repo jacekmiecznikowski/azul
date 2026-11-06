@@ -474,8 +474,8 @@ i systemowym Edge WebView2 (bez dołączonego silnika Electron/Chromium).
 
 ### Najprościej: gotowy EXE z GitHub Actions (bez instalacji Rusta)
 
-1. Otwórz repozytorium na GitHubie → **Actions**.
-2. Wybierz **Portable Windows EXE (Tauri)** → **Run workflow** → uruchom na `main`.
+1. Zaloguj się na GitHub i otwórz **Actions** w repozytorium.
+2. Wybierz **Windows EXE** → otwórz ostatnią udaną kompilację z `main`. Aby zbudować ją ponownie, wybierz **Run workflow**.
 3. Po zakończeniu zadania pobierz artefakt **SintraGlass-Portable-Win64**.
 4. Rozpakuj `SintraGlass-Portable-Win64.zip` i uruchom **SintraGlass.exe**.
 
@@ -541,7 +541,7 @@ EXE nadal potrzebuje systemowego WebView2, które na komputerze bez niego
 może wymagać jednorazowego doinstalowania. Po zapewnieniu runtime sama gra
 nie wymaga sieci.
 
-## Android — aktualny kod gry, wersja mobilna (v25)
+## Android — testowa wersja APK
 
 Android jest budowany z najnowszej gałęzi `main`, a **nie z dawnej v7**.
 Capacitor 8 pakuje do APK cały lokalny frontend (również muzykę `background.mp3`,
@@ -551,9 +551,9 @@ czytelny układ: pełna plansza wybranego gracza, warsztaty obok,
 przełączanie między graczami oraz panele wyników i historii.
 Duży, czteroosobowy stół desktopowy pozostaje bez zmian.
 
-**Zbudowanie przez GitHub:** Actions → **Android APK (current main, mobile layout)**
+**Zbudowanie przez GitHub:** Actions → **Android APK**
 → uruchom workflow lub pobierz ostatnią udaną kompilację → artefakt
-`SintraGlass-Android-Main-Mobile` → `app-debug.apk`.
+`SintraGlass-Android` → `app-debug.apk`.
 
 **Na Windows (z Android SDK i Java 21):**
 ```powershell
@@ -611,7 +611,7 @@ Przy małym oknie (szerokość ≤1180 CSS px lub wysokość ≤640 CSS px)
 automatycznie wyświetlany jest sprawdzony układ kompaktowy także na PC.
 Wszystkie testy i buildy trzech wersji trzeba sprawdzać po zmianach wspólnego UI.
 
-APK v29: <https://github.com/jacekmiecznikowski/azul/releases/tag/android-v29-preview> (publiczny prerelease, bez logowania).
+Archiwalne wydanie v29. Aktualny pakiet znajdziesz w [kompilacjach Android APK](https://github.com/jacekmiecznikowski/azul/actions/workflows/android-apk.yml).
 
 
 ## v30 — poprawka regresji laptop/2K/4K
